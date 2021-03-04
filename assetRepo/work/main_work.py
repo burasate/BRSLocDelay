@@ -1,6 +1,6 @@
 """
-BRS LOCATOR TRANSFER
-create mimic translate and rotate animation
+BRS LOCATOR DELAY
+easy ovelaping animation
 """
 
 import urllib,os
@@ -13,6 +13,8 @@ def formatPath(path):
 
 mayaAppDir = formatPath(mel.eval('getenv MAYA_APP_DIR'))
 scriptsDir = formatPath(mayaAppDir + os.sep + 'scripts')
+projectDir = formatPath(scriptsDir + os.sep + 'BRSLocDelay')
+locDelayFile = formatPath(projectDir + os.sep + 'BRSLocDelaySystem.py')
 
 url = 'https://raw.githubusercontent.com/burasate/animTransferLoc/master/main.py'
 for i in range(3):
