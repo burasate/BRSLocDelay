@@ -584,7 +584,7 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
 
     getBRSEventRec(eventName='ovelape', eventStartTime=eventStartTime, selectList=targetList,
                    mode=mode, distance=distance, dynamic=dynamic, offset=offset,
-                   isSmoothness=smoothness, breakdown=0)
+                   isSmoothness=smoothness, breakdown='')
 
 
 
