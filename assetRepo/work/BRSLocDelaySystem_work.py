@@ -584,8 +584,6 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
                    mode=mode, distance=distance, dynamic=dynamic, offset=offset,
                    isSmoothness=smoothness, breakdown='')
 
-
-
 """
 -----------------------------------------------------------------------
 Do Set Keyframe
