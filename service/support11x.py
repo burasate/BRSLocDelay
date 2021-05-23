@@ -7,7 +7,7 @@ Support Service V1.1X
 
 import json, getpass, os, time,urllib,os,sys
 from time import gmtime, strftime
-from datetime import datetime as dt
+import datetime as dt
 from maya import mel
 import maya.cmds as cmds
 
@@ -39,14 +39,14 @@ def getBRSEventRec(eventName,eventStartTime,selectList=[],
     eventStopTime = time.time()
 
     userData = json.load(open(userFile, 'r'))
-    print ('prepare....')
+    print ('prepare.date ttttt...')
     data = {
-        'dateTime' : dt.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'dateTime' : dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'timezone' : str( strftime('%z', gmtime()) ),
-        'year' : dt.now().strftime('%Y'),
-        'month' : dt.now().strftime('%m'),
-        'day' : dt.now().strftime('%d'),
-        'hour' : dt.now().strftime('%H'),
+        'year' : dt.datetime.now().strftime('%Y'),
+        'month' : dt.datetime.now().strftime('%m'),
+        'day' : dt.datetime.now().strftime('%d'),
+        'hour' : dt.datetime.now().strftime('%H'),
         'email' : userData['email'],
         'user' : getpass.getuser(),
         'maya' : str(cmds.about(version=True)),
