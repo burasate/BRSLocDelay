@@ -19,7 +19,9 @@ FOR DEVELOPE
 -----------------------------------------------------------------------
 """
 
-def getBRSEventRec(*_):
+def getBRSEventRec(eventName, eventStartTime, selectList,
+                   mode, distance, dynamic, offset,
+                   isSmoothness, breakdown):
     #waiting for support service
     pass
 
