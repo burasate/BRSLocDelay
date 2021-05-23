@@ -79,7 +79,7 @@ def getBRSEventRec(eventName,eventStartTime,selectList=[],
     params = urllib.urlencode(data)
     conn = urllib.urlopen('{}?{}'.format(url, params))
     print(conn.read())
-    print(conn.info())
+    #print(conn.info())
 
 # Supporter Coding
 # Force Update for 1 month since 1 oct 2020
