@@ -584,8 +584,6 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
                    mode=mode, distance=distance, dynamic=dynamic, offset=offset,
                    isSmoothness=smoothness, breakdown='')
 
-
-
 """
 -----------------------------------------------------------------------
 Do Set Keyframe
@@ -811,7 +809,7 @@ MAIN UI SETUP
 
 winID = 'BRSLDSWINDOWW'
 winWidth = 300
-verName = 'LOCATOR DELAY - {}'.format(str(userS['version']))
+verName = 'LOCATOR DELAY - {}'.format(str(BRSVersion))
 
 colorSet = {
     'bg': (.2, .2, .2),

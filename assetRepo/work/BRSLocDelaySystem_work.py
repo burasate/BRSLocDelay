@@ -809,7 +809,7 @@ MAIN UI SETUP
 
 winID = 'BRSLDSWINDOWW'
 winWidth = 300
-verName = 'LOCATOR DELAY - {}'.format(str(userS['version']))
+verName = 'LOCATOR DELAY - {}'.format(str(BRSVersion))
 
 colorSet = {
     'bg': (.2, .2, .2),
