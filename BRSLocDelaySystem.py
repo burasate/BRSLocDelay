@@ -18,9 +18,9 @@ from time import gmtime, strftime
 FOR DEVELOPE
 -----------------------------------------------------------------------
 """
-def getBRSEventRec(*_):
+#def getBRSEventRec(*_):
     #waiting for support service
-    pass
+    #pass
 
 """
 -----------------------------------------------------------------------
