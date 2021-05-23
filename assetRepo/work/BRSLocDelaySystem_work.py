@@ -957,8 +957,8 @@ cmds.setParent('..')
 cmds.rowLayout(h=20, numberOfColumns=4, columnWidth4=(70, 50, 150, 10), adjustableColumn=3, columnAlign=(1, 'right'),
                columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)])
 cmds.text(l='Distance  ', al='right')
-distanceT = cmds.floatField(editable=True,value=0,pre=1,min=0,max=100)
-distanceS = cmds.floatSlider(minValue=1, maxValue=100, value=2)
+distanceT = cmds.floatField(editable=True,value=0,pre=1,min=0,max=250)
+distanceS = cmds.floatSlider(minValue=1, maxValue=250, value=2)
 cmds.button(l=' ? ',annotation='Distance from selecion to locator')
 cmds.setParent('..')
 
