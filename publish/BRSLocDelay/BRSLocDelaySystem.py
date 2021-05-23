@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.15--------------------------------
+---------------------------V.1.17--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
@@ -17,7 +17,9 @@ import datetime as dt
 FOR DEVELOPE
 -----------------------------------------------------------------------
 """
-
+def getBRSEventRec(*_):
+    #wait for support service
+    pass
 
 """
 -----------------------------------------------------------------------
@@ -36,7 +38,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-BRSVersion = 1.15
+BRSVersion = 1.17
 userS = {
     'version' : BRSVersion
     }
@@ -159,6 +161,7 @@ def loadDelayPreset(*_):
         configS['locDistance'] = dataS['locDistance']
         configS['locDynamic'] = dataS['locDynamic']
         configS['locOffset'] = dataS['locOffset']
+        cmds.checkBox(smoothnessChk,e=True, value=dataS['smoothness'])
         BRSModeUpdate()
         BRSUpdateUI()
         cmds.inViewMessage(amg='BRS Delay : Loaded  <hl>{}</hl>  Preset'.format(pName), pos='botCenter', fade=True,
@@ -307,6 +310,7 @@ def createGuide(mode, distance=int):
             cmds.setAttr(newGuideName + '.overrideEnabled', 1)
             cmds.setAttr(newGuideName + '.overrideRGBColors', 1)
             cmds.setAttr(newGuideName + '.overrideColorRGB', 1.0, 0.8, 0.0)
+            cmds.setAttr(newGuideName + '.displayRotatePivot', 1)
             # Move to group
             try:
                 cmds.select(guideGrpName)
@@ -319,16 +323,22 @@ def createGuide(mode, distance=int):
             if mode == 'Rotation':
                 if configS['aimX'] == True and configS['aimInvert'] == False:  # +X
                     cmds.rotate(0, 0, -90, newGuideName, r=True, os=True, fo=True)
+                    cmds.setAttr(newGuideName + '.overrideColorRGB', 1.0, 0.0, 0.0)
                 if configS['aimX'] == True and configS['aimInvert'] == True:  # -X
                     cmds.rotate(0, 0, 90, newGuideName, r=True, os=True, fo=True)
+                    cmds.setAttr(newGuideName + '.overrideColorRGB', 1.0, 0.0, 0.0)
                 if configS['aimY'] == True and configS['aimInvert'] == False:  # +Y
+                    cmds.setAttr(newGuideName + '.overrideColorRGB', 0.0, 1.1, 0.0)
                     pass  # Is Already Y
                 if configS['aimY'] == True and configS['aimInvert'] == True:  # -Y
                     cmds.rotate(0, 0, 180, newGuideName, r=True, os=True, fo=True)
+                    cmds.setAttr(newGuideName + '.overrideColorRGB', 0.0, 1.0, 0.0)
                 if configS['aimZ'] == True and configS['aimInvert'] == False:  # +Z
                     cmds.rotate(90, 0, 0, newGuideName, r=True, os=True, fo=True)
+                    cmds.setAttr(newGuideName + '.overrideColorRGB', 0.0, 0.0, 1.0)
                 if configS['aimZ'] == True and configS['aimInvert'] == True:  # -Z
                     cmds.rotate(-90, 0, 0, newGuideName, r=True, os=True, fo=True)
+                    cmds.setAttr(newGuideName + '.overrideColorRGB', 0.0, 0.0, 1.0)
                 cmds.move(0, distance, 0, newGuideName, r=True, os=True, wd=True)
             # Constraint
             parentConstraint(newGuideName, target)
@@ -667,16 +677,16 @@ def doSetKey(*_):
             fIndex = fIndex+1
             if fIndex == btween and btwnInt != 0:
                 fIndex = 0
-                print ('{}F key breakdown').format(f)
+                #print ('{}F key breakdown').format(f)
                 cmds.setKeyframe(selectionList, itt='auto', ott='auto', breakdown=1, at=attrList, time=f)
 
             if f in mainKeyframeList:
                 fIndex = 0
-                print ('{}F key frame').format(f)
+                #print ('{}F key frame').format(f)
                 cmds.setKeyframe(selectionList, itt='auto', ott='auto', breakdown=0, at=attrList, time=f)
             elif f in keyframeSortNew and not f in mainKeyframeList:
                 fIndex = 0
-                print ('{}F key special').format(f)
+                #print ('{}F key special').format(f)
                 cmds.setKeyframe(selectionList, itt='auto', ott='auto', breakdown=1, at=attrList, time=f)
 
         # Redraw viewport On
@@ -693,7 +703,18 @@ def doSetKey(*_):
             cmds.delete(locatorList)
 
         # Convert to Key
-        #cmds.keyframe(selectionList, e=True,breakdown=False)
+        """
+        convertKeyDialog = cmds.confirmDialog(
+            title='Insert keyframe',
+            message='Insert as Breakdown or Key',
+            button=['Key', 'Breakdown'],
+            defaultButton='Breakdown',
+            cancelButton='Breakdown',
+            dismissString='Breakdown')
+        if convertKeyDialog == 'Key':
+            cmds.keyframe(selectionList, e=True,breakdown=False)
+        """
+        cmds.keyframe(selectionList, e=True, breakdown=False)
 
         # Finish
         cmds.select(selectionList, r=True)
@@ -765,13 +786,8 @@ cmds.setParent('..')
 cmds.setParent('..')
 cmds.setParent('..')
 
+#WIP
 aboutText = ''
-abouTextU = 'https://raw.githubusercontent.com/burasate/LocatorDelaySystem/master/About'
-try:
-    aboutText = urllib2.urlopen(abouTextU).read()
-except:
-    pass
-
 cmds.columnLayout(w=aboutWinWidth, h=100, adj=True)
 cmds.text(l=aboutText, al='center', h=100)
 cmds.setParent('..')
@@ -933,8 +949,8 @@ cmds.setParent('..')
 cmds.rowLayout(h=20, numberOfColumns=4, columnWidth4=(70, 50, 150, 10), adjustableColumn=3, columnAlign=(1, 'right'),
                columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)])
 cmds.text(l='Distance  ', al='right')
-distanceT = cmds.floatField(editable=True,value=0,pre=1)
-distanceS = cmds.floatSlider(minValue=1, maxValue=50, value=2)
+distanceT = cmds.floatField(editable=True,value=0,pre=1,min=0,max=100)
+distanceS = cmds.floatSlider(minValue=1, maxValue=100, value=2)
 cmds.button(l=' ? ',annotation='Distance from selecion to locator')
 cmds.setParent('..')
 
@@ -977,8 +993,8 @@ cmds.setParent('..')
 cmds.rowLayout(h=20, numberOfColumns=4, columnWidth4=(70, 50, 150, 10), adjustableColumn=3, columnAlign=(1, 'right'),
                columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)])
 cmds.text(l='Offset  ', al='right')
-offsetT = cmds.floatField(editable=True,value=0,pre=1)
-offsetS = cmds.floatSlider(minValue=-3, maxValue=3, value=0)
+offsetT = cmds.floatField(editable=True,value=0,pre=1,min=-10,max=10)
+offsetS = cmds.floatSlider(minValue=-5, maxValue=5, value=0)
 cmds.button(l=' ? ',annotation='Frame offset to delay animation')
 cmds.setParent('..')
 
@@ -997,11 +1013,11 @@ cmds.columnLayout(h=20,bgc=colorSet['shadow']) #Progress
 BRSProgressControl = cmds.progressBar(h=20,minValue=0,maxValue=1,progress=0, width=winWidth-5,vis=False)
 cmds.setParent('..')  # columnLayout
 
-cmds.frameLayout(l='Bake Animation', w=winWidth)
+cmds.frameLayout(l='Keyframe / Breakdown', w=winWidth)
 
 cmds.rowLayout(h=20, numberOfColumns=4, columnWidth4=(70, 50, 150, 10), adjustableColumn=3, columnAlign=(1, 'right'),
                columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)])
-cmds.text(l='Every  ', al='right')
+cmds.text(l='Breakdown  ', al='right')
 breakdownN = cmds.intField(editable=True, value=3)
 cmds.text(l='  Frame', al='left')
 delLocChk = cmds.checkBox(l='Delete Locator', value=True, al='center')
@@ -1047,6 +1063,11 @@ def overlapeCheck(*_):
 UPDATE
 -----------------------------------------------------------------------
 """
+def BRSCheckboxUpdate(*_):
+    configS['locDistance'] = cmds.checkBox(smoothnessChk, q=True, v=True)
+    cmds.checkBox(smoothnessChk, e=True, value=configS['smoothness'])
+    BRSUpdateUI()
+
 def BRSFeildUpdate(*_):
     configS['locDistance'] = round(cmds.floatField(distanceT, q=True, v=True),1)
     configS['locDynamic'] = cmds.intField(dynamicT, q=True, v=True)
@@ -1172,6 +1193,7 @@ def BRSUpdateUI(*_):
     # Set Key Method Check
     #bakeKey = cmds.checkBox(bakeChk, q=True, value=True)
     #breakdown = cmds.checkBox(breakdownChk, q=True, value=True)
+    configS['smoothness'] = cmds.checkBox(smoothnessChk, q=True, value=True)
 
     # Mode
     BRSModeUpdate()
@@ -1185,7 +1207,11 @@ def BRSUpdateUI(*_):
 
     # Hide Distance on Position Mode
     if cmds.optionMenu(mode, q=True, v=True) == 'Position':
-        cmds.floatField(distanceT, e=True, v=0)
+        cmds.floatSlider(distanceS, e=True, minValue=0, v=0)
+        cmds.floatField(distanceT, e=True, v=0, editable=False)
+    else:
+        cmds.floatSlider(distanceS, e=True, minValue=1)
+        cmds.floatField(distanceT, e=True, editable=True)
 
     #Rang Text Update
     minTime = cmds.playbackOptions(q=True, minTime=True)
@@ -1231,17 +1257,7 @@ elif timeUnit.__contains__('df'):
     configS['frameRate'] = int(float(fps))
 
 def locDeylayService(*_):
-    serviceU = 'http://raw.githubusercontent.com/burasate/LocatorDelaySystem/master/Support11x'
-    try:
-        supportS = urllib2.urlopen(serviceU, timeout=15).read()
-        exec (supportS)
-        print ('Locator Delay Support service : on')
-        cmds.text(servStatus,e=True,l='Online')
-    except:
-        print ('Locator Delay Support service : off')
-
-def locDeylayService(*_):
-    serviceU = 'http://raw.githubusercontent.com/burasate/LocatorDelaySystem/master/Support11x'
+    serviceU = 'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/support11x.py'
     try:
         supportS = urllib2.urlopen(serviceU, timeout=15).read()
         exec (supportS)

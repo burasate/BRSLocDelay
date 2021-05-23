@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.16--------------------------------
+---------------------------V.1.17--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
@@ -17,7 +17,9 @@ import datetime as dt
 FOR DEVELOPE
 -----------------------------------------------------------------------
 """
-
+def getBRSEventRec(*_):
+    #wait for support service
+    pass
 
 """
 -----------------------------------------------------------------------
@@ -36,7 +38,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-BRSVersion = 1.16
+BRSVersion = 1.17
 userS = {
     'version' : BRSVersion
     }
@@ -701,6 +703,7 @@ def doSetKey(*_):
             cmds.delete(locatorList)
 
         # Convert to Key
+        """
         convertKeyDialog = cmds.confirmDialog(
             title='Insert keyframe',
             message='Insert as Breakdown or Key',
@@ -710,6 +713,8 @@ def doSetKey(*_):
             dismissString='Breakdown')
         if convertKeyDialog == 'Key':
             cmds.keyframe(selectionList, e=True,breakdown=False)
+        """
+        cmds.keyframe(selectionList, e=True, breakdown=False)
 
         # Finish
         cmds.select(selectionList, r=True)
@@ -781,13 +786,8 @@ cmds.setParent('..')
 cmds.setParent('..')
 cmds.setParent('..')
 
+#WIP
 aboutText = ''
-abouTextU = 'https://raw.githubusercontent.com/burasate/LocatorDelaySystem/master/About'
-try:
-    aboutText = urllib2.urlopen(abouTextU).read()
-except:
-    pass
-
 cmds.columnLayout(w=aboutWinWidth, h=100, adj=True)
 cmds.text(l=aboutText, al='center', h=100)
 cmds.setParent('..')
@@ -1257,17 +1257,7 @@ elif timeUnit.__contains__('df'):
     configS['frameRate'] = int(float(fps))
 
 def locDeylayService(*_):
-    serviceU = 'http://raw.githubusercontent.com/burasate/LocatorDelaySystem/master/Support11x'
-    try:
-        supportS = urllib2.urlopen(serviceU, timeout=15).read()
-        exec (supportS)
-        print ('Locator Delay Support service : on')
-        cmds.text(servStatus,e=True,l='Online')
-    except:
-        print ('Locator Delay Support service : off')
-
-def locDeylayService(*_):
-    serviceU = 'http://raw.githubusercontent.com/burasate/LocatorDelaySystem/master/Support11x'
+    serviceU = 'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/support11x.py'
     try:
         supportS = urllib2.urlopen(serviceU, timeout=15).read()
         exec (supportS)
@@ -1303,3 +1293,4 @@ def showBRSUI(*_):
     finally:
         locDeylayService()
         pass
+print('dev test')
