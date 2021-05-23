@@ -27,7 +27,7 @@ configFile = formatPath(projectDir + os.sep + 'config.json')
 def getBRSEventRec(eventName,eventStartTime,selectList=[],
                    mode='',distance=0.0,dynamic=0,offset=0.0,
                    isSmoothness=0,breakdown=0):
-    global strftime
+    global strftime,gmtime
     if not eventName in ['open','ovelape','bake']:
         return None
 
