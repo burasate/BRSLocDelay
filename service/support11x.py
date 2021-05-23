@@ -3,11 +3,11 @@
 LocatorDelaySystem
 Support Service V1.1X
 ---------------------
-LOG
-- added checking in
 """
-import json,getpass,urllib2,urllib,os,sys
-import datetime as dt
+
+import json, getpass, os, time,urllib,os,sys
+from time import gmtime, strftime
+from datetime import datetime as dt
 from maya import mel
 import maya.cmds as cmds
 
@@ -24,43 +24,58 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-#--------------
-# user
-#--------------
+def getBRSEventRec(eventName,eventStartTime,selectList=[],
+                   mode='',distance=0.0,dynamic=0,offset=0.0,
+                   isSmoothness=0,breakdown=0):
 
-#Check Info
+    if not eventName in ['open','ovelape','bake']:
+        return None
 
-#Time
-date = dt.datetime.today()
-value1 = urllib.quote_plus(str(date))
+    filepath = cmds.file(q=True, sn=True)
+    filename = os.path.basename(filepath)
+    raw_name, extension = os.path.splitext(filename)
+    minTime = cmds.playbackOptions(q=True, minTime=True)
+    maxTime = cmds.playbackOptions(q=True, maxTime=True)
+    eventStopTime = time.time()
 
-#User Info
-data_set = {}
-try:
-    with open(userFile, 'r') as f:
-        data_set = json.load(f)
-except:
-    data_set['email'] = 'user not found  '+ script_dirpath
-    pass
-user = str(getpass.getuser()).upper()
-ma_ver = 'MAYA'+str(cmds.about(version=True))
-ip_host = str(urllib2.urlopen('https://v4.ident.me', timeout=5).read().decode('utf8'))
-value2_list = [data_set['email'],user,ma_ver,ip_host]
-value2 = ','.join(value2_list)
-value2 = urllib.quote_plus(value2)
+    userData = json.load(open(userFile, 'r'))
+    data = {
+        'dateTime' : dt.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'timezone' : str( strftime('%z', gmtime()) ),
+        'year' : dt.now().strftime('%Y'),
+        'month' : dt.now().strftime('%m'),
+        'day' : dt.now().strftime('%d'),
+        'hour' : dt.now().strftime('%H'),
+        'email' : userData['email'],
+        'user' : getpass.getuser(),
+        'maya' : str(cmds.about(version=True)),
+        'ip' : str(urllib2.urlopen('https://v4.ident.me', timeout=5).read().decode('utf8')),
+        'version' : userData['version'],
+        'scene' : raw_name,
+        'timeUnit' : cmds.currentUnit(q=True, t=True),
+        'eventName' : eventName,
+        'eventTime' : eventStopTime - eventStartTime,
+        'timeMin' : minTime,
+        'timeMax' : maxTime,
+        'duration' : maxTime - minTime,
+        'selectCount' : len(selectList),
+        'selectList' : ','.join(selectList),
+        'mode' : mode,
+        'distance' : distance,
+        'dynamic' : dynamic,
+        'offset' : offset,
+        'isSmoothness' : isSmoothness,
+        'breakdown' : breakdown,
+        'lastUpdate' : userData['lastUsedDate'],
+        'used' : userData['used'],
+        'isTrial' : userData['isTrial'],
+        'days' : userData['days'],
+        'registerDate' : userData['registerDate'],
+        'lastUsedDate' : userData['lastUpdate']
+    }
 
-#Action
-value3_list = [str(data_set['version'])]
-value3 = ','.join(value3_list)
-value3 = urllib.quote_plus(value3)
-url = 'https://maker.ifttt.com/trigger/brs_locDlay/with/key/lt6C8G5VRbvc2fOnGjmS5_4J9A_fwtNjQ2VQJ6fO5YK?value1='+value1+'&value2='+value2+'&value3='+value3
-urllib2.urlopen(url, timeout=5).read()
-
-
-# Supporter Coding
-# Force Update for 1 month since 1 oct 2020
-try:
-    updateSource = 'source "'+projectDir.replace('\\','/') + '/BRS_DragNDrop_Update.mel' + '";'
-    mel.eval(updateSource)
-except:
-    pass
+    url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
+    params = urllib.urlencode(data)
+    conn = urllib.urlopen('{}?{}'.format(url, params))
+    print(conn.read())
+    print(conn.info())
