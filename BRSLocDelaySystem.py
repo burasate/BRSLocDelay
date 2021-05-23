@@ -9,7 +9,7 @@
 """
 import maya.cmds as cmds
 from maya import mel
-import json,os,urllib2,sys
+import json,os,urllib2,sys,time
 import datetime as dt
 
 """
@@ -18,7 +18,7 @@ FOR DEVELOPE
 -----------------------------------------------------------------------
 """
 def getBRSEventRec(*_):
-    #wait for support service
+    #waiting for support service
     pass
 
 """
@@ -404,6 +404,7 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
     global lastSelection
     lastSelection = targetList
 
+    eventStartTime = time.time()
     minTime = cmds.playbackOptions(q=True, minTime=True)
     maxTime = cmds.playbackOptions(q=True, maxTime=True)
     frameOffset = 4
@@ -581,6 +582,11 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
     # Redraw viewport On
     cmds.refresh(suspend=False)
 
+    getBRSEventRec(eventName='ovelape', eventStartTime=eventStartTime, selectList=targetList,
+                   mode=mode, distance=distance, dynamic=dynamic, offset=offset,
+                   isSmoothness=smoothness, breakdown=0)
+
+
 
 """
 -----------------------------------------------------------------------
@@ -588,6 +594,7 @@ Do Set Keyframe
 -----------------------------------------------------------------------
 """
 def doSetKey(*_):
+    eventStartTime = time.time()
     #Locator Count
     brsLoc = []
     for obj in cmds.ls( type='locator' ):
@@ -719,6 +726,9 @@ def doSetKey(*_):
         # Finish
         cmds.select(selectionList, r=True)
         progressEnd()
+        getBRSEventRec(eventName='bake', eventStartTime=eventStartTime, selectList=selectionList,
+                       mode='', distance='', dynamic='', offset='',
+                       isSmoothness='', breakdown=btwnInt)
 
     else:
         cmds.confirmDialog(title='No Overlaping Select', message='Select object has overlaping locator.',
@@ -1257,6 +1267,7 @@ elif timeUnit.__contains__('df'):
     configS['frameRate'] = int(float(fps))
 
 def locDeylayService(*_):
+    eventStartTime = time.time()
     serviceU = 'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/support11x.py'
     try:
         supportS = urllib2.urlopen(serviceU, timeout=15).read()
@@ -1265,6 +1276,9 @@ def locDeylayService(*_):
         cmds.text(servStatus,e=True,l='Online')
     except:
         print ('Locator Delay Support service : off')
+    getBRSEventRec(eventName='open', eventStartTime=eventStartTime, selectList=[],
+                   mode='', distance='', dynamic='', offset='',
+                   isSmoothness='', breakdown='')
 
 def showBRSUI(*_):
     global userS
@@ -1293,4 +1307,3 @@ def showBRSUI(*_):
     finally:
         locDeylayService()
         pass
-print('dev test')
