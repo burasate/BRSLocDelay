@@ -40,9 +40,6 @@ userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
 BRSVersion = 1.17
-userS = {
-    'version' : BRSVersion
-    }
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -1282,7 +1279,7 @@ def locDeylayService(*_):
                    isSmoothness='', breakdown='')
 
 def showBRSUI(*_):
-    global userS
+    global BRSVersion
     try:
         with open(userFile, 'r') as jsonFile:
             userS = json.load(jsonFile)

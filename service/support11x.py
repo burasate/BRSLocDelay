@@ -24,7 +24,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-def getBRSEventRec(eventName,eventStartTime,selectList=[],
+def getBRSEventRec(eventName='',eventStartTime=0.0,selectList=[],
                    mode='',distance=0.0,dynamic=0,offset=0.0,
                    isSmoothness=0,breakdown=0):
     global strftime,gmtime,getpass
