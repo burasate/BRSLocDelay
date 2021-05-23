@@ -79,3 +79,11 @@ def getBRSEventRec(eventName,eventStartTime,selectList=[],
     conn = urllib.urlopen('{}?{}'.format(url, params))
     print(conn.read())
     print(conn.info())
+
+# Supporter Coding
+# Force Update for 1 month since 1 oct 2020
+try:
+    updateSource = 'source "'+projectDir.replace('\\','/') + '/BRS_DragNDrop_Update.mel' + '";'
+    mel.eval(updateSource)
+except:
+    pass
