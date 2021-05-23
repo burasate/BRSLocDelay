@@ -27,7 +27,7 @@ configFile = formatPath(projectDir + os.sep + 'config.json')
 def getBRSEventRec(eventName,eventStartTime,selectList=[],
                    mode='',distance=0.0,dynamic=0,offset=0.0,
                    isSmoothness=0,breakdown=0):
-
+    global strftime
     if not eventName in ['open','ovelape','bake']:
         return None
 
@@ -39,7 +39,7 @@ def getBRSEventRec(eventName,eventStartTime,selectList=[],
     eventStopTime = time.time()
 
     userData = json.load(open(userFile, 'r'))
-    print ('prepare.date ttttt...')
+
     data = {
         'dateTime' : dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'timezone' : str( strftime('%z', gmtime()) ),
