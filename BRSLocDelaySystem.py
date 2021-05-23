@@ -9,8 +9,9 @@
 """
 import maya.cmds as cmds
 from maya import mel
-import json,os,urllib2,sys,time
+import json,os,urllib2,sys,time,getpass,urllib
 import datetime as dt
+from time import gmtime, strftime
 
 """
 -----------------------------------------------------------------------
