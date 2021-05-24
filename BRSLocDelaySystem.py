@@ -83,7 +83,7 @@ def locDeylayService(*_):
     getBRSEventRec(eventName='open', eventStartTime=eventStartTime, selectList=[],
                    mode='', distance='', dynamic='', offset='',
                    isSmoothness='', breakdown='')
-
+locDeylayService()
 """
 -----------------------------------------------------------------------
 Any Function
@@ -1298,5 +1298,5 @@ def showBRSUI(*_):
         with open(userFile, 'wb') as jsonFile:
             json.dump(userS, jsonFile, indent=4)
     finally:
-        locDeylayService()
+        #locDeylayService()
         pass
