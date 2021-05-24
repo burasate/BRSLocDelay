@@ -69,7 +69,7 @@ except:
     with open(userFile, 'w') as f:
         json.dump(dataSet, f, indent=4)
 
-else:
+finally:
     # Create Shelf
     topShelf = mel.eval('$nul = $gShelfTopLevel')
     currentShelf = cmds.tabLayout(topShelf, q=1, st=1)
