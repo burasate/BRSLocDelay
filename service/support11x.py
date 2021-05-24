@@ -30,7 +30,6 @@ filename = os.path.basename(filepath)
 raw_name, extension = os.path.splitext(filename)
 minTime = cmds.playbackOptions(q=True, minTime=True)
 maxTime = cmds.playbackOptions(q=True, maxTime=True)
-eventStopTime = time.time()
 
 userData = json.load(open(userFile, 'r'))
 data = {
@@ -47,19 +46,9 @@ data = {
     'version' : userData['version'],
     'scene' : raw_name,
     'timeUnit' : cmds.currentUnit(q=True, t=True),
-    'eventName' : eventName,
-    'eventTime' : eventStopTime - eventStartTime,
     'timeMin' : minTime,
     'timeMax' : maxTime,
     'duration' : maxTime - minTime,
-    'selectCount' : len(selectList),
-    'selectList' : ','.join(selectList),
-    'mode' : mode,
-    'distance' : distance,
-    'dynamic' : dynamic,
-    'offset' : offset,
-    'isSmoothness' : isSmoothness,
-    'breakdown' : breakdown,
     'lastUpdate' : userData['lastUsedDate'],
     'used' : userData['used'],
     'isTrial' : userData['isTrial'],

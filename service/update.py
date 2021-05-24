@@ -59,7 +59,7 @@ else:
 # -------------------------
 # Supporter Coding For 110 - 114
 # -------------------------
-
+"""
 # Presets
 try:
     os.mkdir(presetsDir)
@@ -90,6 +90,7 @@ except:
     }
     with open(presetsDir + os.sep + 'Defualt.json', 'wb') as jsonFile:
         json.dump(DefualtS, jsonFile, indent=4)
+
 
 # User
 try:
@@ -142,6 +143,7 @@ except:
     }
     with open(configFile, 'wb') as jsonFile:
         json.dump(configS, jsonFile, indent=4)
+"""
 
 # .pyc Removal
 pycList = [projectDir + os.sep + 'BRSLocDelaySystem.pyc', projectDir + os.sep + '__init__.pyc']
