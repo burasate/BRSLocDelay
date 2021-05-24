@@ -576,10 +576,6 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
     # Redraw viewport On
     cmds.refresh(suspend=False)
 
-    getBRSEventRec(eventName='ovelape', eventStartTime=eventStartTime, selectList=targetList,
-                   mode=mode, distance=distance, dynamic=dynamic, offset=offset,
-                   isSmoothness=smoothness, breakdown='')
-
 """
 -----------------------------------------------------------------------
 Do Set Keyframe
@@ -718,9 +714,6 @@ def doSetKey(*_):
         # Finish
         cmds.select(selectionList, r=True)
         progressEnd()
-        getBRSEventRec(eventName='bake', eventStartTime=eventStartTime, selectList=selectionList,
-                       mode='', distance='', dynamic='', offset='',
-                       isSmoothness='', breakdown=btwnInt)
 
     else:
         cmds.confirmDialog(title='No Overlaping Select', message='Select object has overlaping locator.',
@@ -1268,9 +1261,6 @@ def locDeylayService(*_):
         cmds.text(servStatus,e=True,l='Online')
     except:
         print ('Locator Delay Support service : off')
-    getBRSEventRec(eventName='open', eventStartTime=eventStartTime, selectList=[],
-                   mode='', distance='', dynamic='', offset='',
-                   isSmoothness='', breakdown='')
 
 def showBRSUI(*_):
     global BRSVersion

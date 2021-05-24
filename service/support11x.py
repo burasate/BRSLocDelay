@@ -24,62 +24,56 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-def getBRSEventRec(eventName='',eventStartTime=0.0,selectList=[],
-                   mode='',distance=0.0,dynamic=0,offset=0.0,
-                   isSmoothness=0,breakdown=0):
-    global strftime,gmtime,getpass
-    if not eventName in ['open','ovelape','bake']:
-        return None
 
-    filepath = cmds.file(q=True, sn=True)
-    filename = os.path.basename(filepath)
-    raw_name, extension = os.path.splitext(filename)
-    minTime = cmds.playbackOptions(q=True, minTime=True)
-    maxTime = cmds.playbackOptions(q=True, maxTime=True)
-    eventStopTime = time.time()
+filepath = cmds.file(q=True, sn=True)
+filename = os.path.basename(filepath)
+raw_name, extension = os.path.splitext(filename)
+minTime = cmds.playbackOptions(q=True, minTime=True)
+maxTime = cmds.playbackOptions(q=True, maxTime=True)
+eventStopTime = time.time()
 
-    userData = json.load(open(userFile, 'r'))
+userData = json.load(open(userFile, 'r'))
+data = {
+    'dateTime' : dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+    'timezone' : str( strftime('%z', gmtime()) ),
+    'year' : dt.datetime.now().strftime('%Y'),
+    'month' : dt.datetime.now().strftime('%m'),
+    'day' : dt.datetime.now().strftime('%d'),
+    'hour' : dt.datetime.now().strftime('%H'),
+    'email' : userData['email'],
+    'user' : getpass.getuser(),
+    'maya' : str(cmds.about(version=True)),
+    'ip' : str(urllib2.urlopen('https://v4.ident.me', timeout=5).read().decode('utf8')),
+    'version' : userData['version'],
+    'scene' : raw_name,
+    'timeUnit' : cmds.currentUnit(q=True, t=True),
+    'eventName' : eventName,
+    'eventTime' : eventStopTime - eventStartTime,
+    'timeMin' : minTime,
+    'timeMax' : maxTime,
+    'duration' : maxTime - minTime,
+    'selectCount' : len(selectList),
+    'selectList' : ','.join(selectList),
+    'mode' : mode,
+    'distance' : distance,
+    'dynamic' : dynamic,
+    'offset' : offset,
+    'isSmoothness' : isSmoothness,
+    'breakdown' : breakdown,
+    'lastUpdate' : userData['lastUsedDate'],
+    'used' : userData['used'],
+    'isTrial' : userData['isTrial'],
+    'days' : userData['days'],
+    'registerDate' : userData['registerDate'],
+    'lastUsedDate' : userData['lastUpdate']
+}
 
-    data = {
-        'dateTime' : dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-        'timezone' : str( strftime('%z', gmtime()) ),
-        'year' : dt.datetime.now().strftime('%Y'),
-        'month' : dt.datetime.now().strftime('%m'),
-        'day' : dt.datetime.now().strftime('%d'),
-        'hour' : dt.datetime.now().strftime('%H'),
-        'email' : userData['email'],
-        'user' : getpass.getuser(),
-        'maya' : str(cmds.about(version=True)),
-        'ip' : str(urllib2.urlopen('https://v4.ident.me', timeout=5).read().decode('utf8')),
-        'version' : userData['version'],
-        'scene' : raw_name,
-        'timeUnit' : cmds.currentUnit(q=True, t=True),
-        'eventName' : eventName,
-        'eventTime' : eventStopTime - eventStartTime,
-        'timeMin' : minTime,
-        'timeMax' : maxTime,
-        'duration' : maxTime - minTime,
-        'selectCount' : len(selectList),
-        'selectList' : ','.join(selectList),
-        'mode' : mode,
-        'distance' : distance,
-        'dynamic' : dynamic,
-        'offset' : offset,
-        'isSmoothness' : isSmoothness,
-        'breakdown' : breakdown,
-        'lastUpdate' : userData['lastUsedDate'],
-        'used' : userData['used'],
-        'isTrial' : userData['isTrial'],
-        'days' : userData['days'],
-        'registerDate' : userData['registerDate'],
-        'lastUsedDate' : userData['lastUpdate']
-    }
+url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
+params = urllib.urlencode(data)
+conn = urllib.urlopen('{}?{}'.format(url, params))
+print(conn.read())
+#print(conn.info())
 
-    url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
-    params = urllib.urlencode(data)
-    conn = urllib.urlopen('{}?{}'.format(url, params))
-    print(conn.read())
-    #print(conn.info())
 
 # Supporter Coding
 # Force Update for 1 month since 1 oct 2020
