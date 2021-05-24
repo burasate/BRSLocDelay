@@ -51,7 +51,7 @@ data = {
     'duration' : maxTime - minTime,
     'lastUpdate' : userData['lastUsedDate'],
     'used' : userData['used'],
-    'isTrial' : userData['isTrial'],
+    'isTrial' : int(userData['isTrial']),
     'days' : userData['days'],
     'registerDate' : userData['registerDate'],
     'lastUsedDate' : userData['lastUpdate']
