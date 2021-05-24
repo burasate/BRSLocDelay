@@ -69,21 +69,6 @@ except :
 
 # Redraw viewport On
 cmds.refresh(suspend=False)
-
-def locDeylayService(*_):
-    eventStartTime = time.time()
-    serviceU = 'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/support11x.py'
-    try:
-        supportS = urllib2.urlopen(serviceU, timeout=15).read()
-        exec (supportS)
-        print ('Locator Delay Support service : on')
-        cmds.text(servStatus,e=True,l='Online')
-    except:
-        print ('Locator Delay Support service : off')
-    getBRSEventRec(eventName='open', eventStartTime=eventStartTime, selectList=[],
-                   mode='', distance='', dynamic='', offset='',
-                   isSmoothness='', breakdown='')
-locDeylayService()
 """
 -----------------------------------------------------------------------
 Any Function
@@ -1273,6 +1258,20 @@ elif timeUnit.__contains__('df'):
     cmds.intField(fpsF, e=True, v=int(float(fps)))
     configS['frameRate'] = int(float(fps))
 
+def locDeylayService(*_):
+    eventStartTime = time.time()
+    serviceU = 'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/support11x.py'
+    try:
+        supportS = urllib2.urlopen(serviceU, timeout=15).read()
+        exec (supportS)
+        print ('Locator Delay Support service : on')
+        cmds.text(servStatus,e=True,l='Online')
+    except:
+        print ('Locator Delay Support service : off')
+    getBRSEventRec(eventName='open', eventStartTime=eventStartTime, selectList=[],
+                   mode='', distance='', dynamic='', offset='',
+                   isSmoothness='', breakdown='')
+
 def showBRSUI(*_):
     global BRSVersion
     try:
@@ -1298,5 +1297,7 @@ def showBRSUI(*_):
         with open(userFile, 'wb') as jsonFile:
             json.dump(userS, jsonFile, indent=4)
     finally:
-        #locDeylayService()
+        locDeylayService()
         pass
+import pprint
+pprint.pprint(globals())
