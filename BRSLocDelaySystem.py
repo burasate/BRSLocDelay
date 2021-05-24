@@ -1299,5 +1299,3 @@ def showBRSUI(*_):
     finally:
         locDeylayService()
         pass
-import pprint
-pprint.pprint(globals())
