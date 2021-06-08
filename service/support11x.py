@@ -30,6 +30,8 @@ filename = os.path.basename(filepath)
 raw_name, extension = os.path.splitext(filename)
 minTime = cmds.playbackOptions(q=True, minTime=True)
 maxTime = cmds.playbackOptions(q=True, maxTime=True)
+referenceList = cmds.ls(references=True)
+nameSpaceList = cmds.namespaceInfo(lon=True)
 
 userData = json.load(open(userFile, 'r'))
 data = {
@@ -54,7 +56,9 @@ data = {
     'isTrial' : int(userData['isTrial']),
     'days' : userData['days'],
     'registerDate' : userData['registerDate'],
-    'lastUsedDate' : userData['lastUpdate']
+    'lastUsedDate' : userData['lastUpdate'],
+    'referenceCount': len(referenceList),
+    'nameSpaceList': ','.join(nameSpaceList)
 }
 
 url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
