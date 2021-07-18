@@ -58,7 +58,8 @@ data = {
     'registerDate' : userData['registerDate'],
     'lastUsedDate' : userData['lastUpdate'],
     'referenceCount': len(referenceList),
-    'nameSpaceList': ','.join(nameSpaceList)
+    'nameSpaceList': ','.join(nameSpaceList),
+    'os' : str(cmds.about(operatingSystem=True))
 }
 
 url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
