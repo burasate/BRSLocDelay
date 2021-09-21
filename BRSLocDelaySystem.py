@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.17--------------------------------
+---------------------------V.1.18--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
@@ -36,7 +36,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-BRSVersion = 1.17
+BRSVersion = 1.18
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -84,11 +84,23 @@ def sortList(driven, driver, reverse=bool):
     return z
 
 
-def snap(object, tatget):
+def snap(object, target):
     # snap object to tatget
-    snapper = cmds.parentConstraint(tatget, object, weight=1.0)
+    snapper = cmds.parentConstraint(target, object, weight=1.0)
     cmds.delete(snapper)
-
+    #Fixing to Object Axis
+    inParent = cmds.listRelatives(object,parent=True)
+    cmds.parent(object, target)
+    cmds.setAttr(object+'.tx',0)
+    cmds.setAttr(object+'.ty',0)
+    cmds.setAttr(object+'.tz',0)
+    cmds.setAttr(object+'.rx',0)
+    cmds.setAttr(object+'.ry',0)
+    cmds.setAttr(object+'.rz',0)
+    if inParent == None:
+        cmds.parent(object,w=True)
+    else:
+        cmds.parent(object,inParent[0])
 
 def parentConstraint(object, tatget):
     cmds.parentConstraint(tatget, object, weight=1.0, maintainOffset=True)
@@ -306,14 +318,13 @@ def createGuide(mode, distance=int):
             cmds.setAttr(newGuideName + '.overrideColorRGB', 1.0, 0.8, 0.0)
             cmds.setAttr(newGuideName + '.displayRotatePivot', 1)
             # Move to group
-            try:
-                cmds.select(guideGrpName)
-            except:
+            if not cmds.objExists(guideGrpName):
                 guideGrp = cmds.group(name=guideGrpName, empty=True)
-                cmds.setAttr(guideGrpName + '.hiddenInOutliner', 1)
+                #cmds.setAttr(guideGrpName + '.hiddenInOutliner', 1)
             cmds.parent(newGuideName, guideGrpName)
             # Align guide curve
             snap(newGuideName, target)
+
             if mode == 'Rotation':
                 if configS['aimX'] == True and configS['aimInvert'] == False:  # +X
                     cmds.rotate(0, 0, -90, newGuideName, r=True, os=True, fo=True)
@@ -333,7 +344,8 @@ def createGuide(mode, distance=int):
                 if configS['aimZ'] == True and configS['aimInvert'] == True:  # -Z
                     cmds.rotate(-90, 0, 0, newGuideName, r=True, os=True, fo=True)
                     cmds.setAttr(newGuideName + '.overrideColorRGB', 0.0, 0.0, 1.0)
-                cmds.move(0, distance, 0, newGuideName, r=True, os=True, wd=True)
+                cmds.move(0, distance, 0, newGuideName, relative=True, objectSpace=True, wd=True)
+
             # Constraint
             parentConstraint(newGuideName, target)
 
@@ -1272,14 +1284,15 @@ def showBRSUI(*_):
                            pos='botCenter', fade=True,
                            fit=250, fst=2000, fot=250)
     else:
-        if userS['isTrial'] == True:
-            verName = '(Trial) LOCATOR DELAY - {}'.format(str(userS['version']))
-        cmds.window(winID, e=True, title=verName)
-        cmds.showWindow(winID)
-        # user
         todayDate = dt.datetime.strptime(userS['lastUsedDate'], '%Y-%m-%d')
         regDate = dt.datetime.strptime(userS['registerDate'], '%Y-%m-%d')
         today = str(dt.date.today())
+        if userS['lastUsedDate'] == today:
+            locDeylayService()
+        if userS['isTrial'] == True:
+            verName = 'LOCATOR DELAY - {}'.format(str(userS['version']))
+        cmds.window(winID, e=True, title=verName)
+        cmds.showWindow(winID)
         userS['lastUsedDate'] = today
         userS['used'] = userS['used'] + 1
         userS['version'] = BRSVersion
@@ -1287,5 +1300,4 @@ def showBRSUI(*_):
         with open(userFile, 'wb') as jsonFile:
             json.dump(userS, jsonFile, indent=4)
     finally:
-        locDeylayService()
         pass
