@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.18--------------------------------
+---------------------------V.1.19--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
@@ -710,7 +710,6 @@ def doSetKey(*_):
             cmds.delete(locatorList)
 
         # Convert to Key
-        """
         convertKeyDialog = cmds.confirmDialog(
             title='Insert keyframe',
             message='Insert as Breakdown or Key',
@@ -720,7 +719,7 @@ def doSetKey(*_):
             dismissString='Breakdown')
         if convertKeyDialog == 'Key':
             cmds.keyframe(selectionList, e=True,breakdown=False)
-        """
+
         cmds.keyframe(selectionList, e=True, breakdown=False)
 
         # Finish
