@@ -720,8 +720,6 @@ def doSetKey(*_):
         if convertKeyDialog == 'Key':
             cmds.keyframe(selectionList, e=True,breakdown=False)
 
-        cmds.keyframe(selectionList, e=True, breakdown=False)
-
         # Finish
         cmds.select(selectionList, r=True)
         progressEnd()
