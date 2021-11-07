@@ -36,7 +36,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-BRSVersion = 1.18
+BRSVersion = 1.19
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
