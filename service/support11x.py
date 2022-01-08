@@ -59,7 +59,8 @@ data = {
     'lastUsedDate' : userData['lastUpdate'],
     'referenceCount': len(referenceList),
     'nameSpaceList': ','.join(nameSpaceList),
-    'os' : str(cmds.about(operatingSystem=True))
+    'os' : str(cmds.about(operatingSystem=True)),
+    'fullName' : 'Locator Delay System'
 }
 
 url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
