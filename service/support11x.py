@@ -35,6 +35,7 @@ nameSpaceList = cmds.namespaceInfo(lon=True)
 
 userData = json.load(open(userFile, 'r'))
 data = {
+    'name' : 'Locator Delay System',
     'dateTime' : dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     'timezone' : str( strftime('%z', gmtime()) ),
     'year' : dt.datetime.now().strftime('%Y'),
@@ -59,8 +60,7 @@ data = {
     'lastUsedDate' : userData['lastUpdate'],
     'referenceCount': len(referenceList),
     'nameSpaceList': ','.join(nameSpaceList),
-    'os' : str(cmds.about(operatingSystem=True)),
-    'fullName' : 'Locator Delay System'
+    'os' : str(cmds.about(operatingSystem=True))
 }
 
 url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
