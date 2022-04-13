@@ -10,9 +10,9 @@ from time import gmtime, strftime
 import datetime as dt
 from maya import mel
 import maya.cmds as cmds
-if sys.version[0] == '3':
+if sys.version[0] == '3': #python 3
     import urllib.request as uLib
-if sys.version[0] == '2':
+else: #python 2
     import urllib as uLib
 
 def formatPath(path):
@@ -68,7 +68,11 @@ data = {
 }
 
 url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
-params = uLib.urlencode(data)
+if sys.version[0] == '3': #python 3
+    import urllib.parse
+    params = urllib.parse.urlencode(data)
+else: #python 2
+    params = uLib.urlencode(data)
 conn = uLib.urlopen('{}?{}'.format(url, params))
 print(conn.read())
 #print(conn.info())
