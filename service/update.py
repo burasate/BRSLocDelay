@@ -6,8 +6,10 @@ from maya import mel
 import os, json, getpass
 import datetime as dt
 if sys.version[0] == '3':
+    writeMode = 'w'
     import urllib.request as uLib
-if sys.version[0] == '2':
+else:
+    writeMode = 'wb'
     import urllib as uLib
 
 def formatPath(path):
@@ -44,13 +46,15 @@ except:
                        button=['OK'])
 else:
     mainReader = open(projectDir + os.sep + 'BRSLocDelaySystem.py', 'r').readlines()
-    mainWriter = open(projectDir + os.sep + 'BRSLocDelaySystem.py', 'w')
+    if sys.version[0] == '3':
+        mainWriter = open(projectDir + os.sep + 'BRSLocDelaySystem.py', 'wb')
+    else:
+        mainWriter = open(projectDir + os.sep + 'BRSLocDelaySystem.py', 'w')
     try:
         urlReader = uLib.urlopen(scriptUpdater).readlines()
         mainWriter.writelines(urlReader)
         mainWriter.close()
         print('Update Successful')
-        # cmds.confirmDialog(title='BRS LOCATOR DELAY UPDATE', message='Update Successful', button=['OK'])
     except:
         mainWriter.writelines(mainReader)
         mainWriter.close()
@@ -91,7 +95,7 @@ except:
         "smoothness": True,
         "isMode": "Rotation"
     }
-    with open(presetsDir + os.sep + 'Defualt.json', 'wb') as jsonFile:
+    with open(presetsDir + os.sep + 'Defualt.json', writeMode) as jsonFile:
         json.dump(DefualtS, jsonFile, indent=4)
 
 
@@ -119,7 +123,7 @@ else:
     #if user == 'PETE2':
         #userS['email'] = 'pete2@m2animation.com'
 
-    with open(userFile, 'wb') as jsonFile:
+    with open(userFile, writeMode) as jsonFile:
         json.dump(userS, jsonFile, indent=4)
 
 # Config
@@ -144,7 +148,7 @@ except:
         'smoothness': True,
         'isMode': 'Rotation',
     }
-    with open(configFile, 'wb') as jsonFile:
+    with open(configFile, writeMode) as jsonFile:
         json.dump(configS, jsonFile, indent=4)
 #"""
 
