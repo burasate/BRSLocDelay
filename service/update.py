@@ -59,7 +59,7 @@ else:
 # -------------------------
 # Supporter Coding For 110 - 114
 # -------------------------
-"""
+#"""
 # Presets
 try:
     os.mkdir(presetsDir)
@@ -107,14 +107,14 @@ else:
     except:
         regDate = dt.datetime.strptime(today, '%Y-%m-%d')
     userS['used'] = userS['used']
-    userS['version'] = 1.14
+    userS['version'] = 1.17
     userS['days'] = abs((regDate - todayDate).days)
     userS['lastUpdate'] = today
 
     # M2A Support
-    user = str(getpass.getuser()).upper()
-    if user == 'PETE2':
-        userS['email'] = 'pete2@m2animation.com'
+    #user = str(getpass.getuser()).upper()
+    #if user == 'PETE2':
+        #userS['email'] = 'pete2@m2animation.com'
 
     with open(userFile, 'wb') as jsonFile:
         json.dump(userS, jsonFile, indent=4)
@@ -143,7 +143,7 @@ except:
     }
     with open(configFile, 'wb') as jsonFile:
         json.dump(configS, jsonFile, indent=4)
-"""
+#"""
 
 # .pyc Removal
 pycList = [projectDir + os.sep + 'BRSLocDelaySystem.pyc', projectDir + os.sep + '__init__.pyc']
