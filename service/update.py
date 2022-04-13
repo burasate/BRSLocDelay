@@ -3,7 +3,7 @@ LOCATOR DELAY SYSTEM UPDATER
 """
 from maya import cmds
 from maya import mel
-import os, json, urllib2, getpass
+import os, json, urllib, getpass
 import datetime as dt
 
 
@@ -43,7 +43,7 @@ else:
     mainReader = open(projectDir + os.sep + 'BRSLocDelaySystem.py', 'r').readlines()
     mainWriter = open(projectDir + os.sep + 'BRSLocDelaySystem.py', 'w')
     try:
-        urlReader = urllib2.urlopen(scriptUpdater, timeout=60).readlines()
+        urlReader = urllib.urlopen(scriptUpdater).readlines()
         mainWriter.writelines(urlReader)
         mainWriter.close()
         print('Update Successful')
