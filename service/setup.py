@@ -3,7 +3,7 @@ LOCATOR DELAY SYSTEM SHELF INSTALLER
 """
 from maya import cmds
 from maya import mel
-import os, json
+import os, json, sys
 import datetime as dt
 
 
@@ -66,8 +66,12 @@ except:
     dataSet['version'] = 0
 
     # Create User
-    with open(userFile, 'w') as f:
-        json.dump(dataSet, f, indent=4)
+    if sys.version[0] == '3':
+        with open(userFile, 'w') as jsonFile:
+            json.dump(dataSet, jsonFile, indent=4)
+    else:
+        with open(userFile, 'wb') as jsonFile:
+            json.dump(dataSet, jsonFile, indent=4)
 
 finally:
     # Create Shelf

@@ -3,21 +3,25 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.19--------------------------------
+---------------------------V.1.20--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
 import maya.cmds as cmds
 from maya import mel
-import json,os,sys,time,getpass,urllib
+import json,os,sys,time,getpass
 import datetime as dt
 from time import gmtime, strftime
-
+if sys.version[0] == '3':
+    import urllib.request as uLib
+if sys.version[0] == '2':
+    import urllib as uLib
 """
 -----------------------------------------------------------------------
 FOR DEVELOPE
 -----------------------------------------------------------------------
 """
+print('python version', sys.version[0])
 
 """
 -----------------------------------------------------------------------
@@ -36,7 +40,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-BRSVersion = 1.19
+BRSVersion = 1.20
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -1246,25 +1250,18 @@ START
 # Get Fps
 timeUnitSet = {'game': 15, 'film': 24, 'pal': 25, 'ntsc': 30, 'show': 48, 'palf': 50, 'ntscf': 60}
 timeUnit = cmds.currentUnit(q=True, t=True)
-
 if timeUnit in timeUnitSet:
     cmds.intField(fpsF, e=True, v=timeUnitSet[timeUnit])
     configS['frameRate'] = int(timeUnitSet[timeUnit])
-elif timeUnit.__contains__('fps'):
-    fps = str(cmds.currentUnit(q=True, t=True))[:-3]
+else:
     cmds.intField(fpsF, e=True, v=int(float(fps)))
-    configS['frameRate'] = int(float(fps))
-elif timeUnit.__contains__('df'):
-    fps = str(cmds.currentUnit(q=True, t=True))[:-2]
-    print int(float(fps))
-    cmds.intField(fpsF, e=True, v=int(float(fps)))
-    configS['frameRate'] = int(float(fps))
+    configS['frameRate'] = 24
 
 def locDeylayService(*_):
     eventStartTime = time.time()
     serviceU = 'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/support11x.py'
     try:
-        supportS = urllib.urlopen(serviceU).read()
+        supportS = uLib.urlopen(serviceU).read()
         exec (supportS)
         print ('Locator Delay Support service : on')
         cmds.text(servStatus,e=True,l='Online')
@@ -1294,7 +1291,11 @@ def showBRSUI(*_):
         userS['used'] = userS['used'] + 1
         userS['version'] = BRSVersion
         userS['days'] = abs((regDate - todayDate).days)
-        with open(userFile, 'wb') as jsonFile:
-            json.dump(userS, jsonFile, indent=4)
+        if sys.version[0] == '3':
+            with open(userFile, 'w') as jsonFile:
+                json.dump(userS, jsonFile, indent=4)
+        else:
+            with open(userFile, 'wb') as jsonFile:
+                json.dump(userS, jsonFile, indent=4)t=4)
     finally:
         pass
