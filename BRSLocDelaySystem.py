@@ -9,7 +9,7 @@
 """
 import maya.cmds as cmds
 from maya import mel
-import json,os,urllib2,sys,time,getpass,urllib
+import json,os,sys,time,getpass,urllib
 import datetime as dt
 from time import gmtime, strftime
 
@@ -1264,7 +1264,7 @@ def locDeylayService(*_):
     eventStartTime = time.time()
     serviceU = 'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/support11x.py'
     try:
-        supportS = urllib2.urlopen(serviceU, timeout=15).read()
+        supportS = urllib.urlopen(serviceU).read()
         exec (supportS)
         print ('Locator Delay Support service : on')
         cmds.text(servStatus,e=True,l='Online')
@@ -1284,7 +1284,8 @@ def showBRSUI(*_):
         todayDate = dt.datetime.strptime(userS['lastUsedDate'], '%Y-%m-%d')
         regDate = dt.datetime.strptime(userS['registerDate'], '%Y-%m-%d')
         today = str(dt.date.today())
-        locDeylayService()
+        if today != todayDate:
+            locDeylayService()
         if userS['isTrial'] == True:
             verName = 'LOCATOR DELAY - {}'.format(str(userS['version']))
         cmds.window(winID, e=True, title=verName)
