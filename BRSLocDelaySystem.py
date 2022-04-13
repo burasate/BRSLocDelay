@@ -1284,8 +1284,7 @@ def showBRSUI(*_):
         todayDate = dt.datetime.strptime(userS['lastUsedDate'], '%Y-%m-%d')
         regDate = dt.datetime.strptime(userS['registerDate'], '%Y-%m-%d')
         today = str(dt.date.today())
-        if userS['lastUsedDate'] == today:
-            locDeylayService()
+        locDeylayService()
         if userS['isTrial'] == True:
             verName = 'LOCATOR DELAY - {}'.format(str(userS['version']))
         cmds.window(winID, e=True, title=verName)
