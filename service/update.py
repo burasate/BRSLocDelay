@@ -3,9 +3,12 @@ LOCATOR DELAY SYSTEM UPDATER
 """
 from maya import cmds
 from maya import mel
-import os, json, urllib, getpass
+import os, json, getpass
 import datetime as dt
-
+if sys.version[0] == '3':
+    import urllib.request as uLib
+if sys.version[0] == '2':
+    import urllib as uLib
 
 def formatPath(path):
     path = path.replace("/", os.sep)
@@ -43,7 +46,7 @@ else:
     mainReader = open(projectDir + os.sep + 'BRSLocDelaySystem.py', 'r').readlines()
     mainWriter = open(projectDir + os.sep + 'BRSLocDelaySystem.py', 'w')
     try:
-        urlReader = urllib.urlopen(scriptUpdater).readlines()
+        urlReader = uLib.urlopen(scriptUpdater).readlines()
         mainWriter.writelines(urlReader)
         mainWriter.close()
         print('Update Successful')

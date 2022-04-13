@@ -5,11 +5,15 @@ Support Service V1.1X
 ---------------------
 """
 
-import json, getpass, os, time,urllib,os,sys
+import json, getpass, time,os,sys
 from time import gmtime, strftime
 import datetime as dt
 from maya import mel
 import maya.cmds as cmds
+if sys.version[0] == '3':
+    import urllib.request as uLib
+if sys.version[0] == '2':
+    import urllib as uLib
 
 def formatPath(path):
     import os
@@ -45,7 +49,7 @@ data = {
     'email' : userData['email'],
     'user' : getpass.getuser(),
     'maya' : str(cmds.about(version=True)),
-    'ip' : str(urllib2.urlopen('http://v4.ident.me', timeout=5).read().decode('utf8')),
+    'ip' : str(uLib.urlopen('http://v4.ident.me').read().decode('utf8')),
     'version' : userData['version'],
     'scene' : raw_name,
     'timeUnit' : cmds.currentUnit(q=True, t=True),
@@ -64,8 +68,8 @@ data = {
 }
 
 url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
-params = urllib.urlencode(data)
-conn = urllib.urlopen('{}?{}'.format(url, params))
+params = uLib.urlencode(data)
+conn = uLib.urlopen('{}?{}'.format(url, params))
 print(conn.read())
 #print(conn.info())
 
