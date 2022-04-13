@@ -1296,6 +1296,6 @@ def showBRSUI(*_):
                 json.dump(userS, jsonFile, indent=4)
         else:
             with open(userFile, 'wb') as jsonFile:
-                json.dump(userS, jsonFile, indent=4)t=4)
+                json.dump(userS, jsonFile, indent=4)
     finally:
         pass
