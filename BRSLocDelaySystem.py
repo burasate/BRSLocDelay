@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.20--------------------------------
+---------------------------V.1.21--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
@@ -13,15 +13,17 @@ import json,os,sys,time,getpass
 import datetime as dt
 from time import gmtime, strftime
 if sys.version[0] == '3':
+    writeMode = 'w'
     import urllib.request as uLib
-if sys.version[0] == '2':
+else:
+    writeMode = 'wb'
     import urllib as uLib
 """
 -----------------------------------------------------------------------
 FOR DEVELOPE
 -----------------------------------------------------------------------
 """
-print('python version', sys.version[0])
+#print('python version', sys.version[0])
 
 """
 -----------------------------------------------------------------------
@@ -40,7 +42,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-BRSVersion = 1.20
+BRSVersion = 1.21
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -62,7 +64,7 @@ except :
         'smoothness': True,
         'isMode': 'Rotation',
     }
-    with open(configFile, 'wb') as jsonFile:
+    with open(configFile, writeMode) as jsonFile:
         json.dump(configS, jsonFile, indent=4)
 
 #preset folder
@@ -206,7 +208,7 @@ def saveDelayPreset(*_):
     if saveDialog == 'Save' and cmds.promptDialog(query=True, text=True) != 'Defualt':
         presetName = cmds.promptDialog(query=True, text=True)
         presetName = str(presetName).replace(' ', '_')
-        with open(presetsDir + os.sep + presetName + '.json', 'wb') as jsonFile:
+        with open(presetsDir + os.sep + presetName + '.json', writeMode) as jsonFile:
             json.dump(configS, jsonFile, indent=4)
         cmds.inViewMessage(amg='BRS Delay : Saved  <hl>{}</hl>  Preset'.format(presetName), pos='botCenter', fade=True,
                            fit=250, fst=1000, fot=250)
@@ -958,7 +960,7 @@ cmds.rowLayout(h=20, numberOfColumns=4, columnWidth4=(70, 50, 150, 10), adjustab
                columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)])
 cmds.text(l='Distance  ', al='right')
 distanceT = cmds.floatField(editable=True,value=0,pre=1,min=0,max=250)
-distanceS = cmds.floatSlider(minValue=1, maxValue=250, value=2)
+distanceS = cmds.floatSlider(minValue=0.01, maxValue=500, value=2)
 cmds.button(l=' ? ',annotation='Distance from selecion to locator')
 cmds.setParent('..')
 
@@ -1295,7 +1297,7 @@ def showBRSUI(*_):
             with open(userFile, 'w') as jsonFile:
                 json.dump(userS, jsonFile, indent=4)
         else:
-            with open(userFile, 'wb') as jsonFile:
+            with open(userFile, writeMode) as jsonFile:
                 json.dump(userS, jsonFile, indent=4)
     finally:
         pass
