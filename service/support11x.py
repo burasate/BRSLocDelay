@@ -85,3 +85,6 @@ try:
     mel.eval(updateSource)
 except:
     pass
+
+# Fix Distance Slider
+cmds.floatSlider(distanceS,e=True, minValue=0.01, maxValue=500, value=2)
