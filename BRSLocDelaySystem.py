@@ -959,7 +959,7 @@ cmds.setParent('..')
 cmds.rowLayout(h=20, numberOfColumns=4, columnWidth4=(70, 50, 150, 10), adjustableColumn=3, columnAlign=(1, 'right'),
                columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)])
 cmds.text(l='Distance  ', al='right')
-distanceT = cmds.floatField(editable=True,value=.1,pre=1,min=0.1,max=500)
+distanceT = cmds.floatField(editable=True,value=0,pre=1,max=500)
 distanceS = cmds.floatSlider(minValue=0.1, maxValue=500, value=2)
 cmds.button(l=' ? ',annotation='Distance from selecion to locator')
 cmds.setParent('..')
@@ -1283,13 +1283,13 @@ def showBRSUI(*_):
         todayDate = dt.datetime.strptime(userS['lastUsedDate'], '%Y-%m-%d')
         regDate = dt.datetime.strptime(userS['registerDate'], '%Y-%m-%d')
         today = str(dt.date.today())
-        if today != todayDate:
+        if today != userS['lastUsedDate']:
             locDeylayService()
+            userS['lastUsedDate'] = today
         if userS['isTrial'] == True:
             verName = 'LOCATOR DELAY - {}'.format(str(userS['version']))
         cmds.window(winID, e=True, title=verName)
         cmds.showWindow(winID)
-        userS['lastUsedDate'] = today
         userS['used'] = userS['used'] + 1
         userS['version'] = BRSVersion
         userS['days'] = abs((regDate - todayDate).days)
