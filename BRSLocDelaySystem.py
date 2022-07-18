@@ -532,7 +532,6 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
 
         # Aim Or Point
         if mode == 'Rotation':
-
             if configS['aimX'] == True and configS['aimY'] == False and configS['aimZ'] == False and configS['aimInvert'] == False:  # X
                 #cmds.aimConstraint(tempLocName, target, aimVector=(1, 0, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
                 cmds.aimConstraint(tempLocName, target, aimVector=(1, 0, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
@@ -553,10 +552,8 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
                 cmds.aimConstraint(tempLocName, target, aimVector=(0, 0, -1), skip='z', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
         elif mode == 'Position':
             if configS['posXZ'] == True:
-                #cmds.pointConstraint(tempLocName, target, weight=1, mo=False, skip='y')
                 cmds.pointConstraint(tempLocName, target, weight=1, mo=False)
             elif configS['posY'] == True:
-                #cmds.pointConstraint(tempLocName, target, weight=1, mo=False, skip=('x', 'z'))
                 cmds.pointConstraint(tempLocName, target, weight=1, mo=False)
             elif configS['posXYZ'] == True:
                 cmds.pointConstraint(tempLocName, target, weight=1, mo=False)
