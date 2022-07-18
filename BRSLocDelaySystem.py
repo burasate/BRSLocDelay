@@ -1256,7 +1256,7 @@ if timeUnit in timeUnitSet:
     cmds.intField(fpsF, e=True, v=timeUnitSet[timeUnit])
     configS['frameRate'] = int(timeUnitSet[timeUnit])
 else:
-    cmds.intField(fpsF, e=True, v=int(float(fps)))
+    cmds.intField(fpsF, e=True, v=int(float(timeUnit)))
     configS['frameRate'] = 24
 
 def locDeylayService(*_):
