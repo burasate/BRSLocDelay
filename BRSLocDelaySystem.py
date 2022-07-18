@@ -1256,8 +1256,9 @@ if timeUnit in timeUnitSet:
     cmds.intField(fpsF, e=True, v=timeUnitSet[timeUnit])
     configS['frameRate'] = int(timeUnitSet[timeUnit])
 else:
+    timeUnit = ''.join([i for i in timeUnit if i.isdigit()])
     cmds.intField(fpsF, e=True, v=int(float(timeUnit)))
-    configS['frameRate'] = 24
+    configS['frameRate'] = timeUnit
 
 def locDeylayService(*_):
     eventStartTime = time.time()
