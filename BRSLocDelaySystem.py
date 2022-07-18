@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.22--------------------------------
+---------------------------V.1.23--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
@@ -42,7 +42,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-BRSVersion = 1.22
+BRSVersion = 1.23
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -1249,9 +1249,20 @@ BRSPresetUIUpdate()
 START
 -----------------------------------------------------------------------
 """
-# Get Fps
+def getFPS(*_):
+    timeUnitSet = {'game': 15, 'film': 24, 'pal': 25, 'ntsc': 30, 'show': 48, 'palf': 50, 'ntscf': 60}
+    timeUnit = cmds.currentUnit(q=True, t=True)
+    if timeUnit in timeUnitSet:
+        return timeUnitSet[timeUnit]
+    else:
+        return float(''.join([i for i in timeUnit if i.isdigit()]))
+
 timeUnitSet = {'game': 15, 'film': 24, 'pal': 25, 'ntsc': 30, 'show': 48, 'palf': 50, 'ntscf': 60}
 timeUnit = cmds.currentUnit(q=True, t=True)
+configS['frameRate'] = getFPS()
+cmds.intField(fpsF, e=True, v=configS['frameRate'])
+
+"""
 if timeUnit in timeUnitSet:
     cmds.intField(fpsF, e=True, v=timeUnitSet[timeUnit])
     configS['frameRate'] = int(timeUnitSet[timeUnit])
@@ -1259,6 +1270,7 @@ else:
     timeUnit = ''.join([i for i in timeUnit if i.isdigit()])
     cmds.intField(fpsF, e=True, v=int(float(timeUnit)))
     configS['frameRate'] = timeUnit
+"""
 
 def locDeylayService(*_):
     eventStartTime = time.time()
