@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.23--------------------------------
+---------------------------V.1.24--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
@@ -42,7 +42,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-BRSVersion = 1.23
+DelayLoc_Version = 1.24
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -381,25 +381,23 @@ Do Overlap
 locName = 'aimLoc'
 tempLocName = 'tempLoc'
 tempParticleName = 'tempParticle'
+tempGimbalLoc = 'gimLoc'
+subGimbalLoc = 'sub_gimLoc'
 
 def clearTemp(*_):
-    try:
-        cmds.delete(locName)
-    except:
-        pass
-    try:
-        cmds.delete(tempLocName)
-    except:
-        pass
-    try:
-        cmds.delete(tempParticleName)
-    except:
-        pass
-    try:
-        cmds.delete(tempLoc)
-    except:
-        pass
-    #print ('Clear Temp Node')
+    clearList = [locName, tempLocName, tempParticleName, tempGimbalLoc, subGimbalLoc]
+    for i in clearList:
+        if cmds.objExists(i):
+            cmds.delete(i)
+
+def setObjColor(objName, rgb=[1, 0.23, 0]):
+    if len(rgb) != 3:
+        return None
+    cmds.setAttr(objName + '.useOutlinerColor', 1)
+    cmds.setAttr(objName + '.outlinerColor', rgb[0], rgb[1], rgb[2])
+    cmds.setAttr(objName + 'Shape.overrideEnabled', 1)
+    cmds.setAttr(objName + 'Shape.overrideRGBColors', 1)
+    cmds.setAttr(objName + 'Shape.overrideColorRGB', rgb[0], rgb[1], rgb[2])
 
 
 def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
@@ -446,15 +444,18 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
         elif mode == 'Position':
             locName = 'posLoc'
             newLocName = target + '_posLoc'
-        # print ('Create '+newLocName)
-        try:
+        if cmds.objExists(target + '_aimLoc'):
             cmds.delete(target + '_aimLoc')
-        except:
-            pass
-        try:
+        if cmds.objExists(target + '_posLoc'):
             cmds.delete(target + '_posLoc')
-        except:
-            pass
+
+        # Get Skip Constraint Attribute
+        translate_at = {'translateX': 'x', 'translateY': 'y', 'translateZ': 'z'}
+        rotate_at = {'rotateX': 'x', 'rotateY': 'y', 'rotateZ': 'z'}
+        t_at = [a for a in cmds.listAttr(target, k=True) if a in list(translate_at)]
+        r_at = [a for a in cmds.listAttr(target, k=True) if a in list(rotate_at)]
+        skip_t_at = [translate_at[a] for a in list(translate_at) if not a in t_at]
+        skip_r_at = [rotate_at[a] for a in list(rotate_at) if not a in r_at]
 
         # Guide to Locator
         cmds.select(target, r=True)
@@ -486,13 +487,11 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
         if mode == 'Position':
             if configS['posXZ'] == True:
                 tempConstn = cmds.pointConstraint(target, tempLocName, weight=1, o=[0,0,0],skip=('x', 'z'))
-                print ('setPoint')
             elif configS['posY'] == True:
                 tempConstn = cmds.pointConstraint(target, tempLocName, weight=1, o=[0,0,0], skip='y')
-                print ('setPoint')
             else :
                 tempConstn = None
-                print ('setPoint')
+            print ('setPoint')
 
         # Bake Locator
         if smoothness:
@@ -518,9 +517,9 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
         #cmds.select(tempLocName, r=True)
         if mode == 'Position':
             if configS['posXZ'] == True:
-                cmds.keyframe(tempLocName,e=True, iub=True, r=True, o='over', tc=offset,at=['translateX','translateZ'])
+                cmds.keyframe(tempLocName,e=True, iub=True, r=True, o='over', tc=offset, at=['translateX','translateZ'])
             elif configS['posY'] == True:
-                cmds.keyframe(tempLocName,e=True, iub=True, r=True, o='over', tc=offset,at=['translateY'])
+                cmds.keyframe(tempLocName,e=True, iub=True, r=True, o='over', tc=offset, at=['translateY'])
             elif configS['posXYZ'] == True:
                 cmds.keyframe(tempLocName,e=True, iub=True, r=True, o='over', tc=offset)
         else:
@@ -530,60 +529,63 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
         cmds.delete(tempParticleName)
         cmds.delete(locName)
 
+        # Gimbal Fix Locator
+        if mode == 'Rotation':
+            cmds.spaceLocator(name=tempGimbalLoc)
+            cmds.spaceLocator(name=subGimbalLoc)
+            cmds.parent(subGimbalLoc, tempGimbalLoc)
+            tempPrConstn = cmds.parentConstraint(target, tempGimbalLoc, weight=1, mo=False)
+            cmds.bakeResults(tempGimbalLoc, simulation=True, t=(minTime,maxTime),
+                             sampleBy=1 * (configS['frameRate'] / 24),
+                             oversamplingRate=1, disableImplicitControl=False, preserveOutsideKeys=True,
+                             sparseAnimCurveBake=False, removeBakedAttributeFromLayer=False,
+                             removeBakedAnimFromLayer=False,
+                             bakeOnOverrideLayer=False, minimizeRotation=True, at=('tx', 'ty', 'tz', 'rx', 'ry', 'rz'))
+            cmds.delete(tempPrConstn)
+            cmds.filterCurve(cmds.keyframe(tempGimbalLoc, q=True, name=True))
+            cmds.pointConstraint(target, tempGimbalLoc, weight=1, mo=False, skip=skip_t_at)
+
         # Aim Or Point
         if mode == 'Rotation':
             if configS['aimX'] == True and configS['aimY'] == False and configS['aimZ'] == False and configS['aimInvert'] == False:  # X
-                #cmds.aimConstraint(tempLocName, target, aimVector=(1, 0, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
-                cmds.aimConstraint(tempLocName, target, aimVector=(1, 0, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
+                cmds.aimConstraint(tempLocName, subGimbalLoc, aimVector=(1, 0, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
             elif configS['aimX'] == False and configS['aimY'] == True and configS['aimZ'] == False and configS['aimInvert'] == False:  # Y
-                #cmds.aimConstraint(tempLocName, target, aimVector=(0, 1, 0), skip='y', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
-                cmds.aimConstraint(tempLocName, target, aimVector=(0, 1, 0), skip='y', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
+                cmds.aimConstraint(tempLocName, subGimbalLoc, aimVector=(0, 1, 0), skip='y', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
             elif configS['aimX'] == False and configS['aimY'] == False and configS['aimZ'] == True and configS['aimInvert'] == False:  # Z
-                #cmds.aimConstraint(tempLocName, target, aimVector=(0, 0, 1), skip='z', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
-                cmds.aimConstraint(tempLocName, target, aimVector=(0, 0, 1), skip='z', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
+                cmds.aimConstraint(tempLocName, subGimbalLoc, aimVector=(0, 0, 1), skip='z', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
             elif configS['aimX'] == True and configS['aimY'] == False and configS['aimZ'] == False and configS['aimInvert'] == True:  # -X
-                #cmds.aimConstraint(tempLocName, target, aimVector=(-1, 0, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
-                cmds.aimConstraint(tempLocName, target, aimVector=(-1, 0, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
+                cmds.aimConstraint(tempLocName, subGimbalLoc, aimVector=(-1, 0, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
             elif configS['aimX'] == False and configS['aimY'] == True and configS['aimZ'] == False and configS['aimInvert'] == True:  # -Y
-                #cmds.aimConstraint(tempLocName, target, aimVector=(0, -1, 0), skip='y', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
-                cmds.aimConstraint(tempLocName, target, aimVector=(0, -1, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
+                cmds.aimConstraint(tempLocName, subGimbalLoc, aimVector=(0, -1, 0), skip='y', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
             elif configS['aimX'] == False and configS['aimY'] == False and configS['aimZ'] == True and configS['aimInvert'] == True:  # -Z
-                #cmds.aimConstraint(tempLocName, target, aimVector=(0, 0, -1), skip='z', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
-                cmds.aimConstraint(tempLocName, target, aimVector=(0, 0, -1), skip='z', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
+                cmds.aimConstraint(tempLocName, subGimbalLoc, aimVector=(0, 0, -1), skip='z', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
+            # Aim Gimbal Lock Fix
+            cmds.orientConstraint(subGimbalLoc, target, weight=1, mo=True, skip=skip_r_at)
         elif mode == 'Position':
             if configS['posXZ'] == True:
-                cmds.pointConstraint(tempLocName, target, weight=1, mo=False)
+                cmds.pointConstraint(tempLocName, target, weight=1, mo=False, skip=skip_t_at)
             elif configS['posY'] == True:
-                cmds.pointConstraint(tempLocName, target, weight=1, mo=False)
+                cmds.pointConstraint(tempLocName, target, weight=1, mo=False, skip=skip_t_at)
             elif configS['posXYZ'] == True:
-                cmds.pointConstraint(tempLocName, target, weight=1, mo=False)
+                cmds.pointConstraint(tempLocName, target, weight=1, mo=False, skip=skip_t_at)
 
         progressStep()
 
         # ReColor And Name
         if mode == 'Position':
-            cmds.setAttr(tempLocName + '.useOutlinerColor', 1)
-            cmds.setAttr(tempLocName + '.outlinerColor', 1, 0.23, 0)
-            cmds.setAttr(tempLocName + 'Shape.overrideEnabled', 1)
-            cmds.setAttr(tempLocName + 'Shape.overrideRGBColors', 1)
-            cmds.setAttr(tempLocName + 'Shape.overrideColorRGB', 1, 0.23, 0)
-            #cmds.setAttr (tempLocName+'.hideOnPlayback',1)
-            cmds.setAttr(tempLocName + 'Shape.localScaleX', 0.25)
-            cmds.setAttr(tempLocName + 'Shape.localScaleY', 0.25)
-            cmds.setAttr(tempLocName + 'Shape.localScaleZ', 0.25)
+            setObjColor(tempLocName, rgb=[1, 0.23, 0])
             newLocName = target + '_posLoc'
         elif mode == 'Rotation':
-            cmds.setAttr(tempLocName + '.useOutlinerColor', 1)
-            cmds.setAttr(tempLocName + '.outlinerColor', 1, 0.8, 0)
-            cmds.setAttr(tempLocName + 'Shape.overrideEnabled', 1)
-            cmds.setAttr(tempLocName + 'Shape.overrideRGBColors', 1)
-            cmds.setAttr(tempLocName + 'Shape.overrideColorRGB', 1, 0.8, 0)
-            #cmds.setAttr(tempLocName + '.hideOnPlayback', 1)
-            cmds.setAttr(tempLocName + 'Shape.localScaleX', 0.25)
-            cmds.setAttr(tempLocName + 'Shape.localScaleY', 0.25)
-            cmds.setAttr(tempLocName + 'Shape.localScaleZ', 0.25)
+            setObjColor(tempLocName, rgb=[1, 0.8, 0])
             newLocName = target + '_aimLoc'
         cmds.rename(tempLocName, newLocName)
+
+        # Fix Gimbal ReColor And Name
+        if mode == 'Rotation':
+            setObjColor(tempGimbalLoc, rgb=[1, 0.8, 0])
+            setObjColor(subGimbalLoc, rgb=[1, 0.8, 0])
+            cmds.rename(tempGimbalLoc, target + '_gimLoc')
+            cmds.rename(subGimbalLoc, target + '_gimLocSub')
 
     # Finish
     cmds.select(targetList, r=True)
@@ -743,7 +745,7 @@ def clearBakedLocator(*_):
     objectList = cmds.ls(type='locator')
     locatorList = []
     for n in objectList:
-        if n.__contains__('aimLoc') or n.__contains__('posLoc'):
+        if '_aimLoc' in n or '_posLoc' in n or '_gimLoc' in n:
             cmds.select(n, r=True)
             cmds.pickWalk(d='up')
             x = (cmds.ls(sl=True)[0])
@@ -786,7 +788,7 @@ cmds.text(l='Author  : ', al='right', h=75/3)
 cmds.setParent('..')
 
 cmds.columnLayout(adj=True)
-cmds.text(l=BRSVersion, al='left', h=75/3)
+cmds.text(l=DelayLoc_Version, al='left', h=75/3)
 servStatus = cmds.text(l='Offline', al='left', h=75/3)
 cmds.text(l='Burasate Uttha', al='left', h=75/3)
 cmds.setParent('..')
@@ -811,7 +813,7 @@ MAIN UI SETUP
 
 winID = 'BRSLDSWINDOWW'
 winWidth = 300
-verName = 'LOCATOR DELAY - {}'.format(str(BRSVersion))
+verName = 'LOCATOR DELAY - {}'.format(str(DelayLoc_Version))
 
 colorSet = {
     'bg': (.2, .2, .2),
@@ -1282,7 +1284,7 @@ def locDeylayService(*_):
         print ('Locator Delay Support service : off')
 
 def showBRSUI(*_):
-    global BRSVersion
+    global DelayLoc_Version
     try:
         with open(userFile, 'r') as jsonFile:
             userS = json.load(jsonFile)
@@ -1302,7 +1304,7 @@ def showBRSUI(*_):
         cmds.window(winID, e=True, title=verName)
         cmds.showWindow(winID)
         userS['used'] = userS['used'] + 1
-        userS['version'] = BRSVersion
+        userS['version'] = DelayLoc_Version
         userS['days'] = abs((regDate - todayDate).days)
         if sys.version[0] == '3':
             with open(userFile, 'w') as jsonFile:
