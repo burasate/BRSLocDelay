@@ -5,6 +5,7 @@ from maya import cmds
 from maya import mel
 import os, json, sys
 import datetime as dt
+import getpass,base64
 
 
 def formatPath(path):
@@ -57,13 +58,14 @@ except:
             break
 
     # Create New Dataset
-    dataSet['isTrial'] = True
+    dataSet['isTrial'] = False
     dataSet['registerDate'] = today
     dataSet['lastUsedDate'] = today
     dataSet['lastUpdate'] = today
     dataSet['days'] = 0
     dataSet['used'] = 0
     dataSet['version'] = 0
+    dataSet['regUser64'] = base64.b64encode(getpass.getuser())
 
     # Create User
     if sys.version[0] == '3':

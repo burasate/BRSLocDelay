@@ -1283,9 +1283,12 @@ def showBRSUI(*_):
         with open(userFile, 'r') as jsonFile:
             userS = json.load(jsonFile)
     except:
-        cmds.inViewMessage(amg='<center><h5>Error can\'t found \"user\" file\nplease re-install</h5></center>',
+        cmds.inViewMessage(amg='<center><h5>Error can\'t install \nplease re-install</h5></center>',
                            pos='botCenter', fade=True,
                            fit=250, fst=2000, fot=250)
+        installSource = 'source "' + projectDir.replace('\\', '/') + '/BRS_DragNDrop_Install.mel' + '";'
+        mel.eval(installSource)
+
     else:
         todayDate = dt.datetime.strptime(userS['lastUsedDate'], '%Y-%m-%d')
         regDate = dt.datetime.strptime(userS['registerDate'], '%Y-%m-%d')
