@@ -52,7 +52,9 @@ except:
         else:
             dataSet['email'] = ''
 
-        if not dataSet['email'].__contains__('@') or not dataSet['email'].__contains__('.'):
+        if not '@' in dataSet['email'] or not '.' in dataSet['email']:
+            pass
+        elif len(dataSet['email'].split('@')[0]) < 3:
             pass
         else:
             break
@@ -64,7 +66,7 @@ except:
     dataSet['lastUpdate'] = today
     dataSet['days'] = 0
     dataSet['used'] = 0
-    dataSet['version'] = 0
+    dataSet['version'] = 1.2
     dataSet['regUser64'] = base64.b64encode(getpass.getuser())
 
     # Create User

@@ -27,8 +27,28 @@ projectDir = formatPath(scriptsDir + os.sep + 'BRSLocDelay')
 presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
+userData = json.load(open(userFile, 'r'))
 
 
+# Supporter Coding
+# Force Update for 1 month since 1 oct 2020
+try:
+    updateSource = 'source "'+projectDir.replace('\\','/') + '/BRS_DragNDrop_Update.mel' + '";'
+    mel.eval(updateSource)
+except:
+    pass
+
+# Fix Distance Slider
+cmds.floatSlider(distanceS,e=True, minValue=0.01, maxValue=500, value=2)
+
+#User Data
+if not 'regUser64' in userData:
+    pass
+    #installSource = 'source "' + projectDir.replace('\\', '/') + '/BRS_DragNDrop_Install.mel' + '";'
+    #mel.eval(installSource)
+
+#===============================================================================
+#Check In
 filepath = cmds.file(q=True, sn=True)
 filename = os.path.basename(filepath)
 raw_name, extension = os.path.splitext(filename)
@@ -37,7 +57,6 @@ maxTime = cmds.playbackOptions(q=True, maxTime=True)
 referenceList = cmds.ls(references=True)
 nameSpaceList = cmds.namespaceInfo(lon=True)
 
-userData = json.load(open(userFile, 'r'))
 data = {
     'name' : 'Locator Delay System',
     'dateTime' : dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -74,17 +93,6 @@ if sys.version[0] == '3': #python 3
 else: #python 2
     params = uLib.urlencode(data)
 conn = uLib.urlopen('{}?{}'.format(url, params))
-print(conn.read())
+#print(conn.read())
 #print(conn.info())
-
-
-# Supporter Coding
-# Force Update for 1 month since 1 oct 2020
-try:
-    updateSource = 'source "'+projectDir.replace('\\','/') + '/BRS_DragNDrop_Update.mel' + '";'
-    mel.eval(updateSource)
-except:
-    pass
-
-# Fix Distance Slider
-cmds.floatSlider(distanceS,e=True, minValue=0.01, maxValue=500, value=2)
+#===============================================================================

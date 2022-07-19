@@ -1296,8 +1296,7 @@ def showBRSUI(*_):
         if today != userS['lastUsedDate']:
             locDeylayService()
             userS['lastUsedDate'] = today
-        if userS['isTrial'] == True:
-            verName = 'LOCATOR DELAY - {}'.format(str(userS['version']))
+        verName = 'LOCATOR DELAY - {}'.format(str(userS['version']))
         cmds.window(winID, e=True, title=verName)
         cmds.showWindow(winID)
         userS['used'] = userS['used'] + 1
