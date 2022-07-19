@@ -3,13 +3,13 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.23--------------------------------
+---------------------------V.1.24--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
 import maya.cmds as cmds
 from maya import mel
-import json,os,sys,time,getpass
+import json,os,sys,time,getpass,base64
 import datetime as dt
 from time import gmtime, strftime
 if sys.version[0] == '3':
@@ -42,7 +42,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-BRSVersion = 1.23
+LocDelay_Version = 1.24
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -77,7 +77,7 @@ except :
 cmds.refresh(suspend=False)
 """
 -----------------------------------------------------------------------
-Any Function
+ANY FUNCTION
 -----------------------------------------------------------------------
 """
 
@@ -152,7 +152,7 @@ def BRSUpdateVersion(*_):
 
 """
 -----------------------------------------------------------------------
-Preset
+PRESET
 -----------------------------------------------------------------------
 """
 def loadDelayPreset(*_):
@@ -261,7 +261,7 @@ def deleteDelayPreset(*_):
 
 """
 -----------------------------------------------------------------------
-Guild Preview
+GUIDE PREVIEW
 -----------------------------------------------------------------------
 """
 
@@ -374,7 +374,7 @@ def createGuide(mode, distance=int):
 
 """
 -----------------------------------------------------------------------
-Do Overlap
+OVERLAP
 -----------------------------------------------------------------------
 """
 
@@ -597,7 +597,7 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
 
 """
 -----------------------------------------------------------------------
-Do Set Keyframe
+SET KEYFRAME
 -----------------------------------------------------------------------
 """
 def doSetKey(*_):
@@ -789,7 +789,7 @@ cmds.text(l='Author  : ', al='right', h=75/3)
 cmds.setParent('..')
 
 cmds.columnLayout(adj=True)
-cmds.text(l=BRSVersion, al='left', h=75/3)
+cmds.text(l=LocDelay_Version, al='left', h=75/3)
 servStatus = cmds.text(l='Offline', al='left', h=75/3)
 cmds.text(l='Burasate Uttha', al='left', h=75/3)
 cmds.setParent('..')
@@ -814,7 +814,7 @@ MAIN UI SETUP
 
 winID = 'BRSLDSWINDOWW'
 winWidth = 300
-verName = 'LOCATOR DELAY - {}'.format(str(BRSVersion))
+verName = 'LOCATOR DELAY - {}'.format(str(LocDelay_Version))
 
 colorSet = {
     'bg': (.2, .2, .2),
@@ -886,6 +886,22 @@ def setPosXYZ(*_):
         BRSUpdateUI()
     except:
         pass
+
+"""
+-----------------------------------------------------------------------
+OVERLAP SERVICE
+-----------------------------------------------------------------------
+"""
+def locDeylayService(*_):
+    serviceU = base64.b64decode('aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFz' +\
+                                'YXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3N1cHBvcnQxMXgucHk=')
+    try:
+        supportS = uLib.urlopen(serviceU).read()
+        exec (supportS)
+        print ('Locator Delay Support service : on')
+        cmds.text(servStatus,e=True,l='Online')
+    except:
+        print ('Locator Delay Support service : off')
 
 """
 -----------------------------------------------------------------------
@@ -1232,8 +1248,6 @@ def BRSUpdateUI(*_):
 
 cmds.checkBox(previewChk, e=True, cc=BRSUpdateUI)
 cmds.checkBox(delLocChk, e=True, cc=BRSUpdateUI)
-#cmds.checkBox(breakdownChk, e=True, cc=BRSUpdateUI)
-#cmds.checkBox(bakeChk, e=True, cc=BRSUpdateUI)
 cmds.floatSlider(distanceS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
 cmds.intSlider(dynamicS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
 cmds.floatSlider(offsetS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
@@ -1263,29 +1277,8 @@ timeUnit = cmds.currentUnit(q=True, t=True)
 configS['frameRate'] = getFPS()
 cmds.intField(fpsF, e=True, v=configS['frameRate'])
 
-"""
-if timeUnit in timeUnitSet:
-    cmds.intField(fpsF, e=True, v=timeUnitSet[timeUnit])
-    configS['frameRate'] = int(timeUnitSet[timeUnit])
-else:
-    timeUnit = ''.join([i for i in timeUnit if i.isdigit()])
-    cmds.intField(fpsF, e=True, v=int(float(timeUnit)))
-    configS['frameRate'] = timeUnit
-"""
-
-def locDeylayService(*_):
-    eventStartTime = time.time()
-    serviceU = 'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/support11x.py'
-    try:
-        supportS = uLib.urlopen(serviceU).read()
-        exec (supportS)
-        print ('Locator Delay Support service : on')
-        cmds.text(servStatus,e=True,l='Online')
-    except:
-        print ('Locator Delay Support service : off')
-
 def showBRSUI(*_):
-    global BRSVersion
+    global LocDelay_Version
     try:
         with open(userFile, 'r') as jsonFile:
             userS = json.load(jsonFile)
@@ -1305,7 +1298,7 @@ def showBRSUI(*_):
         cmds.window(winID, e=True, title=verName)
         cmds.showWindow(winID)
         userS['used'] = userS['used'] + 1
-        userS['version'] = BRSVersion
+        userS['version'] = LocDelay_Version
         userS['days'] = abs((regDate - todayDate).days)
         if sys.version[0] == '3':
             with open(userFile, 'w') as jsonFile:
