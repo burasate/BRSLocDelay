@@ -132,12 +132,7 @@ while userData['email'] == 'burasedborvon@gmail.com':
     if license_prompt == 'Find License Key':
         cmds.launch(web='https://dex3d.gumroad.com/l/hZBQC/hw37nj1discount4you')
     if license_prompt == 'Leter':
-        cmds.floatSlider(distanceS, e=True, enable=False, minValue=0, maxValue=2)
-        cmds.intSlider(dynamicS, e=True, enable=False, minValue=1, maxValue=2)
-        cmds.floatSlider(offsetS, e=True, enable=False, minValue=-0.1, maxValue=0.1)
-        cmds.floatField(distanceT, e=True, visible=False)
-        cmds.intField(dynamicT, e=True, visible=False)
-        cmds.floatField(offsetT, e=True, visible=False)
+        # Do Something
         break
 
 
