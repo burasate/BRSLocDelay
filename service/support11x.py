@@ -135,9 +135,9 @@ while userData['email'] == 'burasedborvon@gmail.com':
         cmds.floatSlider(distanceS, e=True, enable=False)
         cmds.intSlider(dynamicS, e=True, enable=False)
         cmds.floatSlider(offsetS, e=True, enable=False)
-        cmds.floatField(distanceT, e=True, editable=False)
-        cmds.floatField(dynamicT, e=True, editable=False)
-        cmds.floatField(offsetT, e=True, editable=False)
+        cmds.floatField(distanceT, e=True, editable=False, min=2, max=2)
+        cmds.floatField(dynamicT, e=True, editable=False, min=3, max=3)
+        cmds.floatField(offsetT, e=True, editable=False, min=0, max=0)
         break
 
 
