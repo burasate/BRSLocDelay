@@ -114,7 +114,7 @@ def getBRSLicense(licenseKey):
 license_key, license_email = ('', '')
 while userData['email'] == 'burasedborvon@gmail.com':
     license_key, license_email = getBRSLicense(userData['licenseKey'])
-    print(license_key)
+    print(userData['licenseKey'], license_key)
     if not license_key == '':
         userData['licenseKey'] = license_key
         with open(userFile, writeMode) as jsonFile:
@@ -129,7 +129,6 @@ while userData['email'] == 'burasedborvon@gmail.com':
         dismissString='Leter', bgc=(.2, .2, .2))
     if license_prompt == 'Confirm':
         userData['licenseKey'] = cmds.promptDialog(query=True, text=True)
-        license_key, license_email = getBRSLicense(userData['licenseKey'])
     if license_prompt == 'Find License Key':
         cmds.launch(web='https://dex3d.gumroad.com/l/hZBQC/hw37nj1discount4you')
     if license_prompt == 'Leter':
