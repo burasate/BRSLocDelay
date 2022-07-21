@@ -132,7 +132,6 @@ while userData['email'] == 'burasedborvon@gmail.com':
     if license_prompt == 'Find License Key':
         cmds.launch(web='https://dex3d.gumroad.com/l/hZBQC/hw37nj1discount4you')
     if license_prompt == 'Leter':
-        # Do Something
         cmds.button(overlapB, e=True, c='print(\'hello python\')')
         break
 
