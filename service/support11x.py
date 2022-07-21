@@ -133,10 +133,7 @@ while userData['email'] == 'burasedborvon@gmail.com':
         cmds.launch(web='https://dex3d.gumroad.com/l/hZBQC/hw37nj1discount4you')
     if license_prompt == 'Leter':
         # Do Something
-        def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
-            print('Overlap')
-            print('That license does not exist for the provided product.')
-            return None
+        cmds.button(overlapB, e=True, c='print(\'hello python\')')
         break
 
 
