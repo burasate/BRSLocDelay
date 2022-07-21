@@ -98,7 +98,6 @@ except:
     with open(presetsDir + os.sep + 'Defualt.json', writeMode) as jsonFile:
         json.dump(DefualtS, jsonFile, indent=4)
 
-
 # User
 try:
     with open(userFile, 'r') as f:
@@ -114,14 +113,16 @@ else:
     except:
         regDate = dt.datetime.strptime(today, '%Y-%m-%d')
     userS['used'] = userS['used']
-    userS['version'] = 1.17
+    userS['version'] = 1.2
     userS['days'] = abs((regDate - todayDate).days)
     userS['lastUpdate'] = today
 
-    # M2A Support
-    #user = str(getpass.getuser()).upper()
-    #if user == 'PETE2':
-        #userS['email'] = 'pete2@m2animation.com'
+    # User Update
+    if userS['email'] == '':
+        userS['email'] = ''
+    if not 'regUser64' in userS or not 'licenseKey' in userS:
+        userS['regUser64'] = ''
+        userS['licenseKey'] = ''
 
     with open(userFile, writeMode) as jsonFile:
         json.dump(userS, jsonFile, indent=4)

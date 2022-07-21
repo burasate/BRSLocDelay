@@ -60,7 +60,7 @@ except:
             break
 
     # Create New Dataset
-    dataSet['isTrial'] = False
+    dataSet['isTrial'] = True
     dataSet['registerDate'] = today
     dataSet['lastUsedDate'] = today
     dataSet['lastUpdate'] = today
@@ -68,6 +68,7 @@ except:
     dataSet['used'] = 0
     dataSet['version'] = 1.2
     dataSet['regUser64'] = base64.b64encode(getpass.getuser())
+    dataSet['licenseKey'] = ''
 
     # Create User
     if sys.version[0] == '3':

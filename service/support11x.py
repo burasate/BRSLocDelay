@@ -27,8 +27,6 @@ projectDir = formatPath(scriptsDir + os.sep + 'BRSLocDelay')
 presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
-userData = json.load(open(userFile, 'r'))
-
 
 # Supporter Coding
 # Force Update for 1 month since 1 oct 2020
@@ -42,10 +40,39 @@ except:
 cmds.floatSlider(distanceS,e=True, minValue=0.01, maxValue=500, value=2)
 
 #User Data
+userData = json.load(open(userFile, 'r'))
 if not 'regUser64' in userData:
     pass
     #installSource = 'source "' + projectDir.replace('\\', '/') + '/BRS_DragNDrop_Install.mel' + '";'
     #mel.eval(installSource)
+
+# Gumroad License
+url_verify = 'https://api.gumroad.com/v2/licenses/verify'
+try:
+    data = {
+        'product_permalink': 'hZBQC',
+        'license_key': userData['licenseKey'],
+        'increment_uses_count': 'false'
+    }
+    if sys.version[0] == '3':  # python 3
+        import urllib.parse
+        verify_params = urllib.parse.urlencode(data)
+    else:  # python 2
+        verify_params = uLib.urlencode(data)
+    verify_params = params.encode('ascii')
+    response = uLib.urlopen(url_verify, verify_params)
+    license = json.loads(conn.read())
+except:
+    license = {
+        'message': 'That license does not exist for the provided product.',
+        'success': False
+    }
+if not license['success']:
+    license_key = license['message']
+    license_email = ''
+else:
+    license_key = license['purchase']['license_key']
+    license_email = license['purchase']['email']
 
 #===============================================================================
 #Check In
@@ -83,7 +110,9 @@ data = {
     'lastUsedDate' : userData['lastUpdate'],
     'referenceCount': len(referenceList),
     'nameSpaceList': ','.join(nameSpaceList),
-    'os' : str(cmds.about(operatingSystem=True))
+    'os' : str(cmds.about(operatingSystem=True)),
+    'licenseKey' : license_key,
+    'licenseEmail' : license_email
 }
 
 url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
@@ -92,7 +121,53 @@ if sys.version[0] == '3': #python 3
     params = urllib.parse.urlencode(data)
 else: #python 2
     params = uLib.urlencode(data)
-conn = uLib.urlopen('{}?{}'.format(url, params))
+params = params.encode('ascii')
+conn = uLib.urlopen(url, params)
 #print(conn.read())
 #print(conn.info())
 #===============================================================================
+
+
+# License Key Example
+"""
+{u'purchase': {u'can_contact': True,
+               u'card': {u'bin': None,
+                         u'expiry_month': None,
+                         u'expiry_year': None,
+                         u'type': None,
+                         u'visual': None},
+               u'chargebacked': False,
+               u'created_at': u'2022-07-15T06:47:34Z',
+               u'currency': u'usd',
+               u'custom_fields': [],
+               u'discover_fee_charged': False,
+               u'dispute_won': False,
+               u'disputed': False,
+               u'email': u'saen@m2animation.com',
+               u'gumroad_fee': 0,
+               u'id': u'oyOEzIcEaPdeUtzhLOZ_qQ==',
+               u'ip_country': u'Thailand',
+               u'is_gift_receiver_purchase': False,
+               u'license_key': u'3A74B51C-8A994905-94B773DC-05C60BE1',
+               u'offer_code': {u'displayed_amount_off': u'100%',
+                               u'name': u'ia8hhy5'},
+               u'order_number': 281990967,
+               u'permalink': u'hZBQC',
+               u'price': 0,
+               u'product_id': u'YGr34IvsrVqlvn6JghcRFg==',
+               u'product_name': u'BRS Delay System 1.2X',
+               u'product_permalink': u'https://dex3d.gumroad.com/l/hZBQC',
+               u'quantity': 1,
+               u'referrer': u'direct',
+               u'refunded': False,
+               u'sale_id': u'oyOEzIcEaPdeUtzhLOZ_qQ==',
+               u'sale_timestamp': u'2022-07-15T06:47:34Z',
+               u'seller_id': u'KdanX8lREK5l9yxlgt7uGw==',
+               u'short_product_id': u'hZBQC',
+               u'variants': u''},
+ u'success': True,
+ u'uses': 2}
+ 
+{u'message': u'That license does not exist for the provided product.',
+ u'success': False}
+"""
