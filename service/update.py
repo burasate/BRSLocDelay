@@ -117,11 +117,12 @@ else:
     userS['days'] = abs((regDate - todayDate).days)
     userS['lastUpdate'] = today
 
-    # User Update
+    # User Update ===================== >
     if userS['email'] == '':
         userS['email'] = ''
-    if not 'regUser64' in userS or not 'licenseKey' in userS:
+    if not 'regUser64' in userS :
         userS['regUser64'] = ''
+    if not 'licenseKey' in userS:
         userS['licenseKey'] = ''
 
     with open(userFile, writeMode) as jsonFile:
