@@ -114,6 +114,11 @@ def getBRSLicense(licenseKey):
 license_key, license_email = ('', '')
 while userData['email'] == 'burasedborvon@gmail.com':
     license_key, license_email = getBRSLicense(userData['licenseKey'])
+    if not license_key == '':
+        userData['licenseKey'] = license_key
+        with open(userFile, writeMode) as jsonFile:
+            json.dump(userData, jsonFile, indent=4)
+
     license_prompt = cmds.promptDialog(
         title='BRS Loc Delay Register',
         message='BRS Loc Delay\nLicense Key',
@@ -123,11 +128,11 @@ while userData['email'] == 'burasedborvon@gmail.com':
         dismissString='Leter', bgc=(.2, .2, .2))
     if license_prompt == 'Confirm':
         userData['licenseKey'] = cmds.promptDialog(query=True, text=True)
-        pass
     if license_prompt == 'Find License Key':
         cmds.launch(web='https://dex3d.gumroad.com/l/hZBQC')
     if license_prompt == 'Leter':
         break
+
 
 
 #===============================================================================
