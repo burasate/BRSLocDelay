@@ -114,6 +114,7 @@ def getBRSLicense(licenseKey):
 license_key, license_email = ('', '')
 while userData['email'] == 'burasedborvon@gmail.com':
     license_key, license_email = getBRSLicense(userData['licenseKey'])
+    print(license_key)
     if not license_key == '':
         userData['licenseKey'] = license_key
         with open(userFile, writeMode) as jsonFile:
