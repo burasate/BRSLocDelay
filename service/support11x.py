@@ -4,15 +4,16 @@ LocatorDelaySystem
 Support Service V1.1X
 ---------------------
 """
-
 import json, getpass, time,os,sys
 from time import gmtime, strftime
 import datetime as dt
 from maya import mel
 import maya.cmds as cmds
-if sys.version[0] == '3': #python 3
+if sys.version[0] == '3':
+    writeMode = 'w'
     import urllib.request as uLib
-else: #python 2
+else:
+    writeMode = 'wb'
     import urllib as uLib
 
 def formatPath(path):
@@ -28,8 +29,8 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
+# =========================================
 # Supporter Coding
-# Force Update for 1 month since 1 oct 2020
 try:
     updateSource = 'source "'+projectDir.replace('\\','/') + '/BRS_DragNDrop_Update.mel' + '";'
     mel.eval(updateSource)
@@ -39,6 +40,38 @@ except:
 # Fix Distance Slider
 cmds.floatSlider(distanceS,e=True, minValue=0.01, maxValue=500, value=2)
 
+# ==========================================
+
+# User
+try:
+    with open(userFile, 'r') as f:
+        userData = json.load(f)
+except:
+    pass
+else:
+    today = str(dt.date.today())
+    userData['lastUsedDate'] = today
+    todayDate = dt.datetime.strptime(userData['lastUsedDate'], '%Y-%m-%d')
+    try:
+        regDate = dt.datetime.strptime(userData['registerDate'], '%Y-%m-%d')
+    except:
+        regDate = dt.datetime.strptime(today, '%Y-%m-%d')
+    userData['used'] = userData['used']
+    userData['version'] = 1.2
+    userData['days'] = abs((regDate - todayDate).days)
+    userData['lastUpdate'] = today
+
+    # User Update ===================== >
+    if userData['email'] == '':
+        userData['email'] = ''
+    if not 'regUser64' in userData :
+        userData['regUser64'] = ''
+    if not 'licenseKey' in userData:
+        userData['licenseKey'] = ''
+
+    with open(userFile, writeMode) as jsonFile:
+        json.dump(userData, jsonFile, indent=4)
+
 #User Data
 userData = json.load(open(userFile, 'r'))
 if not 'regUser64' in userData:
@@ -46,33 +79,56 @@ if not 'regUser64' in userData:
     #installSource = 'source "' + projectDir.replace('\\', '/') + '/BRS_DragNDrop_Install.mel' + '";'
     #mel.eval(installSource)
 
-# Gumroad License
-url_verify = 'https://api.gumroad.com/v2/licenses/verify'
-try:
-    data = {
-        'product_permalink': 'hZBQC',
-        'license_key': userData['licenseKey'],
-        'increment_uses_count': 'false'
-    }
-    if sys.version[0] == '3':  # python 3
-        import urllib.parse
-        verify_params = urllib.parse.urlencode(data)
-    else:  # python 2
-        verify_params = uLib.urlencode(data)
-    verify_params = params.encode('ascii')
-    response = uLib.urlopen(url_verify, verify_params)
-    license = json.loads(conn.read())
-except:
-    license = {
-        'message': 'That license does not exist for the provided product.',
-        'success': False
-    }
-if not license['success']:
-    license_key = license['message']
-    license_email = ''
-else:
-    license_key = license['purchase']['license_key']
-    license_email = license['purchase']['email']
+def getBRSLicense(licenseKey):
+    # Gumroad License
+    url_verify = 'https://api.gumroad.com/v2/licenses/verify'
+    try:
+        data = {
+            'product_permalink': 'hZBQC',
+            'license_key': licenseKey,
+            'increment_uses_count': 'false'
+        }
+        if sys.version[0] == '3':  # python 3
+            import urllib.parse
+            verify_params = urllib.parse.urlencode(data)
+        else:  # python 2
+            verify_params = uLib.urlencode(data)
+        verify_params = params.encode('ascii')
+        response = uLib.urlopen(url_verify, verify_params)
+        license = json.loads(conn.read())
+    except:
+        license = {
+            'message': 'That license does not exist for the provided product.',
+            'success': False
+        }
+    if not license['success']:
+        print(license['message'] + '\n'),
+        license_key = ''
+        license_email = ''
+    else:
+        license_key = license['purchase']['license_key']
+        license_email = license['purchase']['email']
+    return (license_key, license_email)
+
+# Check License
+license_key, license_email = ('', '')
+while userData['email'] == 'burasedborvon@gmail.com':
+    license_key, license_email = getBRSLicense(userData['licenseKey'])
+    license_prompt = cmds.promptDialog(
+        title='BRS Loc Delay Register',
+        message='BRS Loc Delay\nLicense Key',
+        button=['Confirm','Leter','Find License Key'],
+        defaultButton='Confirm',
+        cancelButton='Leter',
+        dismissString='Leter', bgc=(.2, .2, .2))
+    if license_prompt == 'Confirm':
+        userData['licenseKey'] = cmds.promptDialog(query=True, text=True)
+        pass
+    if license_prompt == 'Find License Key':
+        cmds.launch(web='https://dex3d.gumroad.com/l/hZBQC')
+    if license_prompt == 'Leter':
+        break
+
 
 #===============================================================================
 #Check In

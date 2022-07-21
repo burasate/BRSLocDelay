@@ -98,36 +98,6 @@ except:
     with open(presetsDir + os.sep + 'Defualt.json', writeMode) as jsonFile:
         json.dump(DefualtS, jsonFile, indent=4)
 
-# User
-try:
-    with open(userFile, 'r') as f:
-        userS = json.load(f)
-except:
-    pass
-else:
-    today = str(dt.date.today())
-    userS['lastUsedDate'] = today
-    todayDate = dt.datetime.strptime(userS['lastUsedDate'], '%Y-%m-%d')
-    try:
-        regDate = dt.datetime.strptime(userS['registerDate'], '%Y-%m-%d')
-    except:
-        regDate = dt.datetime.strptime(today, '%Y-%m-%d')
-    userS['used'] = userS['used']
-    userS['version'] = 1.2
-    userS['days'] = abs((regDate - todayDate).days)
-    userS['lastUpdate'] = today
-
-    # User Update ===================== >
-    if userS['email'] == '':
-        userS['email'] = ''
-    if not 'regUser64' in userS :
-        userS['regUser64'] = ''
-    if not 'licenseKey' in userS:
-        userS['licenseKey'] = ''
-
-    with open(userFile, writeMode) as jsonFile:
-        json.dump(userS, jsonFile, indent=4)
-
 # Config
 configS = {}
 try:
