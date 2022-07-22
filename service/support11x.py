@@ -117,21 +117,22 @@ def getBRSLicense(licenseKey):
     return (license_key, license_email)
 
 # Check License
-license_key, license_email = ('', '')
+license_key, license_email = (u'', u'')
 while userData['email'] == 'burasedborvon@gmail.com':
 #while True:
     #break
-    license_key, license_email = getBRSLicense(userS['licenseKey'])
+    license_key, license_email = getBRSLicense(userData['licenseKey'])
     print(userData['licenseKey'], license_key)
     print('userS',userS)
     print('userData',userData)
     if not license_key == '' :
         print('Found license key', license_key)
-        # change userS from BRSLocDelay.py
         userS['licenseKey'] = license_key
-        userData = userS
-        print('userS', userS)
-        print('userData', userData)
+        with open(userFile, writeMode) as jsonFile:
+            userData['licenseKey'] = license_key
+            json.dump(userS, jsonFile, indent=4)
+        # change userS from BRSLocDelay.py
+        userS = userData
         break
     license_prompt = cmds.promptDialog(
         title='BRS Loc Delay Register',
