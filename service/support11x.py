@@ -124,11 +124,9 @@ while True:
     #print(userData['licenseKey'], license_key)
     if not license_key == '' :
         print('Found license key', license_key)
-        with open(userFile, writeMode) as jsonFile:
-            userData['licenseKey'] = license_key
-            json.dump(userData, jsonFile, indent=4)
-        userData = json.load(open(userFile, 'r'))
-        print (userData['licenseKey'])
+        # change userS from BRSLocDelay.py
+        userS['licenseKey'] = license_key
+        userData = userS
         break
     license_prompt = cmds.promptDialog(
         title='BRS Loc Delay Register',

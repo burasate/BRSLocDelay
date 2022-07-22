@@ -1302,11 +1302,7 @@ def showBRSUI(*_):
         userS['used'] = userS['used'] + 1
         userS['version'] = LocDelay_Version
         userS['days'] = abs((regDate - todayDate).days)
-        if sys.version[0] == '3':
-            with open(userFile, 'w') as jsonFile:
-                json.dump(userS, jsonFile, indent=4)
-        else:
-            with open(userFile, writeMode) as jsonFile:
-                json.dump(userS, jsonFile, indent=4)
+        with open(userFile, writeMode) as jsonFile:
+            json.dump(userS, jsonFile, indent=4)
     finally:
         pass
