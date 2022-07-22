@@ -123,6 +123,7 @@ license_key, license_email, license_success = ('', '', False)
 while userData['email'] == 'burasedborvon@gmail.com':
 #while True:
     #break
+    license_key, license_email, license_success = getBRSLicense(userS['licenseKey'])
     print(userData['licenseKey'], license_key)
     print('userS',userS)
     print('userData',userData)
@@ -132,8 +133,6 @@ while userData['email'] == 'burasedborvon@gmail.com':
         userS['licenseKey'] = license_key
         userData = userS
         break
-    else:
-        license_key, license_email, license_success = getBRSLicense(userS['licenseKey'])
     license_prompt = cmds.promptDialog(
         title='BRS Loc Delay Register',
         message='BRS Loc Delay\nLicense Key',
