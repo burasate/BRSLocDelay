@@ -121,9 +121,9 @@ license_key, license_email, license_success = ('', '', False)
 #while userData['email'] == 'meen_pooh1990@hotmail.com' or userData['email'] ==  'meen_pooh@gmail.com':
 while True:
     #break
-    #print(userData['licenseKey'], license_key)
-    print(userS)
-    print(userData)
+    print(userData['licenseKey'], license_key)
+    print('userS',userS)
+    print('userData',userData)
     if not license_key == '' :
         print('Found license key', license_key)
         # change userS from BRSLocDelay.py
