@@ -123,6 +123,7 @@ while True:
     license_key, license_email, license_success = getBRSLicense(userData['licenseKey'])
     #print(userData['licenseKey'], license_key)
     if not license_key == '' :
+        print('Found license key', license_key)
         with open(userFile, writeMode) as jsonFile:
             userData['licenseKey'] = license_key
             json.dump(userData, jsonFile, indent=4)
