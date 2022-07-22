@@ -120,15 +120,14 @@ def getBRSLicense(licenseKey):
 license_key, license_email, license_success = ('', '', False)
 #while userData['email'] == 'meen_pooh1990@hotmail.com' or userData['email'] ==  'meen_pooh@gmail.com':
 while True:
-    license_key, license_email, license_success = getBRSLicense(userData['licenseKey'])
     #print(userData['licenseKey'], license_key)
     if not license_key == '' :
         print('Found license key', license_key)
         # change userS from BRSLocDelay.py
-        userData['licenseKey'] = license_key
         userS['licenseKey'] = license_key
-        userData = userS
         break
+    else:
+        license_key, license_email, license_success = getBRSLicense(userS['licenseKey'])
     license_prompt = cmds.promptDialog(
         title='BRS Loc Delay Register',
         message='BRS Loc Delay\nLicense Key',
