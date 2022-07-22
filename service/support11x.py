@@ -120,8 +120,8 @@ def getBRSLicense(licenseKey):
 
 # Check License
 license_key, license_email, license_success = ('', '', False)
-#while userData['email'] == 'meen_pooh1990@hotmail.com' or userData['email'] ==  'meen_pooh@gmail.com':
-while True:
+while userData['email'] == 'burasedborvon@gmail.com':
+#while True:
     #break
     print(userData['licenseKey'], license_key)
     print('userS',userS)
