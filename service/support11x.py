@@ -128,6 +128,7 @@ while True:
             userData['licenseKey'] = license_key
             json.dump(userData, jsonFile, indent=4)
         userData = json.load(open(userFile, 'r'))
+        print (userData['licenseKey'])
         break
     license_prompt = cmds.promptDialog(
         title='BRS Loc Delay Register',
