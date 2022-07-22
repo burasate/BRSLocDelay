@@ -93,7 +93,7 @@ def getBRSLicense(licenseKey):
             verify_params = urllib.parse.urlencode(data)
         else:  # python 2
             verify_params = uLib.urlencode(data)
-        verify_params = params.encode('ascii')
+        verify_params = verify_params.encode('ascii')
         print(verify_params)
         response = uLib.urlopen(url_verify, verify_params)
         license = json.loads(response.read())
