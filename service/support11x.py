@@ -98,7 +98,11 @@ def getBRSLicense(licenseKey):
         response = uLib.urlopen(url_verify, verify_params)
         license = json.loads(response.read())
         print (license)
-    except:
+
+    #except:
+    except Exception as e:
+        import traceback
+        print(str(traceback.format_exc()))
         license = {
             'message': 'That license does not exist for the provided product.',
             'success': False
