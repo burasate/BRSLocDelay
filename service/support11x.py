@@ -125,6 +125,7 @@ while True:
         print('Found license key', license_key)
         # change userS from BRSLocDelay.py
         userS['licenseKey'] = license_key
+        userData = userS
         break
     else:
         license_key, license_email, license_success = getBRSLicense(userS['licenseKey'])
