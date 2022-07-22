@@ -118,13 +118,14 @@ def getBRSLicense(licenseKey):
 
 # Check License
 license_key, license_email, license_success = ('', '', False)
-while userData['email'] == 'burasedborvon@gmail.com':
+while userData['email'] == 'meen_pooh1990@hotmail.com':
     license_key, license_email, license_success = getBRSLicense(userData['licenseKey'])
     #print(userData['licenseKey'], license_key)
     if not license_key == '' :
         with open(userFile, writeMode) as jsonFile:
             userData['licenseKey'] = license_key
             json.dump(userData, jsonFile, indent=4)
+        userData = json.load(open(userFile, 'r'))
         break
 
     license_prompt = cmds.promptDialog(
