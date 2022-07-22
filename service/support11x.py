@@ -118,7 +118,8 @@ def getBRSLicense(licenseKey):
 
 # Check License
 license_key, license_email, license_success = ('', '', False)
-while userData['email'] == 'meen_pooh1990@hotmail.com':
+#while userData['email'] == 'meen_pooh1990@hotmail.com' or userData['email'] ==  'meen_pooh@gmail.com':
+while True:
     license_key, license_email, license_success = getBRSLicense(userData['licenseKey'])
     #print(userData['licenseKey'], license_key)
     if not license_key == '' :
@@ -127,7 +128,6 @@ while userData['email'] == 'meen_pooh1990@hotmail.com':
             json.dump(userData, jsonFile, indent=4)
         userData = json.load(open(userFile, 'r'))
         break
-
     license_prompt = cmds.promptDialog(
         title='BRS Loc Delay Register',
         message='BRS Loc Delay\nLicense Key',
@@ -140,9 +140,10 @@ while userData['email'] == 'meen_pooh1990@hotmail.com':
     if license_prompt == 'Find License Key':
         cmds.launch(web='https://dex3d.gumroad.com/l/hZBQC/hw37nj1discount4you')
     if license_prompt == 'Leter':
-        cmds.button(overlapB, e=True, c='print(\'hello python\')')
+        trail_overlap = 'doOverlap(\'Rotation\', 2.0, 3, 0.0, True);' +\
+                        'cmds.launch(web=\'https://dex3d.gumroad.com/l/hZBQC/hw37nj1discount4you\');'
+        cmds.button(overlapB, e=True, c=trail_overlap)
         break
-
 
 
 #===============================================================================
