@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.24--------------------------------
+---------------------------V.1.25--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
@@ -42,7 +42,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-LocDelay_Version = 1.24
+LocDelay_Version = 1.25
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -1237,19 +1237,27 @@ def BRSUpdateUI(*_):
     maxTime = cmds.playbackOptions(q=True, maxTime=True)
     cmds.text(bakeRangeT, e=True, l='frame range [ {} - {} ]'.format(minTime,maxTime))
 
-
-cmds.checkBox(previewChk, e=True, cc=BRSUpdateUI)
-cmds.checkBox(delLocChk, e=True, cc=BRSUpdateUI)
-cmds.floatSlider(distanceS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
-cmds.intSlider(dynamicS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
-cmds.floatSlider(offsetS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
-cmds.floatField(distanceT, e=True, ec=BRSFeildUpdate ,cc=BRSFeildUpdate)
-cmds.intField(dynamicT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
-cmds.floatField(offsetT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
-cmds.optionMenu(mode, e=True, cc=BRSUpdateUI)
+# Init Update
 cmds.button(overlapB, e=True, c=overlapeCheck)
-BRSUpdateUI()
-BRSPresetUIUpdate()
+try:
+    with open(userFile, 'r') as jsonFile:
+        userS = json.load(jsonFile)
+        if userS['isTrial'] and userS['days'] > 30:
+            cmds.button(overlapB, e=True, c='doOverlap(\'Rotation\', 2.0, 3, 0.0, True);')
+except:
+    pass
+finally:
+    cmds.checkBox(previewChk, e=True, cc=BRSUpdateUI)
+    cmds.checkBox(delLocChk, e=True, cc=BRSUpdateUI)
+    cmds.floatSlider(distanceS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
+    cmds.intSlider(dynamicS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
+    cmds.floatSlider(offsetS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
+    cmds.floatField(distanceT, e=True, ec=BRSFeildUpdate ,cc=BRSFeildUpdate)
+    cmds.intField(dynamicT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
+    cmds.floatField(offsetT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
+    cmds.optionMenu(mode, e=True, cc=BRSUpdateUI)
+    BRSUpdateUI()
+    BRSPresetUIUpdate()
 
 """
 -----------------------------------------------------------------------
