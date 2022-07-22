@@ -534,29 +534,21 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
         if mode == 'Rotation':
 
             if configS['aimX'] == True and configS['aimY'] == False and configS['aimZ'] == False and configS['aimInvert'] == False:  # X
-                #cmds.aimConstraint(tempLocName, target, aimVector=(1, 0, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
-                cmds.aimConstraint(tempLocName, target, aimVector=(1, 0, 0), offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
+                cmds.aimConstraint(tempLocName, target, aimVector=(1, 0, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
             elif configS['aimX'] == False and configS['aimY'] == True and configS['aimZ'] == False and configS['aimInvert'] == False:  # Y
-                #cmds.aimConstraint(tempLocName, target, aimVector=(0, 1, 0), skip='y', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
-                cmds.aimConstraint(tempLocName, target, aimVector=(0, 1, 0), offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
+                cmds.aimConstraint(tempLocName, target, aimVector=(0, 1, 0), skip='y', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
             elif configS['aimX'] == False and configS['aimY'] == False and configS['aimZ'] == True and configS['aimInvert'] == False:  # Z
-                #cmds.aimConstraint(tempLocName, target, aimVector=(0, 0, 1), skip='z', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
-                cmds.aimConstraint(tempLocName, target, aimVector=(0, 0, 1), offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
+                cmds.aimConstraint(tempLocName, target, aimVector=(0, 0, 1), skip='z', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
             elif configS['aimX'] == True and configS['aimY'] == False and configS['aimZ'] == False and configS['aimInvert'] == True:  # -X
-                #cmds.aimConstraint(tempLocName, target, aimVector=(-1, 0, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
-                cmds.aimConstraint(tempLocName, target, aimVector=(-1, 0, 0), offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
+                cmds.aimConstraint(tempLocName, target, aimVector=(-1, 0, 0), skip='x', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
             elif configS['aimX'] == False and configS['aimY'] == True and configS['aimZ'] == False and configS['aimInvert'] == True:  # -Y
-                #cmds.aimConstraint(tempLocName, target, aimVector=(0, -1, 0), skip='y', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
-                cmds.aimConstraint(tempLocName, target, aimVector=(0, -1, 0), offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
+                cmds.aimConstraint(tempLocName, target, aimVector=(0, -1, 0), skip='y', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
             elif configS['aimX'] == False and configS['aimY'] == False and configS['aimZ'] == True and configS['aimInvert'] == True:  # -Z
-                #cmds.aimConstraint(tempLocName, target, aimVector=(0, 0, -1), skip='z', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
-                cmds.aimConstraint(tempLocName, target, aimVector=(0, 0, -1), offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none', mo=True)
+                cmds.aimConstraint(tempLocName, target, aimVector=(0, 0, -1), skip='z', offset=(0, 0, 0), weight=1, upVector=(0, 0, 0), worldUpType='none')
         elif mode == 'Position':
             if configS['posXZ'] == True:
-                #cmds.pointConstraint(tempLocName, target, weight=1, mo=False, skip='y')
                 cmds.pointConstraint(tempLocName, target, weight=1, mo=False)
             elif configS['posY'] == True:
-                #cmds.pointConstraint(tempLocName, target, weight=1, mo=False, skip=('x', 'z'))
                 cmds.pointConstraint(tempLocName, target, weight=1, mo=False)
             elif configS['posXYZ'] == True:
                 cmds.pointConstraint(tempLocName, target, weight=1, mo=False)
