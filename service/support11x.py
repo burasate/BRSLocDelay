@@ -94,15 +94,13 @@ def getBRSLicense(licenseKey):
         else:  # python 2
             verify_params = uLib.urlencode(data)
         verify_params = verify_params.encode('ascii')
-        print(verify_params)
+        #print(verify_params)
         response = uLib.urlopen(url_verify, verify_params)
         license = json.loads(response.read())
-        print (license)
+        #print (license)
 
     #except:
-    except Exception as e:
-        import traceback
-        print(str(traceback.format_exc()))
+    except:
         license = {
             'message': 'That license does not exist for the provided product.',
             'success': False
@@ -111,20 +109,23 @@ def getBRSLicense(licenseKey):
         print(license['message'] + '\n'),
         license_key = ''
         license_email = ''
+        license_success = False
     else:
         license_key = license['purchase']['license_key']
         license_email = license['purchase']['email']
-    return (license_key, license_email)
+        license_success = True
+    return (license_key, license_email, license_success)
 
 # Check License
-license_key, license_email = ('', '')
+license_key, license_email, license_success = ('', '', False)
 while userData['email'] == 'burasedborvon@gmail.com':
-    license_key, license_email = getBRSLicense(userData['licenseKey'])
+    license_key, license_email, license_success = getBRSLicense(userData['licenseKey'])
     print(userData['licenseKey'], license_key)
-    if not license_key == '':
+    if not license_key == '' :
         userData['licenseKey'] = license_key
         with open(userFile, writeMode) as jsonFile:
             json.dump(userData, jsonFile, indent=4)
+        break
 
     license_prompt = cmds.promptDialog(
         title='BRS Loc Delay Register',
