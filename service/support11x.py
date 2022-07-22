@@ -94,8 +94,10 @@ def getBRSLicense(licenseKey):
         else:  # python 2
             verify_params = uLib.urlencode(data)
         verify_params = params.encode('ascii')
+        print(verify_params)
         response = uLib.urlopen(url_verify, verify_params)
-        license = json.loads(conn.read())
+        license = json.loads(response.read())
+        print (license)
     except:
         license = {
             'message': 'That license does not exist for the provided product.',
