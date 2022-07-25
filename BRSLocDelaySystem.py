@@ -1239,6 +1239,7 @@ def BRSUpdateUI(*_):
 
 # Init Update
 cmds.button(overlapB, e=True, c=overlapeCheck)
+"""
 try:
     with open(userFile, 'r') as jsonFile:
         userS = json.load(jsonFile)
@@ -1247,17 +1248,18 @@ try:
 except:
     pass
 finally:
-    cmds.checkBox(previewChk, e=True, cc=BRSUpdateUI)
-    cmds.checkBox(delLocChk, e=True, cc=BRSUpdateUI)
-    cmds.floatSlider(distanceS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
-    cmds.intSlider(dynamicS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
-    cmds.floatSlider(offsetS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
-    cmds.floatField(distanceT, e=True, ec=BRSFeildUpdate ,cc=BRSFeildUpdate)
-    cmds.intField(dynamicT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
-    cmds.floatField(offsetT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
-    cmds.optionMenu(mode, e=True, cc=BRSUpdateUI)
-    BRSUpdateUI()
-    BRSPresetUIUpdate()
+"""
+cmds.checkBox(previewChk, e=True, cc=BRSUpdateUI)
+cmds.checkBox(delLocChk, e=True, cc=BRSUpdateUI)
+cmds.floatSlider(distanceS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
+cmds.intSlider(dynamicS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
+cmds.floatSlider(offsetS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
+cmds.floatField(distanceT, e=True, ec=BRSFeildUpdate ,cc=BRSFeildUpdate)
+cmds.intField(dynamicT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
+cmds.floatField(offsetT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
+cmds.optionMenu(mode, e=True, cc=BRSUpdateUI)
+BRSUpdateUI()
+BRSPresetUIUpdate()
 
 """
 -----------------------------------------------------------------------
