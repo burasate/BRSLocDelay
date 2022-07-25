@@ -114,8 +114,11 @@ while userData['email'] == 'burasedborvon@gmail.com':
         userData['licenseKey'] = license_key
         with open(userFile, writeMode) as jsonFile:
             userData['licenseKey'] = license_key
+            userData['isTrial'] = False
             json.dump(userData, jsonFile, indent=4)
         break
+    else:
+        userData = json.load(open(userFile, 'r'))
     license_prompt = cmds.promptDialog(
         title='BRS Loc Delay Register',
         message='BRS Loc Delay\nLicense Key',
