@@ -123,8 +123,6 @@ while userData['email'] == 'burasedborvon@gmail.com':
     #break
     license_key, license_email = getBRSLicense(userData['licenseKey'])
     print(userData['licenseKey'], license_key)
-    print('userS',userS)
-    print('userData',userData)
     if not license_key == '' :
         print('Found license key', license_key)
         userS['licenseKey'] = license_key
