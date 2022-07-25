@@ -1299,18 +1299,26 @@ def showBRSUI(*_):
         today = str(dt.date.today())
         if today != userS['lastUsedDate']:
             locDeylayService()
-            with open(userFile, writeMode) as jsonFile:
+            with open(userFile, 'r') as jsonFile:
                 userS = json.load(jsonFile)
+            with open(userFile, writeMode) as jsonFile:
                 userS['lastUsedDate'] = today
                 json.dump(userS, jsonFile, indent=4)
         verName = 'LOCATOR DELAY - {}'.format(str(userS['version']))
         cmds.window(winID, e=True, title=verName)
         cmds.showWindow(winID)
-        with open(userFile, writeMode) as jsonFile:
+        with open(userFile, 'r') as jsonFile:
             userS = json.load(jsonFile)
+        with open(userFile, writeMode) as jsonFile:
             userS['used'] = userS['used'] + 1
             userS['version'] = LocDelay_Version
             userS['days'] = abs((regDate - todayDate).days)
             json.dump(userS, jsonFile, indent=4)
     finally:
         pass
+
+"""
+-----------------------------------------------------------------------
+BURASED UTTHA
+-----------------------------------------------------------------------
+"""
