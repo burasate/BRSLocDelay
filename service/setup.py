@@ -82,12 +82,22 @@ finally:
     # Create Shelf
     topShelf = mel.eval('$nul = $gShelfTopLevel')
     currentShelf = cmds.tabLayout(topShelf, q=1, st=1)
-    command = 'from BRSLocDelay import BRSLocDelaySystem \
-    \nBRSLocDelaySystem.showBRSUI()'
+    #command = 'from BRSLocDelay import BRSLocDelaySystem \
+    #\nBRSLocDelaySystem.showBRSUI()'
+
+    command = '''
+    import imp
+    try:
+        imp.reload(BRSLocDelaySystem)
+    except:
+        from BRSLocDelay import BRSLocDelaySystem 
+    
+    BRSLocDelaySystem.showBRSUI()
+    '''
+
     imagePath = projectDir + os.sep + 'BRSLocDelaySystem.png'
     cmds.shelfButton(stp='python', iol='DELAY', parent=currentShelf, ann='BRS LOCATOR DELAY SYSTEM', i=imagePath, c=command)
 
     # Finish
     cmds.confirmDialog(title='BRS LOCATOR DELAY', message='Installation Successful.', button=['OK'])
-    exec ('from BRSLocDelay import BRSLocDelaySystem \
-    \nBRSLocDelaySystem.showBRSUI()')
+    exec (command)
