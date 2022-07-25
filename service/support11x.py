@@ -42,26 +42,13 @@ cmds.floatSlider(distanceS,e=True, minValue=0.01, maxValue=500, value=2)
 
 # ==========================================
 
-# User
+# User Update ===================== >
 try:
     with open(userFile, 'r') as f:
         userData = json.load(f)
 except:
     pass
 else:
-    today = str(dt.date.today())
-    userData['lastUsedDate'] = today
-    todayDate = dt.datetime.strptime(userData['lastUsedDate'], '%Y-%m-%d')
-    try:
-        regDate = dt.datetime.strptime(userData['registerDate'], '%Y-%m-%d')
-    except:
-        regDate = dt.datetime.strptime(today, '%Y-%m-%d')
-    userData['used'] = userData['used']
-    userData['version'] = 1.2
-    userData['days'] = abs((regDate - todayDate).days)
-    userData['lastUpdate'] = today
-
-    # User Update ===================== >
     if userData['email'] == '':
         userData['email'] = ''
     if not 'regUser64' in userData :
@@ -120,14 +107,13 @@ def getBRSLicense(licenseKey):
 license_key, license_email = (u'', u'')
 while userData['email'] == 'burasedborvon@gmail.com':
 #while True:
-    #break
+    userData = json.load(open(userFile, 'r'))
     license_key, license_email = getBRSLicense(userData['licenseKey'])
     print(userData['licenseKey'], license_key)
     if not license_key == '' :
         print('Found license key', license_key)
         userData['licenseKey'] = license_key
         with open(userFile, writeMode) as jsonFile:
-            userData = json.load(open(userFile, 'r'))
             userData['licenseKey'] = license_key
             json.dump(userData, jsonFile, indent=4)
         break
