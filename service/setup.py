@@ -86,13 +86,13 @@ finally:
     #\nBRSLocDelaySystem.showBRSUI()'
 
     command = '''
-    import imp
-    try:
-        imp.reload(BRSLocDelaySystem)
-    except:
-        from BRSLocDelay import BRSLocDelaySystem 
-    
-    BRSLocDelaySystem.showBRSUI()
+import imp
+try:
+    imp.reload(BRSLocDelaySystem)
+except:
+    from BRSLocDelay import BRSLocDelaySystem 
+
+BRSLocDelaySystem.showBRSUI()
     '''
 
     imagePath = projectDir + os.sep + 'BRSLocDelaySystem.png'
