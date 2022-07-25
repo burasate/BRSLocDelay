@@ -1284,8 +1284,7 @@ cmds.intField(fpsF, e=True, v=configS['frameRate'])
 def showBRSUI(*_):
     global LocDelay_Version
     try:
-        with open(userFile, 'r') as jsonFile:
-            userS = json.load(jsonFile)
+        userS = json.load(open(userFile, 'r'))
     except:
         cmds.inViewMessage(amg='<center><h5>Error can\'t install \nplease re-install</h5></center>',
                            pos='botCenter', fade=True,
@@ -1300,14 +1299,14 @@ def showBRSUI(*_):
         if today != userS['lastUsedDate']:
             locDeylayService()
             with open(userFile, writeMode) as jsonFile:
-                userS = json.load(jsonFile)
+                userS = json.load(open(userFile, 'r'))
                 userS['lastUsedDate'] = today
                 json.dump(userS, jsonFile, indent=4)
         verName = 'LOCATOR DELAY - {}'.format(str(userS['version']))
         cmds.window(winID, e=True, title=verName)
         cmds.showWindow(winID)
         with open(userFile, writeMode) as jsonFile:
-            userS = json.load(jsonFile)
+            userS = json.load(open(userFile, 'r'))
             userS['used'] = userS['used'] + 1
             userS['version'] = LocDelay_Version
             userS['days'] = abs((regDate - todayDate).days)

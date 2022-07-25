@@ -127,7 +127,7 @@ while userData['email'] == 'burasedborvon@gmail.com':
         print('Found license key', license_key)
         userData['licenseKey'] = license_key
         with open(userFile, writeMode) as jsonFile:
-            userData = json.load(jsonFile)
+            userData = json.load(open(userFile, 'r'))
             userData['licenseKey'] = license_key
             json.dump(userData, jsonFile, indent=4)
         break
