@@ -85,7 +85,8 @@ finally:
     #command = 'from BRSLocDelay import BRSLocDelaySystem \
     #\nBRSLocDelaySystem.showBRSUI()'
 
-    command = '''
+    command = ''\
+'''
 import imp
 try:
     imp.reload(BRSLocDelaySystem)
@@ -93,7 +94,7 @@ except:
     from BRSLocDelay import BRSLocDelaySystem 
 
 BRSLocDelaySystem.showBRSUI()
-    '''
+'''
 
     imagePath = projectDir + os.sep + 'BRSLocDelaySystem.png'
     cmds.shelfButton(stp='python', iol='DELAY', parent=currentShelf, ann='BRS LOCATOR DELAY SYSTEM', i=imagePath, c=command)
