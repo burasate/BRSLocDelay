@@ -1272,7 +1272,7 @@ def getFPS(*_):
     if timeUnit in timeUnitSet:
         return timeUnitSet[timeUnit]
     else:
-        return float(''.join([i for i in timeUnit if i.isdigit()]))
+        return float(''.join([i for i in timeUnit if i.isdigit() and i == '.']))
 
 timeUnitSet = {'game': 15, 'film': 24, 'pal': 25, 'ntsc': 30, 'show': 48, 'palf': 50, 'ntscf': 60}
 timeUnit = cmds.currentUnit(q=True, t=True)
@@ -1297,14 +1297,16 @@ def showBRSUI(*_):
         today = str(dt.date.today())
         if today != userS['lastUsedDate']:
             locDeylayService()
-            userS['lastUsedDate'] = today
+            with open(userFile, writeMode) as jsonFile:
+                userS['lastUsedDate'] = today
+                json.dump(userS, jsonFile, indent=4)
         verName = 'LOCATOR DELAY - {}'.format(str(userS['version']))
         cmds.window(winID, e=True, title=verName)
         cmds.showWindow(winID)
-        userS['used'] = userS['used'] + 1
-        userS['version'] = LocDelay_Version
-        userS['days'] = abs((regDate - todayDate).days)
         with open(userFile, writeMode) as jsonFile:
+            userS['used'] = userS['used'] + 1
+            userS['version'] = LocDelay_Version
+            userS['days'] = abs((regDate - todayDate).days)
             json.dump(userS, jsonFile, indent=4)
     finally:
         pass
