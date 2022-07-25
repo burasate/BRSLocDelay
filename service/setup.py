@@ -42,7 +42,7 @@ except:
     while True:
         user = cmds.promptDialog(
             title='BRS Loc Delay Register',
-            message='BRS Loc Delay Register\nConfirm Your Email',
+            message='BRS Loc Delay Register\nConfirm Your Purchase Email',
             button=['Confirm'],
             defaultButton='Confirm',
             cancelButton='Cancel',

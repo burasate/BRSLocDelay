@@ -105,10 +105,10 @@ def getBRSLicense(licenseKey):
 
 # Check License
 license_key, license_email = (u'', u'')
-while userData['email'] == 'burasedborvon@gmail.com':
-#while True:
+#while userData['email'] == 'burasedborvon@gmail.com':
+while True:
     license_key, license_email = getBRSLicense(userData['licenseKey'])
-    print(userData['licenseKey'], license_key)
+    #print(userData['licenseKey'], license_key) #debug for dev
     if not license_key == '' :
         print('Found license key', license_key)
         userData['licenseKey'] = license_key
