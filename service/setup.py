@@ -87,6 +87,10 @@ finally:
 
     command = ''\
 '''
+#------------------------------------
+# BRS LOCATOR DELAY
+# OVERLAPPING TOOL
+#------------------------------------
 import imp
 try:
     imp.reload(BRSLocDelaySystem)
