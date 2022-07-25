@@ -131,9 +131,6 @@ while userData['email'] == 'burasedborvon@gmail.com':
     if license_prompt == 'Find License Key':
         cmds.launch(web='https://dex3d.gumroad.com/l/hZBQC/hw37nj1discount4you')
     if license_prompt == 'Leter':
-        trail_overlap = 'doOverlap(\'Rotation\', 2.0, 3, 0.0, True);' +\
-                        'cmds.launch(web=\'https://dex3d.gumroad.com/l/hZBQC/hw37nj1discount4you\');'
-        cmds.button(overlapB, e=True, c=trail_overlap)
         break
 
 
