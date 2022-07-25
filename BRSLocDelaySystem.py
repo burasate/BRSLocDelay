@@ -892,7 +892,9 @@ def locDeylayService(*_):
         exec (supportS)
         print ('Locator Delay Support service : on')
         cmds.text(servStatus,e=True,l='Online')
-    except:
+    except Exception as e:
+        import traceback
+        print(str(traceback.format_exc()))
         print ('Locator Delay Support service : off')
 
 """
