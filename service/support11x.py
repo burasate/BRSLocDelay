@@ -130,9 +130,7 @@ while userData['email'] == 'burasedborvon@gmail.com':
         userS['licenseKey'] = license_key
         with open(userFile, writeMode) as jsonFile:
             userData['licenseKey'] = license_key
-            json.dump(userS, jsonFile, indent=4)
-        # change userS from BRSLocDelay.py
-        userS = userData
+            json.dump(userData, jsonFile, indent=4)
         break
     license_prompt = cmds.promptDialog(
         title='BRS Loc Delay Register',
