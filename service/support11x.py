@@ -131,6 +131,10 @@ while True:
     if license_prompt == 'Find License Key':
         cmds.launch(web='https://dex3d.gumroad.com/l/hZBQC/hw37nj1discount4you')
     if license_prompt == 'Leter':
+        with open(userFile, writeMode) as jsonFile:
+            userData['licenseKey'] = ''
+            userData['isTrial'] = True
+            json.dump(userData, jsonFile, indent=4)
         break
 
 

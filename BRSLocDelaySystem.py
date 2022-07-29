@@ -1239,13 +1239,13 @@ def BRSUpdateUI(*_):
     maxTime = cmds.playbackOptions(q=True, maxTime=True)
     cmds.text(bakeRangeT, e=True, l='frame range [ {} - {} ]'.format(minTime,maxTime))
 
-# Init Update
-# User
-with open(userFile, 'r') as jsonFile:
-    userS = json.load(jsonFile)
-    if userS['isTrial'] and userS['days'] > 30:
-        cmds.button(overlapB, e=True,l='Trial expired', c='')
-    else: cmds.button(overlapB, e=True, c=overlapeCheck)
+
+"""
+-----------------------------------------------------------------------
+INIT UPDATE
+-----------------------------------------------------------------------
+"""
+cmds.button(overlapB, e=True, c=overlapeCheck)
 cmds.checkBox(previewChk, e=True, cc=BRSUpdateUI)
 cmds.checkBox(delLocChk, e=True, cc=BRSUpdateUI)
 cmds.floatSlider(distanceS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
@@ -1257,6 +1257,12 @@ cmds.floatField(offsetT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
 cmds.optionMenu(mode, e=True, cc=BRSUpdateUI)
 BRSUpdateUI()
 BRSPresetUIUpdate()
+with open(userFile, 'r') as jsonFile:
+    userS = json.load(jsonFile)
+    if userS['isTrial'] and userS['days'] > 30:
+        cmds.button(overlapB, e=True, l='Trial expired', c='')
+    else:
+        cmds.button(overlapB, e=True, c=overlapeCheck)
 
 """
 -----------------------------------------------------------------------
