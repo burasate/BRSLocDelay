@@ -1240,7 +1240,7 @@ def BRSUpdateUI(*_):
     cmds.text(bakeRangeT, e=True, l='frame range [ {} - {} ]'.format(minTime,maxTime))
 
 # Init Update
-
+# User
 with open(userFile, 'r') as jsonFile:
     userS = json.load(jsonFile)
     if userS['isTrial'] and userS['days'] > 30:
