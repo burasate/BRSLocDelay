@@ -971,7 +971,7 @@ cmds.rowLayout(h=20, numberOfColumns=4, columnWidth4=(70, 50, 150, 10), adjustab
                columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)])
 cmds.text(l='Distance  ', al='right')
 distanceT = cmds.floatField(editable=True,value=0,pre=1,max=500)
-distanceS = cmds.floatSlider(minValue=0.1, maxValue=500, value=2)
+distanceS = cmds.floatSlider(minValue=0, maxValue=500, value=2)
 cmds.button(l=' ? ',annotation='Distance from selecion to locator')
 cmds.setParent('..')
 
@@ -1090,13 +1090,13 @@ def BRSCheckboxUpdate(*_):
     BRSUpdateUI()
 
 def BRSFeildUpdate(*_):
-    configS['locDistance'] = round(cmds.floatField(distanceT, q=True, v=True),1)
+    configS['locDistance'] = round(cmds.floatField(distanceT, q=True, v=True),2)
     configS['locDynamic'] = cmds.intField(dynamicT, q=True, v=True)
     configS['locOffset'] = round(cmds.floatField(offsetT, q=True, v=True),1)
     BRSUpdateUI()
 
 def BRSSliderUpdate(*_):
-    configS['locDistance'] = round(cmds.floatSlider(distanceS, q=True, value=True),1)
+    configS['locDistance'] = round(cmds.floatSlider(distanceS, q=True, value=True),2)
     configS['locDynamic'] = cmds.intSlider(dynamicS, q=True, value=True)
     configS['locOffset'] = round(cmds.floatSlider(offsetS, q=True, value=True),1)
     BRSUpdateUI()
@@ -1231,7 +1231,7 @@ def BRSUpdateUI(*_):
         cmds.floatSlider(distanceS, e=True, minValue=0, v=0)
         cmds.floatField(distanceT, e=True, v=0, editable=False)
     else:
-        cmds.floatSlider(distanceS, e=True, minValue=1)
+        cmds.floatSlider(distanceS, e=True, minValue=0.1)
         cmds.floatField(distanceT, e=True, editable=True)
 
     #Rang Text Update
