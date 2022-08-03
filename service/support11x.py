@@ -104,39 +104,50 @@ def getBRSLicense(licenseKey):
     return (license_key, license_email)
 
 # Check License
-license_key, license_email = (u'', u'')
-#while userData['email'] == 'burasedborvon@gmail.com':
-while True:
-    license_key, license_email = getBRSLicense(userData['licenseKey'])
-    #print(userData['licenseKey'], license_key) #debug for dev
-    if not license_key == '' :
-        print('Found license key', license_key)
-        userData['licenseKey'] = license_key
-        with open(userFile, writeMode) as jsonFile:
+def locDelayLicense(*_):
+    license_key, license_email = (u'', u'')
+    #while userData['email'] == 'burasedborvon@gmail.com':
+    while True:
+        license_key, license_email = getBRSLicense(userData['licenseKey'])
+        #print(userData['licenseKey'], license_key) #debug for dev
+        if not license_key == '' :
+            print('Found license key', license_key)
             userData['licenseKey'] = license_key
-            userData['isTrial'] = False
-            json.dump(userData, jsonFile, indent=4)
-        break
-    else:
-        userData = json.load(open(userFile, 'r'))
-    license_prompt = cmds.promptDialog(
-        title='BRS Loc Delay Register',
-        message='BRS Loc Delay\nLicense Key',
-        button=['Confirm','Find License Key','Leter'],
-        defaultButton='Confirm',
-        cancelButton='Leter',
-        dismissString='Leter', bgc=(.2, .2, .2))
-    if license_prompt == 'Confirm':
-        userData['licenseKey'] = cmds.promptDialog(query=True, text=True)
-    if license_prompt == 'Find License Key':
-        cmds.launch(web='https://dex3d.gumroad.com/l/hZBQC/hw37nj1discount4you')
-    if license_prompt == 'Leter':
-        with open(userFile, writeMode) as jsonFile:
-            userData['licenseKey'] = ''
-            userData['isTrial'] = True
-            json.dump(userData, jsonFile, indent=4)
-        break
+            with open(userFile, writeMode) as jsonFile:
+                userData['licenseKey'] = license_key
+                userData['isTrial'] = False
+                json.dump(userData, jsonFile, indent=4)
+            break
+        else:
+            userData = json.load(open(userFile, 'r'))
+        prompt_button = ['Confirm','Find License Key','Leter']
+        #Trial Checking
+        if userData['isTrial'] and userData['days'] > 30:
+            prompt_button = [i for i in prompt_button if not i == 'Leter']
+        license_prompt = cmds.promptDialog(
+            title='BRS Loc Delay Register',
+            message='BRS Loc Delay\nLicense Key',
+            button=prompt_button,
+            defaultButton='Confirm',
+            cancelButton='Leter',
+            dismissString='Leter', bgc=(.2, .2, .2))
+        if license_prompt == 'Confirm':
+            userData['licenseKey'] = cmds.promptDialog(query=True, text=True)
+        if license_prompt == 'Find License Key':
+            cmds.launch(web='https://app.gumroad.com/library?sort=recently_updated&query=delay')
+        if license_prompt == 'Leter':
+            with open(userFile, writeMode) as jsonFile:
+                userData['licenseKey'] = ''
+                userData['isTrial'] = True
+                json.dump(userData, jsonFile, indent=4)
+            break
 
+locDelayLicense()
+#Menu Upadate
+try:
+    cmds.menuItem(licenseMItem, e=True, c=locDelayLicense)
+except:
+    print('cannot add menu item > locDelayLicense'),
 
 #===============================================================================
 #Check In

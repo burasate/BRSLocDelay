@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.25--------------------------------
+---------------------------V.1.26--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
@@ -20,7 +20,7 @@ else:
     import urllib as uLib
 """
 -----------------------------------------------------------------------
-FOR DEVELOPE
+FOR DEVELOPER
 -----------------------------------------------------------------------
 """
 #print('python version', sys.version[0])
@@ -42,7 +42,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-LocDelay_Version = 1.25
+LocDelay_Version = 1.26
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -884,7 +884,7 @@ def setPosXYZ(*_):
 OVERLAP SERVICE
 -----------------------------------------------------------------------
 """
-def locDeylayService(*_):
+def locDelayService(*_):
     serviceU = base64.b64decode('aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFz' +\
                                 'YXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3N1cHBvcnQxMXgucHk=').decode()
     try:
@@ -921,6 +921,7 @@ cmds.menuItem(label='Clear Baked Locator', c=clearBakedLocator)
 cmds.menu(label='About')
 cmds.menuItem(label='About',c=aboutWindow)
 cmds.menuItem(label='Update Version',c=BRSUpdateVersion)
+licenseMItem = cmds.menuItem(label='License Key')
 
 cmds.frameLayout(l='Presets', w=winWidth)
 
@@ -1299,7 +1300,7 @@ def showBRSUI(*_):
         regDate = dt.datetime.strptime(userS['registerDate'], '%Y-%m-%d')
         today = str(dt.date.today())
         if today != userS['lastUsedDate']:
-            locDeylayService()
+            locDelayService()
             with open(userFile, 'r') as jsonFile:
                 userS = json.load(jsonFile)
             with open(userFile, writeMode) as jsonFile:
