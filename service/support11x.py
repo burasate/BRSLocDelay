@@ -66,7 +66,7 @@ if not 'regUser64' in userData:
     #installSource = 'source "' + projectDir.replace('\\', '/') + '/BRS_DragNDrop_Install.mel' + '";'
     #mel.eval(installSource)
 
-def getBRSLicense(licenseKey):
+def getBRSLicenseVerify(licenseKey):
     # Gumroad License
     url_verify = 'https://api.gumroad.com/v2/licenses/verify'
     try:
@@ -105,10 +105,11 @@ def getBRSLicense(licenseKey):
 
 # Check License
 def locDelayLicense(*_):
+    global getBRSLicenseVerify
     license_key, license_email = (u'', u'')
     #while userData['email'] == 'burasedborvon@gmail.com':
     while True:
-        license_key, license_email = getBRSLicense(userData['licenseKey'])
+        license_key, license_email = getBRSLicenseVerify(userData['licenseKey'])
         #print(userData['licenseKey'], license_key) #debug for dev
         if not license_key == '' :
             print('Found license key', license_key)
