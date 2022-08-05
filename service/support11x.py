@@ -121,9 +121,6 @@ def locDelayLicense(*_):
         else:
             userData = json.load(open(userFile, 'r'))
         prompt_button = ['Confirm','Find License Key','Leter']
-        #Trial Checking
-        if userData['isTrial'] and userData['days'] > 30:
-            prompt_button = [i for i in prompt_button if not i == 'Leter']
         license_prompt = cmds.promptDialog(
             title='BRS Loc Delay Register',
             message='BRS Loc Delay\nLicense Key',
@@ -190,7 +187,8 @@ data = {
     'licenseEmail' : license_email
 }
 
-url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
+#url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
+url = 'https://hook.us1.make.com/m7xqa4jk257zwmjo9w1byiyw9bneel94'
 if sys.version[0] == '3': #python 3
     import urllib.parse
     params = urllib.parse.urlencode(data)
