@@ -112,7 +112,7 @@ def locDelayLicense(*_):
         license_key, license_email = getBRSLicenseVerify(userData['licenseKey'])
         #print(userData['licenseKey'], license_key) #debug for dev
         if not license_key == '' :
-            print('Found license key', license_key)
+            print('Found license key', str(license_key)[:-9] + '-XXXXXXXX')
             userData['licenseKey'] = license_key
             with open(userFile, writeMode) as jsonFile:
                 userData['licenseKey'] = license_key
