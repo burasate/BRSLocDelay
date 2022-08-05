@@ -104,8 +104,8 @@ def getBRSLicenseVerify(licenseKey):
     return (license_key, license_email)
 
 # Check License
-def locDelayLicense(*_):
-    global getBRSLicenseVerify
+def locDelayLicense(userLicenseKey):
+    global getBRSLicenseVerify, userData
     license_key, license_email = (u'', u'')
     #while userData['email'] == 'burasedborvon@gmail.com':
     while True:
