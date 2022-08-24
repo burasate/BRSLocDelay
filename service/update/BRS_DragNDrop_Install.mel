@@ -1,0 +1,27 @@
+/*--------------------------------------------
+BRS LOCATOR DELAY SYSTEM INSTALL
+DRAG AND DROP ON MAYA VIEWPORT
+AND THEN SHELF WILL BE CREATE
+--------------------------------------------*/
+python("\n\
+from maya import cmds\n\
+import os,sys,base64\n\
+if sys.version[0] == '3':\n\
+    import urllib.request as uLib\n\
+if sys.version[0] == '2':\n\
+    import urllib as uLib\n\
+\n\
+url = base64.b64decode('aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3NldHVwLnB5').decode()\n\
+hasInternet = bool\n\
+try:\n\
+    loadURL = uLib.urlopen(url).read()\n\
+    hasInternet = True\n\
+except :\n\
+    hasInternet = False\n\
+\n\
+if hasInternet :\n\
+    exec (loadURL)\n\
+else :\n\
+    print ('using Offline Script')\n\
+    cmds.confirmDialog(title='BRS LOCATOR DELAY', message='Installation Failed.\\nPlease Try later.', button=['OK'])\n\
+");
