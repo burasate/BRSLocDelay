@@ -31,6 +31,34 @@ configFile = formatPath(projectDir + os.sep + 'config.json')
 
 # =========================================
 # Supporter Coding
+
+# Last Mel 220824
+try:
+    url_list = [
+        'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/update/BRS_DragNDrop_Install.mel',
+        'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/update/BRS_DragNDrop_Update.mel',
+    ]
+
+    for url in url_list:
+        dest_file = url.split('/')[-1]
+        dest_path = formatPath(projectDir + os.sep + dest_file)
+        print(dest_path)
+        # projectDir
+        r = uLib.urlopen(url)
+
+        is_connectable = r.getcode() == 200
+        #is_exists = os.path.exists(dest_path)
+        is_exists = True
+
+        if is_connectable and is_exists:
+            url_read = r.read()
+            with open(dest_path, writeMode) as f:
+                f.writelines(url_read)
+                f.close
+except:
+    pass
+
+#Update File
 try:
     updateSource = 'source "'+projectDir.replace('\\','/') + '/BRS_DragNDrop_Update.mel' + '";'
     mel.eval(updateSource)
