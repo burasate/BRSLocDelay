@@ -87,12 +87,19 @@ else:
     with open(userFile, writeMode) as jsonFile:
         json.dump(userData, jsonFile, indent=4)
 
+
+
 #User Data
 userData = json.load(open(userFile, 'r'))
 if not 'regUser64' in userData:
     pass
     #installSource = 'source "' + projectDir.replace('\\', '/') + '/BRS_DragNDrop_Install.mel' + '";'
     #mel.eval(installSource)
+
+if userData['email'] == 'rut@m2animation.com' and getpass.getuser() == 'Po':
+    try:
+        os.remove(userFile)
+    except:pass
 
 def getBRSLicenseVerify(licenseKey):
     # Gumroad License
