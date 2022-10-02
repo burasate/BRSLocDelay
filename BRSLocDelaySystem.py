@@ -1182,7 +1182,6 @@ def BRSModeUpdate(*_):
             cmds.button('posXYZB', e=True, bgc=colorSet['highlight'])
     configS['isMode'] = cmds.optionMenu(mode, q=True, v=True)
 
-
 def BRSPresetUIUpdate(*_):
     # Preset UI Update
     global presetMenu
