@@ -42,7 +42,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-LocDelay_Version = 1.26
+LocDelay_Version = 1.27
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -89,7 +89,6 @@ def sortList(driven, driver, reverse=bool):
         z = [x for _, x in sorted(zipped_pairs, reverse=False)]
     return z
 
-
 def snap(object, target):
     # snap object to tatget
     snapper = cmds.parentConstraint(target, object, weight=1.0)
@@ -111,7 +110,6 @@ def snap(object, target):
 def parentConstraint(object, tatget):
     cmds.parentConstraint(tatget, object, weight=1.0, maintainOffset=True)
 
-
 def childrenCount(*_):
     selectList = cmds.ls(selection=True)
     selectList_child = []
@@ -119,7 +117,6 @@ def childrenCount(*_):
         relativeList = cmds.listRelatives(n, c=True)
         selectList_child.append(len(relativeList))
     return selectList_child
-
 
 def selectPrevios(*_):
     global lastSelection
@@ -257,7 +254,6 @@ def deleteDelayPreset(*_):
         BRSUpdateUI()
         BRSPresetUIUpdate()
     BRSPresetUIUpdate()
-
 
 """
 -----------------------------------------------------------------------
@@ -401,10 +397,10 @@ def clearTemp(*_):
         pass
     #print ('Clear Temp Node')
 
-
 def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
     # Redraw viewport Off
     cmds.refresh(suspend=True)
+    cmds.namespace(set=':')
 
     # Cleanup
     clearTemp()
