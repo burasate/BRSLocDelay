@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.26--------------------------------
+---------------------------V.1.28--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
@@ -42,7 +42,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-LocDelay_Version = 1.27
+LocDelay_Version = 1.281
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -292,11 +292,16 @@ def clearGuide(*_):
 def createGuide(mode, distance=int):
     global guideName
     global guideGrpName
-    selectList = cmds.ls(selection=True)
+    selectList = cmds.ls(sl=1, long=1) #Long Name
+    sn_selectList = [i.split('|')[-1] for i in selectList]
     if selectList != []:
         for target in selectList:
+            index = selectList.index(target)
+            sn_target = sn_selectList[index]
+
             # New name
-            newGuideName = target + '_' + guideName
+            newGuideName = sn_target + '_' + guideName
+            #print(newGuideName)
             if mode == 'Rotation':
                 newGuideName = newGuideName + '_aimLoc'
             elif mode == 'Position':
@@ -405,12 +410,13 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
     # Cleanup
     clearTemp()
 
-    targetList = cmds.ls(selection=True, sn=True)
-    progressStart(0,len(targetList))
+    selectList = cmds.ls(sl=1, long=1) #Long Name
+    sn_selectList = [i.split('|')[-1] for i in selectList]
+    progressStart(0,len(selectList))
 
     # Save Last Selection
     global lastSelection
-    lastSelection = targetList
+    lastSelection = selectList
 
     eventStartTime = time.time()
     minTime = cmds.playbackOptions(q=True, minTime=True)
@@ -433,24 +439,25 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
         goalWeight = 0.5
     # ---
 
-    for target in targetList:
+    for target in selectList:
+        index = selectList.index(target)
+        sn_target = sn_selectList[index]
+
         # Init Locator
         newLocName = ''
         if mode == 'Rotation':
             locName = 'aimLoc'
-            newLocName = target + '_aimLoc'
+            newLocName = sn_target + '_aimLoc'
         elif mode == 'Position':
             locName = 'posLoc'
-            newLocName = target + '_posLoc'
+            newLocName = sn_target + '_posLoc'
         # print ('Create '+newLocName)
-        try:
-            cmds.delete(target + '_aimLoc')
-        except:
-            pass
-        try:
-            cmds.delete(target + '_posLoc')
-        except:
-            pass
+        for n in [
+            '{}_aimLoc'.format(sn_target),
+            '{}_posLoc'.format(sn_target)
+        ]:
+            if cmds.objExists(n):
+                cmds.delete(n)
 
         # Guide to Locator
         cmds.select(target, r=True)
@@ -459,7 +466,7 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
         cmds.setKeyframe(t=minTime, itt='auto', ott='auto', breakdown=0, hierarchy='none', controlPoints=0)
 
         cmds.spaceLocator(name=locName)
-        snap(locName, target + '_' + guideName + '_' + locName)
+        snap(locName, sn_target + '_' + guideName + '_' + locName)
         clearGuide()
         parentConstraint(locName, target)
 
@@ -562,7 +569,7 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
             cmds.setAttr(tempLocName + 'Shape.localScaleX', 0.25)
             cmds.setAttr(tempLocName + 'Shape.localScaleY', 0.25)
             cmds.setAttr(tempLocName + 'Shape.localScaleZ', 0.25)
-            newLocName = target + '_posLoc'
+            newLocName = sn_target + '_posLoc'
         elif mode == 'Rotation':
             cmds.setAttr(tempLocName + '.useOutlinerColor', 1)
             cmds.setAttr(tempLocName + '.outlinerColor', 1, 0.8, 0)
@@ -573,11 +580,12 @@ def doOverlap(mode, distance, dynamic, offset, smoothness=bool):
             cmds.setAttr(tempLocName + 'Shape.localScaleX', 0.25)
             cmds.setAttr(tempLocName + 'Shape.localScaleY', 0.25)
             cmds.setAttr(tempLocName + 'Shape.localScaleZ', 0.25)
-            newLocName = target + '_aimLoc'
+            newLocName = sn_target + '_aimLoc'
+        print(newLocName),
         cmds.rename(tempLocName, newLocName)
 
     # Finish
-    cmds.select(targetList, r=True)
+    cmds.select(selectList, r=True)
     cmds.currentTime(minTime)
     progressEnd()
     # Redraw viewport On
@@ -616,17 +624,20 @@ def doSetKey(*_):
         locatorList = []
         keyframeList = []
         for n in objectList:
-            if n.__contains__('aimLoc') or n.__contains__('posLoc'):
-                cmds.select(n, r=True)
-                cmds.pickWalk(d='up')
-                x = (cmds.ls(sl=True)[0])
-                # print(n) #Shape
-                # print(x) #Locator
-                locatorList.append(x)
-                x = x[:-len('_xxxLoc')]
+            #if n.__contains__('aimLoc') or n.__contains__('posLoc'):
+            if 'aimLoc' in n or 'posLoc' in n:
+                loc_tranform = cmds.listRelatives(n, p=1)[0]
+                con = list(set(cmds.listConnections(loc_tranform, type='constraint')))[0]
+                con_parent = cmds.listRelatives(con, p=1, f=1)[0]
+
+                #cmds.select(n, r=True)
+                #cmds.pickWalk(d='up')
+                #x = (cmds.ls(sl=True)[0])
+                locatorList.append(loc_tranform)
+                #x = x[:-len('_xxxLoc')]
                 # print(x) #Overlape selection
-                selectionList.append(x)
-                cmds.select(cl=True)
+                selectionList.append(con_parent)
+                #cmds.select(cl=True)
 
         #MAIN KEY FRAME FUNC
         for selectName in selectionList:
@@ -1053,7 +1064,7 @@ def overlapeCheck(*_):
     except:
         pass
 
-    targetList = cmds.ls(selection=True, sn=True)
+    targetList = cmds.ls(sl=1)
     configS['isMode'] = cmds.optionMenu(mode, q=True, v=True)
     configS['locDistance'] = float(cmds.floatField(distanceT, q=True, v=True))
     configS['locDynamic'] = int(cmds.intField(dynamicT, q=True, v=True))
@@ -1251,6 +1262,7 @@ cmds.floatField(distanceT, e=True, ec=BRSFeildUpdate ,cc=BRSFeildUpdate)
 cmds.intField(dynamicT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
 cmds.floatField(offsetT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
 cmds.optionMenu(mode, e=True, cc=BRSUpdateUI)
+cmds.menuItem(licenseMItem, e=True, c=locDelayService)
 BRSUpdateUI()
 BRSPresetUIUpdate()
 with open(userFile, 'r') as jsonFile:

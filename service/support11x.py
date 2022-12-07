@@ -96,7 +96,7 @@ if not 'regUser64' in userData:
     #installSource = 'source "' + projectDir.replace('\\', '/') + '/BRS_DragNDrop_Install.mel' + '";'
     #mel.eval(installSource)
 
-if userData['email'] == 'rut@m2animation.com' and getpass.getuser() == 'Po':
+if userData['email'] == 'rut@m2animation.com' and getpass.getuser() == 'kla':
     try:
         os.remove(userFile)
     except:pass
