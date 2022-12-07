@@ -177,10 +177,10 @@ def locDelayLicense(*_):
 
 locDelayLicense()
 #Menu Upadate
-try:
-    cmds.menuItem(licenseMItem, e=True, c=locDelayLicense)
-except:
-    print('cannot add menu item > locDelayLicense'),
+#try:
+    #cmds.menuItem(licenseMItem, e=True, c=locDelayLicense)
+#except:
+    #print('cannot add menu item > locDelayLicense'),
 
 #===============================================================================
 #Check In
