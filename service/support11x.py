@@ -246,7 +246,7 @@ def get_keyframe_data():
 
     anim_attr_list = []
     for obj in anim_object_list:
-        setable_attr_list = cmds.listAttr(i, k=1, se=1)
+        setable_attr_list = cmds.listAttr(obj, k=1, se=1)
         anim_attr_list += [obj + '.' + i for i in setable_attr_list]
     # print(anim_attr_list)
 
@@ -262,7 +262,8 @@ def get_keyframe_data():
             del key_count_dict[l]
     # print(key_count_dict)
 
-    data = {'time_change': sorted(list(key_count_dict)[:10])}
+    tc_limit = 24
+    data = {'time_change': sorted(list(key_count_dict)[:tc_limit])}
     for attr in anim_attr_list:
         data[attr] = [round(float(cmds.getAttr(attr, t=i)), 3) for i in data['time_change']]
     return data
