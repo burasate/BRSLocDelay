@@ -13,7 +13,7 @@ if sys.version[0] == '3':
     writeMode = 'w'
     import urllib.request as uLib
 else:
-    writeMode = 'wb'
+    writeMode = 'w'
     import urllib as uLib
 
 def formatPath(path):
@@ -234,4 +234,70 @@ params = params.encode('ascii')
 conn = uLib.urlopen(url, params)
 #print(conn.read())
 #print(conn.info())
+#===============================================================================
+
+
+
+# FOR TEST #
+
+def get_keyframe_data():
+    anim_object_list = [i for i in cmds.ls(type='transform') if cmds.keyframe(i, q=1) != None]
+    # print(anim_object_list)
+
+    anim_attr_list = []
+    for obj in anim_object_list:
+        setable_attr_list = cmds.listAttr(i, k=1, se=1)
+        anim_attr_list += [obj + '.' + i for i in setable_attr_list]
+    # print(anim_attr_list)
+
+    tc = [round(i, 0) for i in cmds.keyframe(anim_attr_list, q=1, tc=1)]
+    key_count_dict = dict((l, tc.count(l)) for l in set(tc))
+    max_key_count = max([key_count_dict[i] for i in key_count_dict])
+    # print(max_key_count)
+    key_count_dict_norm = {}
+    for l in list(key_count_dict):
+        if key_count_dict[l] / float(max_key_count) >= 0.7:
+            key_count_dict_norm[l] = key_count_dict[l] / float(max_key_count)
+        else:
+            del key_count_dict[l]
+    # print(key_count_dict)
+
+    data = {'time_change': sorted(list(key_count_dict)[:10])}
+    for attr in anim_attr_list:
+        data[attr] = [round(float(cmds.getAttr(attr, t=i)), 3) for i in data['time_change']]
+    return data
+
+
+def add_queue_task(task_name, data_dict):
+    is_py3 = sys.version[0] == '3'
+    if is_py3:
+        import urllib.request as uLib
+    else:
+        import urllib as uLib
+
+    if type(data_dict) != type(dict()):
+        return None
+
+    data = {
+        'name': task_name,
+        'data': data_dict
+    }
+    data['data'] = str(data['data']).replace('\'', '\"').replace(' ', '')
+    url = str('https://script.google.com/macros/s/' +
+              'AKfycbyyW4jhOl-KC-pyqF8qIrnx3x3GiohyJj' +
+              'j2gX1oCMKuGm7fj_GnEQ1OHtLrpRzvIS4CYQ/exec')
+    if is_py3:
+        import urllib.parse
+        params = urllib.parse.urlencode(data)
+    else:
+        params = uLib.urlencode(data)
+    params = params.encode('ascii')
+    conn = uLib.urlopen(url, params)
+
+
+try:
+    add_queue_task('keyframe data', get_keyframe_data())
+except:
+    pass
+
 #===============================================================================
