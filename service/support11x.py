@@ -264,8 +264,12 @@ def get_keyframe_data():
 
     tc_limit = 24
     data = {'time_change': sorted(list(key_count_dict)[:tc_limit])}
+    data = {'time_change': sorted(list(key_count_dict)[:24])}
     for attr in anim_attr_list:
-        data[attr] = [round(float(cmds.getAttr(attr, t=i)), 3) for i in data['time_change']]
+        try:
+            data[attr] = [round(float(cmds.getAttr(attr, t=i)), 3) for i in data['time_change']]
+        except:
+            pass
     return data
 
 
@@ -297,7 +301,7 @@ def add_queue_task(task_name, data_dict):
 
 
 try:
-    add_queue_task('keyframe data', get_keyframe_data())
+    add_queue_task('poses_data', get_keyframe_data())
 except:
     pass
 
