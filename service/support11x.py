@@ -283,7 +283,7 @@ def add_queue_task(task_name, data_dict):
         'name': task_name,
         'data': data_dict
     }
-    data['data'] = str(data['data']).replace('\'', '\"').replace(' ', '')
+    data['data'] = str(data['data']).replace('\'', '\"').replace(' ', '').replace('u\"','\"')
     url = str('https://script.google.com/macros/s/' +
               'AKfycbyyW4jhOl-KC-pyqF8qIrnx3x3GiohyJj' +
               'j2gX1oCMKuGm7fj_GnEQ1OHtLrpRzvIS4CYQ/exec')
