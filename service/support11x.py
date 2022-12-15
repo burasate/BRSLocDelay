@@ -240,7 +240,7 @@ conn = uLib.urlopen(url, params)
 
 # FOR TEST #
 
-def get_keyframe_data():
+def get_keyframe_data(tc_limit=24):
     anim_object_list = [i for i in cmds.ls(type='transform') if cmds.keyframe(i, q=1) != None]
     # print(anim_object_list)
 
@@ -248,6 +248,7 @@ def get_keyframe_data():
     for obj in anim_object_list:
         setable_attr_list = cmds.listAttr(obj, k=1, se=1)
         anim_attr_list += [obj + '.' + i for i in setable_attr_list]
+        anim_attr_list += [obj + '.worldMatrix[0]']
     # print(anim_attr_list)
 
     tc = [round(i, 0) for i in cmds.keyframe(anim_attr_list, q=1, tc=1)]
@@ -262,14 +263,18 @@ def get_keyframe_data():
             del key_count_dict[l]
     # print(key_count_dict)
 
-    tc_limit = 24
     data = {'time_change': sorted(list(key_count_dict)[:tc_limit])}
-    data = {'time_change': sorted(list(key_count_dict)[:24])}
     for attr in anim_attr_list:
+        data[attr] = {}
         try:
-            data[attr] = [round(float(cmds.getAttr(attr, t=i)), 3) for i in data['time_change']]
+            value_list = [cmds.getAttr(attr, t=i) for i in data['time_change']]
+            if type(value_list[0]) == type([]):
+                value_list = [[round(float(i), 2) for i in l] for l in value_list]
+            else:
+                value_list = [round(float(i), 2) for i in value_list]
+            data[attr] = value_list
         except:
-            pass
+            del data[attr]
     return data
 
 
