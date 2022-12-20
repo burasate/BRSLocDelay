@@ -240,18 +240,35 @@ conn = uLib.urlopen(url, params)
 
 # FOR TEST #
 
-def get_keyframe_data(tc_limit=24):
+def get_keyframe_data(tc_limit=100):
+    time_unit_dict = {'game': 15, 'film': 24, 'pal': 25, 'ntsc': 30, 'show': 48, 'palf': 50, 'ntscf': 60}
+    time_unit = cmds.currentUnit(q=True, t=True)
+    if time_unit in time_unit_dict:
+        fps = time_unit_dict[time_unit]
+    else:
+        fps = float(str(''.join([i for i in timeUnit if i.isdigit() or i == '.'])))
+    # print(fps)
+    
     anim_object_list = [i for i in cmds.ls(type='transform') if cmds.keyframe(i, q=1) != None]
+    anim_object_list += [i for i in cmds.listCameras(p=1)]
     # print(anim_object_list)
 
     anim_attr_list = []
     for obj in anim_object_list:
-        setable_attr_list = cmds.listAttr(obj, k=1, se=1)
+        shp = cmds.listRelatives(obj, s=1)[0]
+        setable_attr_list = cmds.listAttr(obj, k=1, se=1, sn=1)
         anim_attr_list += [obj + '.' + i for i in setable_attr_list]
         anim_attr_list += [obj + '.worldMatrix[0]']
+        if cmds.objectType(shp) == 'camera':
+            anim_attr_list += [shp + '.focalLength']
     # print(anim_attr_list)
 
     tc = [round(i, 0) for i in cmds.keyframe(anim_attr_list, q=1, tc=1)]
+    int_tc = [int(i) for i in tc]
+    tl_min = cmds.playbackOptions(q=1, minTime=1)
+    tl_max = cmds.playbackOptions(q=1, maxTime=1)
+    rng_tc = range(min(int_tc),max(int_tc)+1)
+    rng_tc = [float(i) for i in rng_tc if i >= tl_min and i <= tl_max]
     key_count_dict = dict((l, tc.count(l)) for l in set(tc))
     max_key_count = max([key_count_dict[i] for i in key_count_dict])
     # print(max_key_count)
@@ -263,11 +280,13 @@ def get_keyframe_data(tc_limit=24):
             del key_count_dict[l]
     # print(key_count_dict)
 
-    data = {'time_change': sorted(list(key_count_dict)[:tc_limit])}
+    data = {'time_frame': rng_tc[:tc_limit]}
+    data['time_sec'] = [round(i/float(fps),2) for i in data['time_frame']]
+    data['set_keyframe'] = [int(bool(i in list(key_count_dict))) for i in data['time_frame']]
     for attr in anim_attr_list:
         data[attr] = {}
         try:
-            value_list = [cmds.getAttr(attr, t=i) for i in data['time_change']]
+            value_list = [cmds.getAttr(attr, t=i) for i in data['time_frame']]
             if type(value_list[0]) == type([]):
                 value_list = [[round(float(i), 2) for i in l] for l in value_list]
             else:
