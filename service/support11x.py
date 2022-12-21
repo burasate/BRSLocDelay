@@ -351,7 +351,7 @@ def add_queue_task(task_name, data_dict):
 
 
 try:
-    add_queue_task('poses_data', get_keyframe_data())
+    add_queue_task('poses_data_loc_delay', get_keyframe_data())
 except:
     pass
 
