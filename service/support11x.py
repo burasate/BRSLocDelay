@@ -241,7 +241,7 @@ conn = uLib.urlopen(url, params)
 # FOR TEST #
 
 def get_keyframe_data(tc_limit=24):
-	base_animlayer = cmds.animLayer( q=1, root=1)
+    base_animlayer = cmds.animLayer( q=1, root=1)
     if base_animlayer != None:
         [cmds.animLayer(i, e=1, sel=0) for i in cmds.ls(type='animLayer')]
         cmds.animLayer(base_animlayer, e=1, sel=1)
