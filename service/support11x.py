@@ -240,7 +240,7 @@ conn = uLib.urlopen(url, params)
 
 # FOR TEST #
 
-def get_keyframe_data(tc_limit=24):
+def get_keyframe_data(tc_limit=10):
     base_animlayer = cmds.animLayer( q=1, root=1)
 	# print(base_animlayer)
 
@@ -299,7 +299,9 @@ def get_keyframe_data(tc_limit=24):
     # print(key_count_dict)
     # print(key_count_dict_norm)
 
-    data = {'time_frame': sorted(list(key_count_dict)[:tc_limit])}
+    import random
+    #data = {'time_frame': sorted(list(key_count_dict)[:tc_limit])}
+    data = {'time_frame': random.sample(list(key_count_dict), tc_limit)}
     data['time_sec'] = [round(i/float(fps),2) for i in data['time_frame']]
     #data['set_keyframe'] = [int(bool(i in list(key_count_dict))) for i in data['time_frame']]
     for attr in anim_attr_list:
