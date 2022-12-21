@@ -241,6 +241,12 @@ conn = uLib.urlopen(url, params)
 # FOR TEST #
 
 def get_keyframe_data(tc_limit=24):
+	base_animlayer = cmds.animLayer( q=1, root=1)
+    if base_animlayer != None:
+        [cmds.animLayer(i, e=1, sel=0) for i in cmds.ls(type='animLayer')]
+        cmds.animLayer(base_animlayer, e=1, sel=1)
+        cmds.animLayer(uir=1, fur=1)
+
     time_unit_dict = {'game': 15, 'film': 24, 'pal': 25, 'ntsc': 30, 'show': 48, 'palf': 50, 'ntscf': 60}
     time_unit = cmds.currentUnit(q=True, t=True)
     if time_unit in time_unit_dict:
@@ -282,7 +288,7 @@ def get_keyframe_data(tc_limit=24):
 
     data = {'time_frame': sorted(list(key_count_dict))[:tc_limit]}
     data['time_sec'] = [round(i/float(fps),2) for i in data['time_frame']]
-    data['set_keyframe'] = [int(bool(i in list(key_count_dict))) for i in data['time_frame']]
+    #data['set_keyframe'] = [int(bool(i in list(key_count_dict))) for i in data['time_frame']]
     for attr in anim_attr_list:
         data[attr] = {}
         try:
