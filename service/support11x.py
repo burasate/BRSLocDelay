@@ -300,8 +300,14 @@ def get_keyframe_data(tc_limit=10):
     # print(key_count_dict_norm)
 
     import random
-    #data = {'time_frame': sorted(list(key_count_dict)[:tc_limit])}
-    data = {'time_frame': sorted(random.sample(list(key_count_dict)), tc_limit)}
+    time_sel = list(key_count_dict)
+    time_sel = random.sample(time_sel, len(time_sel))[:tc_limit]
+    time_sel = sorted(time_sel)
+    #print(time_sel)
+
+    data = {}
+    # data = {'time_frame': sorted(list(key_count_dict)[:tc_limit])}
+    data['time_frame'] = time_sel
     data['time_sec'] = [round(i/float(fps),2) for i in data['time_frame']]
     #data['set_keyframe'] = [int(bool(i in list(key_count_dict))) for i in data['time_frame']]
     for attr in anim_attr_list:
