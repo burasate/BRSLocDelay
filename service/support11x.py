@@ -292,7 +292,7 @@ def get_keyframe_data(tc_limit=10):
     # print(max_key_count)
     key_count_dict_norm = {}
     for l in list(key_count_dict):
-        if key_count_dict[l] / float(max_key_count) >= 0.875:
+        if key_count_dict[l] / float(max_key_count) >= 0.75:
             key_count_dict_norm[l] = key_count_dict[l] / float(max_key_count)
         else:
             del key_count_dict[l]
