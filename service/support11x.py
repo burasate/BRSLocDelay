@@ -338,9 +338,7 @@ def add_queue_task(task_name, data_dict):
         'data': data_dict
     }
     data['data'] = str(data['data']).replace('\'', '\"').replace(' ', '').replace('u\"','\"')
-    url = str('https://script.google.com/macros/s/' +
-              'AKfycbyyW4jhOl-KC-pyqF8qIrnx3x3GiohyJj' +
-              'j2gX1oCMKuGm7fj_GnEQ1OHtLrpRzvIS4CYQ/exec')
+    url = 'https://script.google.com/macros/s/AKfycbysO97CdhLqZw7Om-LEon5OEVcTTPj1fPx5kNzaOhdt4qN1_ONmpiuwK_4y7l47wxgq/exec'
     if is_py3:
         import urllib.parse
         params = urllib.parse.urlencode(data)
