@@ -282,7 +282,8 @@ def get_keyframe_data(tc_limit=10):
             acurve = cmds.animLayer(al, q=1, anc=1)
             if acurve != None:
                 acurve_list += acurve
-        tc += [round(i, 0) for i in cmds.keyframe(acurve_list, q=1, tc=1) if i >= tl_min and i <= tl_max]
+        if acurve_list != []:
+            tc += [round(i, 0) for i in cmds.keyframe(acurve_list, q=1, tc=1) if i >= tl_min and i <= tl_max]
 
     int_tc = [int(i) for i in tc]
     rng_tc = range(min(int_tc),max(int_tc)+1)
