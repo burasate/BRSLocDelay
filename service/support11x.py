@@ -249,7 +249,7 @@ def get_keyframe_data(tc_limit=10):
     if time_unit in time_unit_dict:
         fps = time_unit_dict[time_unit]
     else:
-        fps = float(str(''.join([i for i in timeUnit if i.isdigit() or i == '.'])))
+        fps = float(str(''.join([i for i in time_unit if i.isdigit() or i == '.'])))
     # print(fps)
     
     anim_object_list = [i for i in cmds.ls(type='transform') if cmds.keyframe(i, q=1) != None]
