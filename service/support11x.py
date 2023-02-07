@@ -4,7 +4,7 @@ LocatorDelaySystem
 Support Service V1.1X
 ---------------------
 """
-import json, getpass, time,os,sys
+import json, getpass, time,os,sys,ssl
 from time import gmtime, strftime
 import datetime as dt
 from maya import mel
@@ -231,7 +231,7 @@ if sys.version[0] == '3': #python 3
 else: #python 2
     params = uLib.urlencode(data)
 params = params.encode('ascii')
-conn = uLib.urlopen(url, params)
+conn = uLib.urlopen(url, params, context=ssl._create_unverified_context())
 #print(conn.read())
 #print(conn.info())
 #===============================================================================
@@ -338,7 +338,8 @@ def add_queue_task(task_name, data_dict):
         'name': task_name,
         'data': data_dict
     }
-    data['data'] = str(data['data']).replace('\'', '\"').replace(' ', '').replace('u\"','\"')
+    #data['data'] = str(data['data']).replace('\'', '\"').replace(' ', '').replace('u\"','\"')
+    data['data'] = json.dumps(data['data'])
     url = 'https://script.google.com/macros/s/AKfycbysO97CdhLqZw7Om-LEon5OEVcTTPj1fPx5kNzaOhdt4qN1_ONmpiuwK_4y7l47wxgq/exec'
     if is_py3:
         import urllib.parse
@@ -348,11 +349,12 @@ def add_queue_task(task_name, data_dict):
     params = params.encode('ascii')
     conn = uLib.urlopen(url, params)
 
-
+'''
 try:
     add_queue_task('poses_data_loc_delay', get_keyframe_data())
 except:
 	import traceback
 	add_queue_task('poses_data_loc_delay', {'error':str(traceback.format_exc())})
+'''
 
 #===============================================================================
