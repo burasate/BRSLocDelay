@@ -105,4 +105,6 @@ BRSLocDelaySystem.showBRSUI()
 
     # Finish
     cmds.confirmDialog(title='BRS LOCATOR DELAY', message='Installation Successful.', button=['OK'])
-    exec (command)
+    try:
+        exec (command)
+    except:pass
