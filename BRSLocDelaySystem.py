@@ -42,7 +42,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-LocDelay_Version = 1.281
+LocDelay_Version = 1.28
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
