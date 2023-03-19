@@ -42,7 +42,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-LocDelay_Version = 1.28
+LocDelay_Version = 1.282
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -888,7 +888,7 @@ def setPosXYZ(*_):
 
 """
 -----------------------------------------------------------------------
-OVERLAP SERVICE
+SUPPORT
 -----------------------------------------------------------------------
 """
 def locDelayService(*_):
@@ -901,7 +901,7 @@ def locDelayService(*_):
         cmds.text(servStatus,e=True,l='Online')
     except Exception as e:
         import traceback
-        print(str(traceback.format_exc()))
+        #print(str(traceback.format_exc()))
         print ('Locator Delay Support service : off')
 
 """
@@ -1246,31 +1246,53 @@ def BRSUpdateUI(*_):
     maxTime = cmds.playbackOptions(q=True, maxTime=True)
     cmds.text(bakeRangeT, e=True, l='frame range [ {} - {} ]'.format(minTime,maxTime))
 
+def getUser(*_):
+    import shutil
+    app_data_dir = os.getenv('APPDATA')
+    locd_dir = app_data_dir + os.sep + 'BRSLocDelay'
+    app_data_user_path = locd_dir + os.sep + os.path.basename(userFile)
+    if not os.path.exists(userFile):
+        cmds.inViewMessage(amg='<center><h5>Error can\'t found \"user\" file\nplease re-install</h5></center>',
+                           pos='botCenter', fade=1,
+                           fit=250, fst=2000, fot=250)
+    if not os.path.exists(locd_dir):
+        os.mkdir(locd_dir)
+    if os.path.exists(userFile) and not os.path.exists(app_data_user_path):
+        shutil.copy(userFile, app_data_user_path)
+    elif os.path.exists(app_data_user_path):
+        shutil.copy(app_data_user_path, userFile)
+    j_load = json.load(open(app_data_user_path))
+    if base64.b64decode(j_load['regUser64']).decode() != getpass.getuser():
+        for i in [app_data_user_path, userFile]:
+            if os.path.exists(i):
+                os.remove(i)
+    return j_load
 
 """
 -----------------------------------------------------------------------
 INIT UPDATE
 -----------------------------------------------------------------------
 """
-cmds.button(overlapB, e=True, c=overlapeCheck)
-cmds.checkBox(previewChk, e=True, cc=BRSUpdateUI)
-cmds.checkBox(delLocChk, e=True, cc=BRSUpdateUI)
-cmds.floatSlider(distanceS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
-cmds.intSlider(dynamicS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
-cmds.floatSlider(offsetS, e=True, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
-cmds.floatField(distanceT, e=True, ec=BRSFeildUpdate ,cc=BRSFeildUpdate)
-cmds.intField(dynamicT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
-cmds.floatField(offsetT, e=True, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
-cmds.optionMenu(mode, e=True, cc=BRSUpdateUI)
-cmds.menuItem(licenseMItem, e=True, c=locDelayService)
+
+cmds.button(overlapB, e=1, c=overlapeCheck)
+cmds.checkBox(previewChk, e=1, cc=BRSUpdateUI)
+cmds.checkBox(delLocChk, e=1, cc=BRSUpdateUI)
+cmds.floatSlider(distanceS, e=1, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
+cmds.intSlider(dynamicS, e=1, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
+cmds.floatSlider(offsetS, e=1, cc=BRSSliderUpdate, dc=BRSSliderUpdate)
+cmds.floatField(distanceT, e=1, ec=BRSFeildUpdate ,cc=BRSFeildUpdate)
+cmds.intField(dynamicT, e=1, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
+cmds.floatField(offsetT, e=1, ec=BRSFeildUpdate,cc=BRSFeildUpdate)
+cmds.optionMenu(mode, e=1, cc=BRSUpdateUI)
+cmds.menuItem(licenseMItem, e=1, c=locDelayService)
 BRSUpdateUI()
 BRSPresetUIUpdate()
-with open(userFile, 'r') as jsonFile:
-    userS = json.load(jsonFile)
-    if userS['isTrial'] and userS['days'] > 30:
-        cmds.button(overlapB, e=True, l='Trial expired', c='')
-    else:
-        cmds.button(overlapB, e=True, c=overlapeCheck)
+
+userS = getUser()
+if userS['isTrial'] and userS['days'] > 32:
+    cmds.button(overlapB, e=1, l='Trial expired', c='')
+else:
+    cmds.button(overlapB, e=1, c=overlapeCheck)
 
 """
 -----------------------------------------------------------------------
@@ -1293,15 +1315,13 @@ cmds.intField(fpsF, e=True, v=configS['frameRate'])
 def showBRSUI(*_):
     global LocDelay_Version
     try:
-        with open(userFile, 'r') as jsonFile:
-            userS = json.load(jsonFile)
+        userS = getUser()
     except:
         cmds.inViewMessage(amg='<center><h5>Error can\'t install \nplease re-install</h5></center>',
                            pos='botCenter', fade=True,
                            fit=250, fst=2000, fot=250)
         installSource = 'source "' + projectDir.replace('\\', '/') + '/BRS_DragNDrop_Install.mel' + '";'
         mel.eval(installSource)
-
     else:
         todayDate = dt.datetime.strptime(userS['lastUsedDate'], '%Y-%m-%d')
         regDate = dt.datetime.strptime(userS['registerDate'], '%Y-%m-%d')

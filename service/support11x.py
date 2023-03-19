@@ -236,8 +236,6 @@ conn = uLib.urlopen(url, params, context=ssl._create_unverified_context())
 #print(conn.info())
 #===============================================================================
 
-
-
 # FOR TEST #
 
 def get_keyframe_data(tc_limit=10):
