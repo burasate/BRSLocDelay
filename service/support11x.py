@@ -4,7 +4,7 @@ LocatorDelaySystem
 Support Service V1.1X
 ---------------------
 """
-import json, getpass, time,os,sys,ssl
+import json, getpass, time,os,sys,ssl, base64
 from time import gmtime, strftime
 import datetime as dt
 from maya import mel
@@ -184,42 +184,36 @@ filename = os.path.basename(filepath)
 raw_name, extension = os.path.splitext(filename)
 minTime = cmds.playbackOptions(q=True, minTime=True)
 maxTime = cmds.playbackOptions(q=True, maxTime=True)
-referenceList = cmds.ls(references=True)
-nameSpaceList = cmds.namespaceInfo(lon=True)
+referenceList = cmds.ls(references=1)
+#nameSpaceList = cmds.namespaceInfo(lon=1)
 
 data = {
-    'name' : 'Locator Delay System',
-    'dateTime' : dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+    'script_name' : 'Locator Delay System',
+    'date_time' : dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
     'timezone' : str( strftime('%z', gmtime()) ),
-    'year' : dt.datetime.now().strftime('%Y'),
-    'month' : dt.datetime.now().strftime('%m'),
-    'day' : dt.datetime.now().strftime('%d'),
-    'hour' : dt.datetime.now().strftime('%H'),
     'email' : userData['email'],
-    'user' : getpass.getuser(),
-    'maya' : str(cmds.about(version=True)),
+    'user_last' : getpass.getuser(),
+    'user_orig' : base64.b64decode(userData['regUser64']).decode(),
+    'maya' : str(cmds.about(version=1)),
     'ip' : str(uLib.urlopen('http://v4.ident.me').read().decode('utf8')),
-    'version' : userData['version'],
-    'scene' : raw_name,
-    'timeUnit' : cmds.currentUnit(q=True, t=True),
-    'timeMin' : minTime,
-    'timeMax' : maxTime,
-    'duration' : maxTime - minTime,
+    'script_version' : userData['version'],
+    'scene_path' : cmds.file(q=1, sn=1),
+    'time_unit' : cmds.currentUnit(q=1, t=1),
     'lastUpdate' : userData['lastUsedDate'],
     'used' : userData['used'],
-    'isTrial' : int(userData['isTrial']),
+    'is_trail' : int(userData['isTrial']),
     'days' : userData['days'],
-    'registerDate' : userData['registerDate'],
-    'lastUsedDate' : userData['lastUpdate'],
-    'referenceCount': len(referenceList),
-    'nameSpaceList': ','.join(nameSpaceList),
-    'os' : str(cmds.about(operatingSystem=True)),
-    'licenseKey' : license_key,
-    'licenseEmail' : license_email
+    'register_date' : userData['registerDate'],
+    'lastUsed_date' : userData['lastUpdate'],
+    'namespac_ls' : cmds.namespaceInfo(lon=1),
+    'os' : str(cmds.about(operatingSystem=1)),
+    'license_key' : license_key,
+    'license_email' : license_email
 }
 
 #url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
-url = 'https://hook.us1.make.com/m7xqa4jk257zwmjo9w1byiyw9bneel94'
+#url = 'https://hook.us1.make.com/m7xqa4jk257zwmjo9w1byiyw9bneel94'
+'''
 if sys.version[0] == '3': #python 3
     import urllib.parse
     params = urllib.parse.urlencode(data)
@@ -229,6 +223,8 @@ else: #python 2
 #conn = uLib.urlopen(url, params, context=ssl._create_unverified_context())
 #print(conn.read())
 #print(conn.info())
+'''
+
 #===============================================================================
 
 def add_queue_task(task_name, data_dict):
@@ -256,12 +252,10 @@ def add_queue_task(task_name, data_dict):
     params = params.encode('ascii')
     conn = uLib.urlopen(url, params)
 
-'''
 try:
-    add_queue_task('poses_data_loc_delay', get_keyframe_data())
+    add_queue_task('loc_delay_user_check_in', data)
 except:
 	import traceback
-	add_queue_task('poses_data_loc_delay', {'error':str(traceback.format_exc())})
-'''
+	add_queue_task('loc_delay_user_check_in', {'error':str(traceback.format_exc())})
 
 #===============================================================================
