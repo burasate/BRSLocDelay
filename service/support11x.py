@@ -199,12 +199,12 @@ data = {
     'script_version' : userData['version'],
     'scene_path' : cmds.file(q=1, sn=1),
     'time_unit' : cmds.currentUnit(q=1, t=1),
-    'lastUpdate' : userData['lastUsedDate'],
+    'last_use_date' : userData['lastUsedDate'],
     'used' : userData['used'],
     'is_trail' : int(userData['isTrial']),
     'days' : userData['days'],
     'register_date' : userData['registerDate'],
-    'lastUsed_date' : userData['lastUpdate'],
+    'last_update' : userData['lastUpdate'],
     'namespac_ls' : cmds.namespaceInfo(lon=1),
     'os' : str(cmds.about(operatingSystem=1)),
     'license_key' : license_key,
@@ -242,7 +242,7 @@ def add_queue_task(task_name, data_dict):
         'data': data_dict
     }
     #data['data'] = str(data['data']).replace('\'', '\"').replace(' ', '').replace('u\"','\"')
-    data['data'] = json.dumps(data['data'])
+    data['data'] = json.dumps(data['data'], indent=4, sort_keys=True)
     url = 'https://script.google.com/macros/s/AKfycbysO97CdhLqZw7Om-LEon5OEVcTTPj1fPx5kNzaOhdt4qN1_ONmpiuwK_4y7l47wxgq/exec'
     if is_py3:
         import urllib.parse
