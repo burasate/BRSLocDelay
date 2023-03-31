@@ -3,7 +3,7 @@
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 -------------------BRS LOCATOR DELAY SYSTEM----------------------
----------------------------V.1.28--------------------------------
+---------------------------V.1.284--------------------------------
 -----------------------------------------------------------------
 -----------------------------------------------------------------
 """
@@ -42,7 +42,7 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-LocDelay_Version = 1.282
+LocDelay_Version = 1.284
 configS = {}
 try :
     with open(configFile, 'r') as jsonFile:
@@ -1266,7 +1266,7 @@ def getUser(*_):
         for i in [app_data_user_path, userFile]:
             if os.path.exists(i):
                 os.remove(i)
-    return j_load
+    return (app_data_user_path, j_load)
 
 """
 -----------------------------------------------------------------------
@@ -1288,7 +1288,7 @@ cmds.menuItem(licenseMItem, e=1, c=locDelayService)
 BRSUpdateUI()
 BRSPresetUIUpdate()
 
-userS = getUser()
+userS = getUser()[1]
 if userS['isTrial'] and userS['days'] > 32:
     cmds.button(overlapB, e=1, l='Trial expired', c='')
 else:
@@ -1314,8 +1314,9 @@ cmds.intField(fpsF, e=True, v=configS['frameRate'])
 
 def showBRSUI(*_):
     global LocDelay_Version
+    userFile = getUser()[0]
     try:
-        userS = getUser()
+        userS = getUser()[1]
     except:
         cmds.inViewMessage(amg='<center><h5>Error can\'t install \nplease re-install</h5></center>',
                            pos='botCenter', fade=True,
@@ -1330,7 +1331,7 @@ def showBRSUI(*_):
             locDelayService()
             with open(userFile, 'r') as jsonFile:
                 userS = json.load(jsonFile)
-            with open(userFile, writeMode) as jsonFile:
+            with open(userFile, 'w') as jsonFile:
                 userS['lastUsedDate'] = today
                 json.dump(userS, jsonFile, indent=4)
         verName = 'LOCATOR DELAY - {}'.format(str(userS['version']))
@@ -1338,7 +1339,7 @@ def showBRSUI(*_):
         cmds.showWindow(winID)
         with open(userFile, 'r') as jsonFile:
             userS = json.load(jsonFile)
-        with open(userFile, writeMode) as jsonFile:
+        with open(userFile, 'w') as jsonFile:
             userS['used'] = userS['used'] + 1
             userS['version'] = LocDelay_Version
             userS['days'] = abs((regDate - todayDate).days)
