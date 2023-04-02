@@ -141,7 +141,9 @@ def getBRSLicenseVerify(licenseKey):
 # Check License
 license_key, license_email = (u'', u'')
 def locDelayLicense(*_):
-    global getBRSLicenseVerify, userData, license_key, license_email
+    global getBRSLicenseVerify, license_key, license_email
+    userFile = getUser()[0]
+    userData = getUser()[1]
     #while userData['email'] == 'burasedborvon@gmail.com':
     while True:
         license_key, license_email = getBRSLicenseVerify(userData['licenseKey'])
@@ -149,7 +151,7 @@ def locDelayLicense(*_):
         if not license_key == '' :
             print('Found license key', str(license_key)[:-9] + '-XXXXXXXX')
             userData['licenseKey'] = license_key
-            with open(userFile, writeMode) as jsonFile:
+            with open(userFile, 'w') as jsonFile:
                 userData['licenseKey'] = license_key
                 userData['isTrial'] = False
                 json.dump(userData, jsonFile, indent=4)
@@ -175,7 +177,7 @@ def locDelayLicense(*_):
                 json.dump(userData, jsonFile, indent=4)
             break
 
-#locDelayLicense()
+locDelayLicense()
 
 #===============================================================================
 #Check In
