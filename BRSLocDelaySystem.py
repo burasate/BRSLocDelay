@@ -1248,13 +1248,15 @@ def BRSUpdateUI(*_):
 
 def getUser(*_):
     import shutil
+    global userFile
     app_data_dir = os.getenv('APPDATA')
     locd_dir = app_data_dir + os.sep + 'BRSLocDelay'
     app_data_user_path = locd_dir + os.sep + os.path.basename(userFile)
     if not os.path.exists(userFile):
         cmds.inViewMessage(amg='<center><h5>Error can\'t found \"user\" file\nplease re-install</h5></center>',
-                           pos='botCenter', fade=1,
+                           pos='midCenter', fade=1,
                            fit=250, fst=2000, fot=250)
+        return None
     if not os.path.exists(locd_dir):
         os.mkdir(locd_dir)
     if os.path.exists(userFile) and not os.path.exists(app_data_user_path):
