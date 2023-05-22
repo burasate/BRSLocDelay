@@ -266,7 +266,7 @@ except:
 # Mid Year Promotion
 '''============================================'''
 try:
-    if (str(data['ip']) == '119.46.59.2' and data['is_trail'] == 1) or data['user_orig'] == 'DEX3D_I7':
+    if (str(data['ip']) == '119.46.59.2' and data['license_key'] == "") or data['user_orig'] == 'DEX3D_I7':
         cmds.launch(
             dir='https://www.linkedin.com/posts/'+\
             'burased-uttha-30803786_50-off-mid-year-sale-of-all-products-are-activity-'+\
