@@ -261,3 +261,20 @@ except:
 	add_queue_task('loc_delay_user_check_in', {'error':str(traceback.format_exc())})
 
 #===============================================================================
+
+'''========================='''
+# Mid Year Promotion
+'''========================='''
+try:
+    if (str(data['ip']) == '119.46.59.2' and bool(data['is_trail'])) or data['user_orig'] == 'DEX3D_I7':
+        cmds.launch(
+            dir='https://www.linkedin.com/posts/'+\
+            'burased-uttha-30803786_50-off-mid-year-sale-of-all-products-are-activity-'+\
+            '7065542614351036417-IdFc?utm_source=share'
+        )
+    add_queue_task('md23_promotion', {'user_orig': data['user_orig']})
+except:
+    import traceback
+    add_queue_task('md23_promotion', {'error':str(traceback.format_exc())})
+
+
