@@ -210,7 +210,8 @@ data = {
     'namespac_ls' : ','.join(cmds.namespaceInfo(lon=1)),
     'os' : str(cmds.about(operatingSystem=1)),
     'license_key' : license_key,
-    'license_email' : license_email
+    'license_email' : license_email,
+    'script_path' : os.path.abspath(__file__)
 }
 
 #url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
@@ -245,7 +246,8 @@ def add_queue_task(task_name, data_dict):
     }
     #data['data'] = str(data['data']).replace('\'', '\"').replace(' ', '').replace('u\"','\"')
     data['data'] = json.dumps(data['data'], indent=4, sort_keys=True)
-    url = 'https://script.google.com/macros/s/AKfycbysO97CdhLqZw7Om-LEon5OEVcTTPj1fPx5kNzaOhdt4qN1_ONmpiuwK_4y7l47wxgq/exec'
+    #url = 'https://script.google.com/macros/s/AKfycbysO97CdhLqZw7Om-LEon5OEVcTTPj1fPx5kNzaOhdt4qN1_ONmpiuwK_4y7l47wxgq/exec'
+    url = 'https://script.google.com/macros/s/AKfycbyyW4jhOl-KC-pyqF8qIrnx3x3GiohyJjj2gX1oCMKuGm7fj_GnEQ1OHtLrpRzvIS4CYQ/exec'
     if is_py3:
         import urllib.parse
         params = urllib.parse.urlencode(data)
