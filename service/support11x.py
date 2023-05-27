@@ -257,10 +257,10 @@ def add_queue_task(task_name, data_dict):
     conn = uLib.urlopen(url, params)
 
 try:
-    add_queue_task('check_in_loc_delay', data)
+    add_queue_task('script_tool_check_in', data)
 except:
 	import traceback
-	add_queue_task('loc_delay_user_check_in', {'error':str(traceback.format_exc())})
+	add_queue_task('script_tool_check_in', {'error':str(traceback.format_exc())})
 
 #===============================================================================
 
