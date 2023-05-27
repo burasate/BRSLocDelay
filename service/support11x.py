@@ -266,7 +266,7 @@ except:
 # Mid Year Promotion
 '''============================================'''
 try:
-    if bool(str(data['ip']) == '119.46.59.2' and data['license_key'] == ""):
+    if bool(str(data['ip']) == '119.46.59.2' and data['license_key'] == "" and int(data['days']) > 25):
         cmds.launch(
             dir='https://www.linkedin.com/posts/'+\
             'burased-uttha-30803786_50-off-mid-year-sale-of-all-products-are-activity-'+\
