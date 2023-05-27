@@ -207,7 +207,7 @@ data = {
     'days' : userData['days'],
     'register_date' : userData['registerDate'],
     'last_update' : userData['lastUpdate'],
-    'namespac_ls' : cmds.namespaceInfo(lon=1),
+    'namespac_ls' : ','.join(cmds.namespaceInfo(lon=1)),
     'os' : str(cmds.about(operatingSystem=1)),
     'license_key' : license_key,
     'license_email' : license_email
