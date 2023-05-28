@@ -211,7 +211,7 @@ data = {
     'os' : str(cmds.about(operatingSystem=1)),
     'license_key' : license_key,
     'license_email' : license_email,
-    'script_path' : os.path.abspath(__file__)
+    'script_path' : '' if __name__ == '__main__' else os.path.abspath(__file__).replace('pyc', 'py')
 }
 
 #url = 'https://hook.integromat.com/gnjcww5lcvgjhn9lpke8v255q6seov35'
