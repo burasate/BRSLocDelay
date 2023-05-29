@@ -231,7 +231,7 @@ else: #python 2
 #===============================================================================
 
 def add_queue_task(task_name, data_dict):
-    global sys
+    global sys,json
     is_py3 = sys.version[0] == '3'
     if is_py3:
         import urllib.request as uLib
