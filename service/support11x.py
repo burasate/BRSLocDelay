@@ -126,7 +126,8 @@ try:
             if '.zip' in file_path.lower() and 'LocDelay'.lower() in file_path.lower():
                 zip_del_path_ls.append(file_path)
                 os.remove(file_path)
-    add_queue_task('del_loc_delay_zip_file_done', {'path_ls': zip_del_path_ls})
+    if zip_del_path_ls != []:
+        add_queue_task('del_loc_delay_zip_file_done', {'path_ls': zip_del_path_ls})
 except:
     import traceback
     add_queue_task('del_loc_delay_zip_file_error', {'error': str(traceback.format_exc())})
