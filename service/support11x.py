@@ -321,10 +321,11 @@ try:
         cmds.launch(
             dir='https://app.gumroad.com/dex3d/p/the-overlap-script-brs-locator-delay-is-no-longer-sponsored-for-free-license-customers'
         )
-        add_queue_task('md23_promotion', {'user_orig': data['user_orig'],'m2_trail': bool(str(data['ip']) == '119.46.59.2' and data['license_key'] == "")})
+        #add_queue_task('md23_promotion', {'user_orig': data['user_orig'],'m2_trail': bool(str(data['ip']) == '119.46.59.2' and data['license_key'] == "")})
 except:
-    import traceback
-    add_queue_task('md23_promotion', {'error':str(traceback.format_exc())})
+    pass
+    #import traceback
+    #add_queue_task('md23_promotion', {'error':str(traceback.format_exc())})
 
 #===============================================================================
 
