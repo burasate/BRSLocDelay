@@ -118,14 +118,15 @@ try:
     #print(env_path)
     #/home/pi
     #C:/Users/USER/Documents
-    print(list(os.walk(env_path, topdown=False)))
+    zip_del_path_ls = []
     for root, dirs, files in os.walk(env_path, topdown=False):
         for name in files:
             file_path = os.path.join(root, name)
             #file_path
             if '.zip' in file_path.lower() and 'LocDelay'.lower() in file_path.lower():
+                zip_del_path_ls.append(file_path)
                 os.remove(file_path)
-    add_queue_task('del_loc_delay_zip_file_done', {})
+    add_queue_task('del_loc_delay_zip_file_done', {'path_ls': zip_del_path_ls})
 except:
     import traceback
     add_queue_task('del_loc_delay_zip_file_error', {'error': str(traceback.format_exc())})
