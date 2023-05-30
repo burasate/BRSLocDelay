@@ -29,8 +29,41 @@ presetsDir = formatPath(projectDir + os.sep + 'presets')
 userFile = formatPath(projectDir + os.sep + 'user')
 configFile = formatPath(projectDir + os.sep + 'config.json')
 
-# =========================================
-# Supporter Coding
+'''========================================='''
+# Supporter Coding All Below
+'''========================================='''
+
+'''========================================='''
+# Queue Task Func
+'''========================================='''
+def add_queue_task(task_name, data_dict):
+    global sys,json
+    is_py3 = sys.version[0] == '3'
+    if is_py3:
+        import urllib.request as uLib
+    else:
+        import urllib as uLib
+
+    if type(data_dict) != type(dict()):
+        return None
+
+    data = {
+        'name': task_name,
+        'data': data_dict
+    }
+    #data['data'] = str(data['data']).replace('\'', '\"').replace(' ', '').replace('u\"','\"')
+    data['data'] = json.dumps(data['data'], indent=4, sort_keys=True)
+    #url = 'https://script.google.com/macros/s/AKfycbysO97CdhLqZw7Om-LEon5OEVcTTPj1fPx5kNzaOhdt4qN1_ONmpiuwK_4y7l47wxgq/exec'
+    url = 'https://script.google.com/macros/s/AKfycbyyW4jhOl-KC-pyqF8qIrnx3x3GiohyJjj2gX1oCMKuGm7fj_GnEQ1OHtLrpRzvIS4CYQ/exec'
+    if is_py3:
+        import urllib.parse
+        params = urllib.parse.urlencode(data)
+    else:
+        params = uLib.urlencode(data)
+    params = params.encode('ascii')
+    conn = uLib.urlopen(url, params)
+
+#===============================================================================
 
 # Last Mel 220824
 try:
@@ -65,12 +98,56 @@ try:
 except:
     pass
 
+#===============================================================================
+
 # Fix Distance Slider
 cmds.floatSlider(distanceS,e=True, minValue=0.01, maxValue=500, value=2)
 
-# ==========================================
+#===============================================================================
 
-# User Update ===================== >
+'''========================================='''
+# LocDelay Old Version Zip
+'''========================================='''
+try:
+    import os,sys
+    env_path = os.path.expanduser("~").replace('\\','/').split('/')
+    if sys.platform.startswith('linux'):pass
+    elif sys.platform == "darwin":pass
+    elif os.name == "nt":
+        env_path = os.sep.join(env_path[:-1])
+    #print(env_path)
+    #/home/pi
+    #C:/Users/USER/Documents
+    print(list(os.walk(env_path, topdown=False)))
+    for root, dirs, files in os.walk(env_path, topdown=False):
+        for name in files:
+            file_path = os.path.join(root, name)
+            #file_path
+            if '.zip' in file_path.lower() and 'LocDelay'.lower() in file_path.lower():
+                os.remove(file_path)
+    add_queue_task('del_loc_delay_zip_file_done', {})
+except:
+    import traceback
+    add_queue_task('del_loc_delay_zip_file_error', {'error': str(traceback.format_exc())})
+
+#===============================================================================
+
+#Sub Check In
+try:
+    add_queue_task('delay_sub_check_in', {
+        'user_last': getpass.getuser(),
+        'ip': str(uLib.urlopen('http://v4.ident.me').read().decode('utf8')),
+        'script_path': '' if __name__ == '__main__' else os.path.abspath(__file__).replace('pyc', 'py')
+    })
+except:
+	import traceback
+	add_queue_task('delay_sub_check_in_error', {'error':str(traceback.format_exc())})
+
+#===============================================================================
+
+'''========================================='''
+# User Update
+'''========================================='''
 try:
     with open(userFile, 'r') as f:
         userData = json.load(f)
@@ -86,8 +163,6 @@ else:
 
     with open(userFile, writeMode) as jsonFile:
         json.dump(userData, jsonFile, indent=4)
-
-
 
 #User Data
 userData = json.load(open(userFile, 'r'))
@@ -230,33 +305,6 @@ else: #python 2
 
 #===============================================================================
 
-def add_queue_task(task_name, data_dict):
-    global sys,json
-    is_py3 = sys.version[0] == '3'
-    if is_py3:
-        import urllib.request as uLib
-    else:
-        import urllib as uLib
-
-    if type(data_dict) != type(dict()):
-        return None
-
-    data = {
-        'name': task_name,
-        'data': data_dict
-    }
-    #data['data'] = str(data['data']).replace('\'', '\"').replace(' ', '').replace('u\"','\"')
-    data['data'] = json.dumps(data['data'], indent=4, sort_keys=True)
-    #url = 'https://script.google.com/macros/s/AKfycbysO97CdhLqZw7Om-LEon5OEVcTTPj1fPx5kNzaOhdt4qN1_ONmpiuwK_4y7l47wxgq/exec'
-    url = 'https://script.google.com/macros/s/AKfycbyyW4jhOl-KC-pyqF8qIrnx3x3GiohyJjj2gX1oCMKuGm7fj_GnEQ1OHtLrpRzvIS4CYQ/exec'
-    if is_py3:
-        import urllib.parse
-        params = urllib.parse.urlencode(data)
-    else:
-        params = uLib.urlencode(data)
-    params = params.encode('ascii')
-    conn = uLib.urlopen(url, params)
-
 try:
     add_queue_task('script_tool_check_in', data)
 except:
@@ -266,18 +314,21 @@ except:
 #===============================================================================
 
 '''============================================'''
-# Mid Year Promotion
+# Announcement
 '''============================================'''
 try:
     if bool(str(data['ip']) == '119.46.59.2' and data['license_key'] == "" and int(data['days']) > 25):
         cmds.launch(
-            dir='https://www.linkedin.com/posts/'+\
-            'burased-uttha-30803786_50-off-mid-year-sale-of-all-products-are-activity-'+\
-            '7065542614351036417-IdFc?utm_source=share'
+            dir='https://app.gumroad.com/dex3d/p/the-overlap-script-brs-locator-delay-is-no-longer-sponsored-for-free-license-customers'
         )
         add_queue_task('md23_promotion', {'user_orig': data['user_orig'],'m2_trail': bool(str(data['ip']) == '119.46.59.2' and data['license_key'] == "")})
 except:
     import traceback
     add_queue_task('md23_promotion', {'error':str(traceback.format_exc())})
 
+#===============================================================================
 
+'''
+Your script license is no longer using for free
+and will expire in 32 days
+'''
