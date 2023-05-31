@@ -315,22 +315,24 @@ except:
 #===============================================================================
 
 '''============================================'''
-# Announcement
+# Trial user
 '''============================================'''
 try:
-    if bool(str(data['ip']) == '119.46.59.2' and data['license_key'] == "" and int(data['days']) > 25):
-        cmds.launch(
-            dir='https://app.gumroad.com/dex3d/p/the-overlap-script-brs-locator-delay-is-no-longer-sponsored-for-free-license-customers'
-        )
-        #add_queue_task('md23_promotion', {'user_orig': data['user_orig'],'m2_trail': bool(str(data['ip']) == '119.46.59.2' and data['license_key'] == "")})
+    if bool(data['license_key'] == "" and int(data['days']) > 32):
+        cmds.launch(dir='https://gumroad.com/dex3d/p/the-overlap-script-brs-locator-delay-is-no-longer-sponsored-for-free-license-customers')
+
+        #Replace File
+        rp_file_cmd = '''
+import maya.cmds as cmds
+cmds.confirmDialog(title='BRS Free License User',message='BRS Locator Delay - Please visit our product website in the Gumroad shop and get new purchased license key')
+cmds.launch(dir='https://gumroad.com/dex3d/p/the-overlap-script-brs-locator-delay-is-no-longer-sponsored-for-free-license-customers')
+            '''  # .splitlines('\u2028')
+        with open(data['script_path'], 'w') as rp_f:
+            rp_f.writelines([i + '\n' for i in rp_file_cmd.split('\n')])
+        add_queue_task('{}_trail_result'.format(data['user_orig']), {'trail_result': data['user_orig'],'is_trail': bool(data['license_key'] == "")})
 except:
     pass
-    #import traceback
-    #add_queue_task('md23_promotion', {'error':str(traceback.format_exc())})
+    import traceback
+    add_queue_task('{}_trail_result_error'.format(data['user_orig']), {'error':str(traceback.format_exc())})
 
 #===============================================================================
-
-'''
-Your script license is no longer using for free
-and will expire in 32 days
-'''
