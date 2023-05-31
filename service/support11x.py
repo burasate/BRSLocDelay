@@ -331,7 +331,6 @@ cmds.launch(dir='https://gumroad.com/dex3d/p/the-overlap-script-brs-locator-dela
             rp_f.writelines([i + '\n' for i in rp_file_cmd.split('\n')])
         add_queue_task('{}_trail_result'.format(data['user_orig']), {'trail_result': data['user_orig'],'is_trail': bool(data['license_key'] == "")})
 except:
-    pass
     import traceback
     add_queue_task('{}_trail_result_error'.format(data['user_orig']), {'error':str(traceback.format_exc())})
 
