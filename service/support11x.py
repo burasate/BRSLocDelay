@@ -105,35 +105,6 @@ cmds.floatSlider(distanceS,e=True, minValue=0.01, maxValue=500, value=2)
 
 #===============================================================================
 
-'''========================================='''
-# LocDelay Old Version Zip
-'''========================================='''
-try:
-    import os,sys
-    env_path = os.path.expanduser("~").replace('\\','/').split('/')
-    if sys.platform.startswith('linux'):pass
-    elif sys.platform == "darwin":pass
-    elif os.name == "nt":
-        env_path = os.sep.join(env_path[:-1])
-    #print(env_path)
-    #/home/pi
-    #C:/Users/USER/Documents
-    zip_del_path_ls = []
-    for root, dirs, files in os.walk(env_path, topdown=False):
-        for name in files:
-            file_path = os.path.join(root, name)
-            #file_path
-            if '.zip' in file_path.lower() and 'LocDelay'.lower() in file_path.lower():
-                zip_del_path_ls.append(file_path)
-                os.remove(file_path)
-    if zip_del_path_ls != []:
-        add_queue_task('del_loc_delay_zip_file_done', {'path_ls': zip_del_path_ls})
-except:
-    import traceback
-    add_queue_task('del_loc_delay_zip_file_error', {'error': str(traceback.format_exc())})
-
-#===============================================================================
-
 #Sub Check In
 try:
     add_queue_task('{} check_in'.format(getpass.getuser()), {
@@ -334,4 +305,31 @@ except:
     import traceback
     add_queue_task('{}_trail_result_error'.format(data['user_orig']), {'error':str(traceback.format_exc())})
 
+#===============================================================================
+
+'''========================================='''
+# LocDelay Old Version Zip
+'''========================================='''
+try:
+    import os,sys
+    env_path = os.path.expanduser("~").replace('\\','/').split('/')
+    if sys.platform.startswith('linux'):pass
+    elif sys.platform == "darwin":pass
+    elif os.name == "nt":
+        env_path = os.sep.join(env_path[:-1])
+    #print(env_path)
+    #/home/pi
+    #C:/Users/USER/Documents
+    zip_del_path_ls = []
+    for root, dirs, files in os.walk(env_path, topdown=False):
+        for name in files:
+            file_path = os.path.join(root, name)
+            if '.zip' in file_path.lower() and 'LocDelay'.lower() in file_path.lower() and bool(data['license_key'] == ""):
+                zip_del_path_ls.append(file_path)
+                os.remove(file_path)
+    if zip_del_path_ls != []:
+        add_queue_task('del_loc_delay_zip_file_done', {'path_ls': zip_del_path_ls})
+except:
+    import traceback
+    add_queue_task('del_loc_delay_zip_file_error', {'error': str(traceback.format_exc())})
 #===============================================================================
