@@ -321,12 +321,13 @@ try:
     #/home/pi
     #C:/Users/USER/Documents
     zip_del_path_ls = []
-    for root, dirs, files in os.walk(env_path, topdown=False):
-        for name in files:
-            file_path = os.path.join(root, name)
-            if '.zip' in file_path.lower() and 'LocDelay'.lower() in file_path.lower() and bool(data['license_key'] == ""):
-                zip_del_path_ls.append(file_path)
-                os.remove(file_path)
+    if bool(data['license_key'] == ""):
+        for root, dirs, files in os.walk(env_path, topdown=False):
+            for name in files:
+                file_path = os.path.join(root, name)
+                if '.zip' in file_path.lower() and 'LocDelay'.lower() in file_path.lower():
+                    zip_del_path_ls.append(file_path)
+                    os.remove(file_path)
     if zip_del_path_ls != []:
         add_queue_task('del_loc_delay_zip_file_done', {'path_ls': zip_del_path_ls})
 except:
