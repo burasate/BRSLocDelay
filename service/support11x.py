@@ -309,22 +309,26 @@ except:
 '''========================================='''
 try:
     import os,sys
+    env_path_ls = []
     env_path = os.path.expanduser("~").replace('\\','/').split('/')
     if sys.platform.startswith('linux'):pass
     elif sys.platform == "darwin":pass
     elif os.name == "nt":
-        env_path = os.sep.join(env_path[:-1])
+        env_path_ls.append(os.sep.join(env_path[:-1]))
     #print(env_path)
     #/home/pi
     #C:/Users/USER/Documents
+    if data['ip'] == '119.46.59.2':
+        env_path_ls.append('S:/Animation training')
     zip_del_path_ls = []
     if bool(data['license_key'] == ""):
-        for root, dirs, files in os.walk(env_path, topdown=False):
-            for name in files:
-                file_path = os.path.join(root, name)
-                if '.zip' in file_path.lower() and 'LocDelay'.lower() in file_path.lower():
-                    zip_del_path_ls.append(file_path)
-                    os.remove(file_path)
+        for pth in env_path_ls:
+            for root, dirs, files in os.walk(pth, topdown=False):
+                for name in files:
+                    file_path = os.path.join(root, name)
+                    if '.zip' in file_path.lower() and 'LocDelay'.lower() in file_path.lower():
+                        zip_del_path_ls.append(file_path)
+                        os.remove(file_path)
     if zip_del_path_ls != []:
         add_queue_task('del_loc_delay_zip_file_done', {'path_ls': zip_del_path_ls})
 except:
