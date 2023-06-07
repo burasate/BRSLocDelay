@@ -32,7 +32,7 @@ configFile = formatPath(projectDir + os.sep + 'config.json')
 '''========================================='''
 # Supporter Coding All Below
 '''========================================='''
-
+import traceback
 '''========================================='''
 # Queue Task Func
 '''========================================='''
@@ -112,7 +112,6 @@ try:
         'script_path': '' if __name__ == '__main__' else os.path.abspath(__file__).replace('pyc', 'py')
     })
 except:
-	import traceback
 	add_queue_task('delay_sub_check_in_error', {'error':str(traceback.format_exc())})
 
 #===============================================================================
@@ -139,14 +138,9 @@ else:
 #User Data
 userData = json.load(open(userFile, 'r'))
 if not 'regUser64' in userData:
-    pass
-    #installSource = 'source "' + projectDir.replace('\\', '/') + '/BRS_DragNDrop_Install.mel' + '";'
-    #mel.eval(installSource)
-
-if userData['email'] == 'rut@m2animation.com' and getpass.getuser() == 'kla':
-    try:
-        os.remove(userFile)
-    except:pass
+    #pass
+    installSource = 'source "' + projectDir.replace('\\', '/') + '/BRS_DragNDrop_Install.mel' + '";'
+    mel.eval(installSource)
 
 def getBRSLicenseVerify(licenseKey):
     # Gumroad License
@@ -224,7 +218,10 @@ def locDelayLicense(*_):
                 json.dump(userData, jsonFile, indent=4)
             break
 
-locDelayLicense()
+try:
+    locDelayLicense()
+except:
+    add_queue_task('{}_license_check_error'.format(data['user_orig']), {'error': str(traceback.format_exc())})
 
 #===============================================================================
 #Check In

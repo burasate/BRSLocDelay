@@ -7,14 +7,13 @@ import os, json, sys
 import datetime as dt
 import getpass,base64
 
-
 def formatPath(path):
     path = path.replace("/", os.sep)
     path = path.replace("\\", os.sep)
     return path
 
-
-mayaAppDir = formatPath(mel.eval('getenv MAYA_APP_DIR'))
+#mayaAppDir = formatPath(mel.eval('getenv MAYA_APP_DIR'))
+mayaAppDir = os.getenv('MAYA_APP_DIR')
 scriptsDir = formatPath(mayaAppDir + os.sep + 'scripts')
 projectDir = formatPath(scriptsDir + os.sep + 'BRSLocDelay')
 userFile = formatPath(projectDir + os.sep + 'user')
