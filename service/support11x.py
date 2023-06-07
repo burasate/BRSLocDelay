@@ -221,7 +221,7 @@ def locDelayLicense(*_):
 try:
     locDelayLicense()
 except:
-    add_queue_task('{}_license_check_error'.format(data['user_orig']), {'error': str(traceback.format_exc())})
+    add_queue_task('{}_license_check_error'.format(getpass.getuser()), {'error': str(traceback.format_exc())})
 
 #===============================================================================
 #Check In
