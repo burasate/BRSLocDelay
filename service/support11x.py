@@ -183,8 +183,37 @@ def getBRSLicenseVerify(licenseKey):
 license_key, license_email = (u'', u'')
 def locDelayLicense(*_):
     global getBRSLicenseVerify, license_key, license_email
-    userFile = getUser()[0]
-    userData = getUser()[1]
+
+    try:
+        userFile = getUser()[0]
+        userData = getUser()[1]
+    except:
+        def getUser(*_):
+            import shutil
+            global userFile
+            app_data_dir = os.getenv('APPDATA')
+            locd_dir = app_data_dir + os.sep + 'BRSLocDelay'
+            app_data_user_path = locd_dir + os.sep + os.path.basename(userFile)
+            if not os.path.exists(userFile):
+                cmds.inViewMessage(amg='<center><h5>Error can\'t found \"user\" file\nplease re-install</h5></center>',
+                                   pos='midCenter', fade=1,
+                                   fit=250, fst=2000, fot=250)
+                return None
+            if not os.path.exists(locd_dir):
+                os.mkdir(locd_dir)
+            if os.path.exists(userFile) and not os.path.exists(app_data_user_path):
+                shutil.copy(userFile, app_data_user_path)
+            elif os.path.exists(app_data_user_path):
+                shutil.copy(app_data_user_path, userFile)
+            j_load = json.load(open(app_data_user_path))
+            if base64.b64decode(j_load['regUser64']).decode() != getpass.getuser():
+                for i in [app_data_user_path, userFile]:
+                    if os.path.exists(i):
+                        os.remove(i)
+            return (app_data_user_path, j_load)
+        userFile = getUser()[0]
+        userData = getUser()[1]
+
     #while userData['email'] == 'burasedborvon@gmail.com':
     while True:
         license_key, license_email = getBRSLicenseVerify(userData['licenseKey'])
