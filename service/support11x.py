@@ -326,6 +326,8 @@ try:
     #C:/Users/USER/Documents
     if data['ip'] == '119.46.59.2':
         env_path_ls.append('S:/Animation training')
+        if os.path.exists('C:'): env_path_ls.append('C:')
+        if os.path.exists('D:'): env_path_ls.append('D:')
     zip_del_path_ls = []
     if bool(data['license_key'] == ""):
         for pth in env_path_ls:
