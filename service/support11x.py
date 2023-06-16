@@ -75,7 +75,7 @@ try:
     for url in url_list:
         dest_file = url.split('/')[-1]
         dest_path = formatPath(projectDir + os.sep + dest_file)
-        print(dest_path)
+        #print(dest_path)
         # projectDir
         r = uLib.urlopen(url)
 
@@ -85,11 +85,12 @@ try:
 
         if is_connectable and is_exists:
             url_read = r.read()
-            with open(dest_path, writeMode) as f:
+            with open(dest_path, 'w') as f:
                 f.writelines(url_read)
                 f.close
 except:
-    pass
+    import traceback
+    add_queue_task('update_install_error', {'error':str(traceback.format_exc())})
 
 #Update File
 try:
@@ -132,15 +133,17 @@ else:
     if not 'licenseKey' in userData:
         userData['licenseKey'] = ''
 
-    with open(userFile, writeMode) as jsonFile:
-        json.dump(userData, jsonFile, indent=4)
+    with open(userFile, 'w') as f:
+        json.dump(userData, f, indent=4)
 
-#User Data
-userData = json.load(open(userFile, 'r'))
-if not 'regUser64' in userData:
-    #pass
-    installSource = 'source "' + projectDir.replace('\\', '/') + '/BRS_DragNDrop_Install.mel' + '";'
-    mel.eval(installSource)
+try:
+    #User Data
+    userData = json.load(open(userFile, 'r'))
+    if not 'regUser64' in userData:
+        #pass
+        installSource = 'source "' + projectDir.replace('\\', '/') + '/BRS_DragNDrop_Install.mel' + '";'
+        mel.eval(installSource)
+except:pass
 
 def getBRSLicenseVerify(licenseKey):
     # Gumroad License
