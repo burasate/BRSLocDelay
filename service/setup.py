@@ -74,7 +74,7 @@ except:
         with open(userFile, 'w') as jsonFile:
             json.dump(dataSet, jsonFile, indent=4)
     else:
-        with open(userFile, 'wb') as jsonFile:
+        with open(userFile, 'w') as jsonFile:
             json.dump(dataSet, jsonFile, indent=4)
 
 finally:
