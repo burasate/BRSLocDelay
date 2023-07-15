@@ -59,7 +59,7 @@ except:
 
 kf = KeyframeOverlap.KFOverlap()
 kf.show_ui()
-'''.format(src_dir)
+'''
 
 cmds.shelfButton(stp='python', iol='Overlap', parent=cur_shelf, ann='KF Overlap', i=image_path, c=command)
 cmds.confirmDialog(title='Keyframe Overlap', message='Installation Successful.', button=['OK'])
