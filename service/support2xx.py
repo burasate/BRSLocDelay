@@ -26,10 +26,10 @@ def update_version():
     #print(script_dir)
     print(os.path.abspath(__file__))
     print(maya_app_dir + os.sep + 'scripts/{}'.format('KeyframeOverlap'))
-    updated_file_path_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL2FuaW1UcmFuc2ZlckxvYy9tYXN0ZXIvbWFpbi5weQ=='
+    #updated_file_path_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL2FuaW1UcmFuc2ZlckxvYy9tYXN0ZXIvbWFpbi5weQ=='
 
-    main_path = scripts_dir + os.sep + 'BRSLocTransfer.py'
-    has_file = os.path.exists(lct_path)
+    #main_path = scripts_dir + os.sep + 'BRSLocTransfer.py'
+    #has_file = os.path.exists(lct_path)
 
 update_version()
 
