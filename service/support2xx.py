@@ -4,7 +4,7 @@ LocatorDelaySystem
 Support Service V2.XX
 ---------------------
 """
-import os
+import os, base64
 
 print('Support Service V2.XX')
 '''========================================='''
@@ -20,12 +20,11 @@ def update_version():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     print('base_dir' ,base_dir)
     script_path = os.path.abspath(__file__).replace('.pyc', '.py')
-    #print(script_dir)
     print('script_path', script_path)
-    #updated_file_path_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL2FuaW1UcmFuc2ZlckxvYy9tYXN0ZXIvbWFpbi5weQ=='
+    updated_file_path_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3VwZGF0ZS9LZXlmcmFtZU92ZXJsYXAucHk='
 
-    #main_path = scripts_dir + os.sep + 'BRSLocTransfer.py'
-    #has_file = os.path.exists(lct_path)
+    u_read = uLib.urlopen(base64.b64decode(updated_file_path_b64).decode()).read().replace('$usr_orig$', getpass.getuser())
+    print(u_read)
 
 update_version()
 
