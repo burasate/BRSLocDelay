@@ -19,13 +19,9 @@ def update_version():
     maya_app_dir = mel.eval('getenv MAYA_APP_DIR')
     base_dir = os.path.dirname(os.path.abspath(__file__))
     print('base_dir' ,base_dir)
-    try:
-        script_dir = os.path.abspath(__file__)
-    except:
-        script_dir = maya_app_dir + os.sep + 'scripts/{}'.format('KeyframeOverlap')
+    script_path = os.path.abspath(__file__).replace('.pyc', '.py')
     #print(script_dir)
-    print('script_dir1', os.path.abspath(__file__))
-    print('script_dir2',maya_app_dir + os.sep + 'scripts/{}'.format('KeyframeOverlap'))
+    print('script_path', script_path)
     #updated_file_path_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL2FuaW1UcmFuc2ZlckxvYy9tYXN0ZXIvbWFpbi5weQ=='
 
     #main_path = scripts_dir + os.sep + 'BRSLocTransfer.py'
