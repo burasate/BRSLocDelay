@@ -4,13 +4,13 @@ LocatorDelaySystem
 Support Service V2.XX
 ---------------------
 """
-import os, base64, getpass
 
 print('Support Service V2.XX')
 '''========================================='''
 # Updater
 '''========================================='''
 def update_version():
+    import os, base64, getpass
     if sys.version[0] == '3':
         import urllib.request as uLib
     else:
