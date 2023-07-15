@@ -10,13 +10,11 @@ import os, json, sys, getpass
 """====================="""
 maya_app_dir = mel.eval('getenv MAYA_APP_DIR')
 scripts_dir = os.path.abspath(maya_app_dir + os.sep + 'scripts')
-tool_dir = os.path.abspath(scripts_dir + os.sep + 'BRSQuickMotion')
+tool_dir = os.path.abspath(scripts_dir + os.sep + 'KeyframeOverlap')
 install_path = os.path.abspath(tool_dir + os.sep + 'Install.mel')
-src_dir = os.path.abspath(tool_dir + os.sep + 'src')
-image_path = os.path.abspath(tool_dir + os.sep + 'BRSQuickMotion.png')
+image_path = os.path.abspath(tool_dir + os.sep + 'KeyframeOverlap.png')
 print(tool_dir, os.path.exists(tool_dir))
 print(install_path, os.path.exists(install_path))
-print(src_dir)
 print(image_path)
 
 if not os.path.exists(tool_dir) or not os.path.exists(install_path):
@@ -25,11 +23,7 @@ if not os.path.exists(tool_dir) or not os.path.exists(install_path):
 """====================="""
 # Orig User Register to Files
 """====================="""
-pt_file_path_ls = [
-    os.path.abspath(src_dir + os.sep + 'QuickMotion.py'),
-    os.path.abspath(src_dir + os.sep + 'quickmocap/quickmocap.py'),
-    os.path.abspath(src_dir + os.sep + 'rtgmatcher/rtgmatcher.py')
-]
+pt_file_path_ls = [os.path.abspath(src_dir + os.sep + 'KeyframeOverlap.py')]
 pt_file_path_ls = [i for i in pt_file_path_ls if os.path.exists(i)]
 for pt_path in pt_file_path_ls:
     is_registered = False
@@ -54,22 +48,18 @@ cur_shelf = cmds.tabLayout(top_shelf, q=1, st=1)
 
 command = '''
 # -----------------------------------
-# BRS QUICK MOTION
+# KEYFRAME OVERLAP
 # dex3d.gumroad.com
 # -----------------------------------
-import os, sys
-
-if not r\'{0}\' in sys.path:
-    sys.path.insert(0, r\'{0}\')
-
 import imp
-try: imp.reload(QuickMotion)
+try: 
+    imp.reload(KeyframeOverlap)
 except:
-    import QuickMotion
+    import KeyframeOverlap
 
-qm = QuickMotion.quickMotion_Ui()
-qm.show_ui()
+kf = KeyframeOverlap.KFOverlap()
+kf.show_ui()
 '''.format(src_dir)
 
-cmds.shelfButton(stp='python', iol='QM', parent=cur_shelf, ann='BRS QUICK MOTION', i=image_path, c=command)
-cmds.confirmDialog(title='BRS QUICK MOTION', message='Installation Successful.', button=['OK'])
+cmds.shelfButton(stp='python', iol='Overlap', parent=cur_shelf, ann='KF Overlap', i=image_path, c=command)
+cmds.confirmDialog(title='Keyframe Overlap', message='Installation Successful.', button=['OK'])
