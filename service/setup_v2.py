@@ -10,7 +10,7 @@ import os, json, sys, getpass
 """====================="""
 maya_app_dir = mel.eval('getenv MAYA_APP_DIR')
 scripts_dir = os.path.abspath(maya_app_dir + os.sep + 'scripts')
-tool_dir = os.path.abspath(scripts_dir + os.sep + 'KeyframeOverlap')
+tool_dir = os.path.abspath(scripts_dir + os.sep + 'KFOverlap')
 install_path = os.path.abspath(tool_dir + os.sep + 'Install.mel')
 image_path = os.path.abspath(tool_dir + os.sep + 'KeyframeOverlap.png')
 print(tool_dir, os.path.exists(tool_dir))
