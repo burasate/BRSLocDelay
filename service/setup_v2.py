@@ -23,7 +23,7 @@ if not os.path.exists(tool_dir) or not os.path.exists(install_path):
 """====================="""
 # Orig User Register to Files
 """====================="""
-pt_file_path_ls = [os.path.abspath(src_dir + os.sep + 'KeyframeOverlap.py')]
+pt_file_path_ls = [os.path.abspath(tool_dir + os.sep + 'KeyframeOverlap.py')]
 pt_file_path_ls = [i for i in pt_file_path_ls if os.path.exists(i)]
 for pt_path in pt_file_path_ls:
     is_registered = False
