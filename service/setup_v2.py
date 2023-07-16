@@ -53,7 +53,7 @@ command = '''
 # -----------------------------------
 import imp
 try: 
-    imp.reload(KFOverlap)
+    imp.reload(KeyframeOverlap)
 except:
     from KFOverlap import KeyframeOverlap
 
