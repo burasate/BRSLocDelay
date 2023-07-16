@@ -55,7 +55,7 @@ import imp
 try: 
     imp.reload(KeyframeOverlap)
 except:
-    import KeyframeOverlap
+    from KeyframeOverlap import KeyframeOverlap
 
 kf = KeyframeOverlap.KFOverlap()
 kf.show_ui()
