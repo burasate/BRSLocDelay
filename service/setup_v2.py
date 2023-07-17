@@ -51,15 +51,20 @@ command = '''
 # KEYFRAME OVERLAP
 # dex3d.gumroad.com
 # -----------------------------------
-import imp
+import imp, os, sys
+# -----------------------------------
+if not '{0}' in sys.path:
+    sys.path.insert(0, '{0}')
+# -----------------------------------
 try: 
     imp.reload(KeyframeOverlap)
 except:
-    from KFOverlap import KeyframeOverlap
-
-kf = KeyframeOverlap.KFOverlap()
-kf.show_ui()
-'''
+    from {1} import KeyframeOverlap
+finally:
+    kfo = KeyframeOverlap.kf_overlap()
+    kfo.show_ui()
+# -----------------------------------
+'''.format(scripts_dir,os.path.split(tool_dir)[-1]).strip()
 
 cmds.shelfButton(stp='python', iol='Overlap', parent=cur_shelf, ann='KF Overlap', i=image_path, c=command)
 cmds.confirmDialog(title='Keyframe Overlap', message='Installation Successful.', button=['OK'])
