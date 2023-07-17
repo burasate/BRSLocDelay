@@ -53,8 +53,8 @@ command = '''
 # -----------------------------------
 import imp, os, sys
 # -----------------------------------
-if not r"{0}" in sys.path:
-    sys.path.insert(0, r"{0}")
+if not r'{0}' in sys.path:
+    sys.path.insert(0, r'{0}')
 # -----------------------------------
 try: 
     imp.reload(KeyframeOverlap)
