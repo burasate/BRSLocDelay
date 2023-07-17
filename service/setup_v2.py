@@ -53,18 +53,18 @@ command = '''
 # -----------------------------------
 import imp, os, sys
 # -----------------------------------
-if not '{0}' in sys.path:
-    sys.path.insert(0, '{0}')
+if not r"{0}" in sys.path:
+    sys.path.insert(0, r"{0}")
 # -----------------------------------
 try: 
     imp.reload(KeyframeOverlap)
 except:
-    from {1} import KeyframeOverlap
+    import KeyframeOverlap
 finally:
     kfo = KeyframeOverlap.kf_overlap()
     kfo.show_ui()
 # -----------------------------------
-'''.format(scripts_dir,os.path.split(tool_dir)[-1]).strip()
+'''.format(tool_dir).strip()
 
 cmds.shelfButton(stp='python', iol='Overlap', parent=cur_shelf, ann='KF Overlap', i=image_path, c=command)
 cmds.confirmDialog(title='Keyframe Overlap', message='Installation Successful.', button=['OK'])
