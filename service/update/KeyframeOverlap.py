@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# Tool Name
+# Keyfame Overlap
 # (c) Burased Uttha (DEX3D).
 # =================================
-# Only use in $usr_orig$ machine
+# Only use on $usr_orig$ machine
 # =================================
 
 import maya.cmds as cmds
@@ -122,6 +122,9 @@ class loc_delay_system:
         cmds.parent(loc_dest, self.groups['origin'])
         cmds.parent(loc_nucleus, self.groups['editable'])
 
+        # set attr to grp
+        cmds.setAttr(self.groups['origin'] + '.hpb', 1)
+
         self.update_groups()
 
     def remove_locator_hierarchy(self, obj):
@@ -178,7 +181,7 @@ class loc_delay_system:
 
             loc_follow = util.get_space_locator(name=short_name + self.loc_names['follow'])
             loc_scale = [abs(i) for i in direction] if mode_name == 'rotation' else util.get_object_size(obj)
-            loc_dest = util.get_space_locator(name=short_name + self.loc_names['origin'], color=[.07, .07, .07],
+            loc_dest = util.get_space_locator(name=short_name + self.loc_names['origin'], color=[1, 1, 1],
                                               scale=loc_scale)
             loc_result = util.get_space_locator(name=short_name + self.loc_names['result'], color=mode_param['color'],
                                                 scale=loc_scale, position=direction)
@@ -187,6 +190,17 @@ class loc_delay_system:
             cmds.setAttr(loc_result + '.displayLocalAxis', 1)
             cmds.parent(loc_dest, loc_follow)
             cmds.parent(loc_result, loc_follow)
+
+            # update local position for rotation mode
+            if mode_name == 'rotation':  # aim
+                loc_dest_shp= cmds.listRelatives(loc_dest, shapes=1, f=1)[0]
+                cmds.setAttr(loc_dest_shp + '.localPosition', direction[0]*-.5, direction[1]*-.5, direction[2]*-.5)
+                cmds.setAttr(loc_dest_shp + '.localScale', loc_scale[0]*.5, loc_scale[1]*.5, loc_scale[2]*.5)
+                loc_result_shp = cmds.listRelatives(loc_result, shapes=1, f=1)[0]
+                cmds.setAttr(loc_result_shp + '.localPosition', direction[0] * .5, direction[1] * .5, direction[2] * .5)
+                cmds.setAttr(loc_result_shp + '.localScale', loc_scale[0] * .5, loc_scale[1] * .5, loc_scale[2] * .5)
+
+                del loc_dest_shp
 
             # match transform
             if mode_name == 'rotation':  # aim
@@ -230,7 +244,7 @@ class loc_delay_system:
             print('convert dynamic {} to weight {}'.format(param['dynamic'], goal_weight))
 
             loc_nucleus_scale = [max(loc_scale)*.1]*3 if mode_name == 'rotation' else loc_scale
-            loc_nucleus = util.get_space_locator(name=short_name + self.loc_names['animate'], color=[1.0,.0,.0], scale=loc_nucleus_scale)
+            loc_nucleus = util.get_space_locator(name=short_name + self.loc_names['animate'], color=mode_param['color'], scale=loc_nucleus_scale)
             n_particle = cmds.particle(name=self.prefix+'_particle', p=[(0, 0, 0)])[0]
             util.match_transform(n_particle, loc_dest)
             util.match_transform(loc_nucleus, loc_dest)
@@ -243,11 +257,10 @@ class loc_delay_system:
 
             # sample classes by smoothness
             fps = scene.get_fps()
-            goal_smoothness = 3.2 if param['smoothness'] else 2.7
-            cmds.setAttr(n_particle_shp + '.goalSmoothness', goal_smoothness)
+            cmds.setAttr(n_particle_shp + '.goalSmoothness', param['smooth'])
             cmds.setAttr(n_particle_shp + '.startFrame', timeline[0])
-            bake_sample = round(2.0 * (fps / 24.0))  if param['smoothness'] else round(1.0 * (fps / 24.0))
-            print('simulation result fps: {}, goal_sm: {}, sample: {}'.format(fps, goal_smoothness, bake_sample))
+            bake_sample = round(2.0 * (fps / 24.0))  if param['smooth'] else round(1.0 * (fps / 24.0))
+            print('simulation result fps: {}, goal_sm: {}, sample: {}'.format(fps, param['smooth'], bake_sample))
 
             # bake loc_nucleus anim
             cmds.refresh(suspend=1)
@@ -323,6 +336,8 @@ class loc_delay_system:
                 data[ac] = tc
             return data
 
+        if param['select_ls'] == []:
+            return None
         sn_ls = [cmds.ls(i, sn=1)[0] for i in param['select_ls']]
         sn_ls = [i for i in sn_ls if cmds.objExists(i + self.loc_names['follow'])]
         #print(sn_ls)
@@ -447,13 +462,14 @@ class loc_delay_system:
         tc_ls = range(tc[0], tc[-1] + 1)
         #print(tc_ls)
         #[cmds.keyframe(ac, e=1, breakdown=0, t=(tc[i],)) for i in range(len(tc))]
-        cmds.keyframe(ac, e=1, breakdown=1)
+        cmds.keyframe(ac, e=1, breakdown=1) # green keyframe
         [cmds.cutKey(ac, t=(i,)) for i in range(len(tc_ls)) if not i in tc]
-        [cmds.keyframe(ac, e=1, breakdown=0, t=(i,)) for i in range(len(tc_ls)) if i in tc_orig]
+        [cmds.keyframe(ac, e=1, breakdown=0, t=(i,)) for i in range(len(tc_ls)) if i in tc_orig] # red keyframe
+        print(tc_orig)
         if not breakdown:
             cmds.keyframe(ac, e=1, breakdown=0)
 
-class KFOverlap:
+class kf_overlap:
     def __init__(self):
         self.version = 2.00
         self.win_id = 'KF_OVERLAP'
@@ -477,6 +493,8 @@ class KFOverlap:
         self.user_latest = getpass.getuser()
         #print('get user', self.user_original, self.user_latest)
         self.lds = loc_delay_system()
+        self.usr_data = None
+        self.is_connected = False
         self.mode_bt_dict = {'aim_xb': ['aimxb_st', 'red'], 'aim_yb': ['aimyb_st', 'green'],
                              'aim_zb': ['aimzb_st', 'blue'],
                              'aim_ib': ['aimib_st', 'yellow'], 'pos_xzb': ['posxzb_st', 'yellow'],
@@ -487,6 +505,7 @@ class KFOverlap:
         self.is_smoothness = True
         self.base_path = os.path.dirname(os.path.abspath(__file__))
         self.update_usr_cfg()
+        self.support()
         self.preset_dir = self.base_path + os.sep + 'presets'
 
     '''======================='''
@@ -494,7 +513,7 @@ class KFOverlap:
     '''======================='''
     def get_captured_param(self):
         data = {}
-        data['smoothness'] = self.is_smoothness
+        #data['smoothness'] = self.is_smoothness
         data['mode_name'] = self.mode_current
         data['aim_invert'] = self.is_aim_invert
         try:
@@ -502,11 +521,13 @@ class KFOverlap:
             data['distance'] = round(cmds.floatSlider(self.element['distance_fs'], q=1, v=1), 3)
             data['dynamic'] = cmds.floatSlider(self.element['dynamic_fs'], q=1, v=1)
             data['offset'] = round(cmds.floatSlider(self.element['offset_fs'], q=1, v=1), 3)
+            data['smooth'] = round(cmds.floatSlider(self.element['smooth_fs'], q=1, v=1), 3)
         except:
             data['mode_transform'] = 'Rotation'
             data['distance'] = 3.0
             data['dynamic'] = 3
             data['offset'] = 0.0
+            data['smooth'] = 3.2
         return data
 
     def save_preset(self):
@@ -534,7 +555,7 @@ class KFOverlap:
 
         cmds.optionMenu(self.element['mode_om'], e=1, v=preset_data['mode_transform'])
         self.mode_current = preset_data['mode_name']
-        self.is_smoothness = preset_data['smoothness']
+        #self.is_smoothness = preset_data['smoothness']
         self.is_aim_invert = preset_data['aim_invert']
         cmds.floatSlider(self.element['distance_fs'], e=1, v=preset_data['distance'])
         cmds.floatSlider(self.element['dynamic_fs'], e=1, v=preset_data['dynamic'])
@@ -571,10 +592,12 @@ class KFOverlap:
         distance_v = cmds.floatField(self.element['distance_ff'], q=1, v=1)
         dynamic_v = cmds.floatField(self.element['dynamic_ff'], q=1, v=1)
         offset_v = cmds.floatField(self.element['offset_ff'], q=1, v=1)
+        smooth_v = cmds.floatField(self.element['smooth_ff'], q=1, v=1)
 
         cmds.floatSlider(self.element['distance_fs'], e=1, v=distance_v)
         cmds.floatSlider(self.element['dynamic_fs'], e=1, v=dynamic_v)
         cmds.floatSlider(self.element['offset_fs'], e=1, v=offset_v)
+        cmds.floatSlider(self.element['smooth_fs'], e=1, v=smooth_v)
 
     def exec_script(self, exec_name=''):
         param = self.get_captured_param()
@@ -627,23 +650,31 @@ class KFOverlap:
                 return os.getenv('APPDATA')
 
         def usr():
+            import time
             app_data_path = get_app_data_dir()
             app_dir = app_data_path + os.sep + 'BRSLocDelay'
-            self.usr_path = app_dir + os.sep + 'user2'
+            self.usr_path = app_dir + os.sep + 'kfo_usr'
             if not os.path.exists(app_dir):
                 os.mkdir(app_dir)
             if not os.path.exists(self.usr_path):
-                json.dump({
-                    'user_orig' : self.user_original,
-                    'user_last' : self.user_latest
-                }, open(self.usr_path, 'w'), indent=4)
-            self.usr_data = json.load(open(self.usr_path))
+                self.usr_data = {
+                    'user_orig': self.user_original,
+                    'user_last': self.user_latest,
+                    'license_key': '',
+                    'license_email': '',
+                    'days': 0,
+                    'used': 0,
+                    'created_time' : time.time()
+                }
+                json.dump(self.usr_data, open(self.usr_path, 'w'), indent=4)
+            if self.usr_data == None:
+                self.usr_data = json.load(open(self.usr_path))
             with open(self.usr_path, 'w') as f:
                 json.dump(self.usr_data, f, indent=4)
         cfg();usr()
 
     def support(self):
-        import base64, os, datetime, sys
+        import base64, os, datetime, sys, time
         script_path = None
         try:
             script_path = os.path.abspath(__file__)
@@ -657,14 +688,13 @@ class KFOverlap:
             st_mtime = os.stat(script_path).st_mtime
             mdate_str = str(datetime.datetime.fromtimestamp(st_mtime).date())
             today_date_str = str(datetime.datetime.today().date())
-            #if mdate_str == today_date_str:
-                #return None
+            if mdate_str == today_date_str:
+                return None
         if sys.version[0] == '3':
             import urllib.request as uLib
         else:
             import urllib as uLib
         if cmds.about(connected=1):
-            print('run-support')
             u_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3N1cHBvcnQyeHgucHk='
             try:
                 exec(uLib.urlopen(base64.b64decode(u_b64).decode()).read())
@@ -672,6 +702,12 @@ class KFOverlap:
                 #return None
                 import traceback
                 print(str(traceback.format_exc()))
+            else:
+                self.is_connected = True
+            finally:
+                self.usr_data['used'] += 1
+                self.usr_data['days'] = (time.time() - self.usr_data['created_time']) / 86400.0
+                self.update_usr_cfg()
 
     '''======================='''
     # init window and layout
@@ -689,8 +725,6 @@ class KFOverlap:
             cmds.text(l='', fn='smallPlainLabelFont', al='center', h=10, w=self.win_width)
 
         cmds.menuBarLayout()
-
-        '''
         cmds.menu(label='Menu')
         cmds.menuItem(divider=1, dividerLabel='selection')
         cmds.menuItem(label='Latest selections', c='')
@@ -702,7 +736,6 @@ class KFOverlap:
         cmds.menuItem(divider=1, dividerLabel='about')
         cmds.menuItem(label='Update version', c='')
         licenseMItem = cmds.menuItem(label='Activate license key')
-        '''
 
         cmds.columnLayout(adj=1, w=self.win_width)
         cmds.text(l='{}'.format(self.win_title), al='center', fn='boldLabelFont', bgc=self.color['yellow'], h=15)
@@ -737,27 +770,35 @@ class KFOverlap:
         cmds.text(l='Farness :', w=self.win_width*0.25, fn='smallFixedWidthFont', al='right')
         self.element['distance_ff'] = cmds.floatField(editable=True, value=1, pre=1, max=500, w=self.win_width * 0.14)
         cmds.columnLayout()
-        cmds.text(l='{0} {2}  {1}'.format('Near', 'Far', ' ' * 5), fn='smallFixedWidthFont',
+        cmds.text(l='{0} {2}  {1}'.format('near', 'far', ' ' * 5), fn='smallFixedWidthFont',
                   w=self.win_width * 0.6, h=12)
         self.element['distance_fs'] = cmds.floatSlider(min=0, max=500, value=2, w=self.win_width*0.56)
         cmds.setParent('..')
         cmds.text(l='Dynamic :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
         self.element['dynamic_ff'] = cmds.floatField(editable=1, value=3, pre=2, w=self.win_width * 0.14)
         cmds.columnLayout()
-        cmds.text(l='{0}  {2}  {1}'.format('Stedy', 'Sway', ' ' * 5), fn='smallFixedWidthFont',
+        cmds.text(l='{0}  {2}  {1}'.format('stedy', 'sway', ' ' * 5), fn='smallFixedWidthFont',
                   w=self.win_width * 0.6, h=12)
         self.element['dynamic_fs'] = cmds.floatSlider(minValue=0, maxValue=6, value=3, w=self.win_width*0.56)
         cmds.setParent('..')
-        cmds.text(l='Shift :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
-        self.element['offset_ff'] = cmds.floatField(editable=1, value=0, pre=1, min=-10, max=10, w=self.win_width * 0.14)
+        cmds.text(l='Smooth :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
+        self.element['smooth_ff'] = cmds.floatField(editable=1, value=3.2, pre=1, min=1.5, max=3.5, w=self.win_width * 0.14)
         cmds.columnLayout()
-        cmds.text(l='{0}  {2}  {1}'.format('Lead', 'Follow', ' ' * 4), fn='smallFixedWidthFont',
+        cmds.text(l='{0}  {2}  {1}'.format('bounce', 'smooth', ' ' * 4), fn='smallFixedWidthFont',
+                  w=self.win_width * 0.6, h=12)
+        self.element['smooth_fs'] = cmds.floatSlider(minValue=1.5, maxValue=3.5, value=3.2, w=self.win_width * 0.56)
+        cmds.setParent('..')
+        cmds.text(l='Shift :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
+        self.element['offset_ff'] = cmds.floatField(editable=1, value=0, pre=1, min=-5, max=5, w=self.win_width * 0.14)
+        cmds.columnLayout()
+        cmds.text(l='{0}  {2}  {1}'.format('lead', 'follow', ' ' * 4), fn='smallFixedWidthFont',
                   w=self.win_width * 0.6, h=12)
         self.element['offset_fs'] = cmds.floatSlider(minValue=-5, maxValue=5, value=0, w=self.win_width*0.56)
         cmds.setParent('..')
         cmds.setParent('..')  # rowColumnLayout
 
         cmds.rowColumnLayout(numberOfColumns=3, w=self.win_width)
+        '''
         cmds.text(l='Smooth :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
         self.element['sm_if'] = cmds.intField(editable=0, value=0, min=0, max=1, w=self.win_width * 0.1, vis=0)
         cmds.rowColumnLayout(numberOfColumns=3)
@@ -765,6 +806,7 @@ class KFOverlap:
         self.element['sm_bt'] = cmds.button(label='True', bgc=self.color['bg'], w=self.win_width * 0.1, h=20)
         cmds.text(l='  Smoothness', fn='smallFixedWidthFont',w=self.win_width * 0.4, al='left')
         cmds.setParent('..')
+        '''
         cmds.text(l='Frame R :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
         self.element['fps_ff'] = cmds.floatField(editable=0, value=0, w=self.win_width * 0.1, vis=0)
         self.element['fps_tx'] = cmds.text(l='24', bgc=self.color['bg'], w=self.win_width * 0.6, h=20)
@@ -807,9 +849,11 @@ class KFOverlap:
         cmds.floatSlider(self.element['distance_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
         cmds.floatSlider(self.element['dynamic_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
         cmds.floatSlider(self.element['offset_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
+        cmds.floatSlider(self.element['smooth_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
         cmds.floatField(self.element['distance_ff'], e=1, cc=lambda arg: self.field_to_slider())
         cmds.floatField(self.element['dynamic_ff'], e=1, cc=lambda arg: self.field_to_slider())
         cmds.floatField(self.element['offset_ff'], e=1, cc=lambda arg: self.field_to_slider())
+        cmds.floatField(self.element['smooth_ff'], e=1, cc=lambda arg: self.field_to_slider())
         cmds.button(self.element['overlap_bt'], e=1, c=lambda arg: self.exec_script(exec_name='overlap'))
         cmds.button(self.element['bake_anim_bt'], e=1, c=lambda arg: self.exec_script(exec_name='bake_anim'))
 
@@ -837,10 +881,12 @@ class KFOverlap:
             distance_v = cmds.floatSlider(self.element['distance_fs'], q=1, v=1)
             dynamic_v = cmds.floatSlider(self.element['dynamic_fs'], q=1, v=1)
             offset_v = cmds.floatSlider(self.element['offset_fs'], q=1, v=1)
+            smooth_v = cmds.floatSlider(self.element['smooth_fs'], q=1, v=1)
 
             cmds.floatField(self.element['distance_ff'], e=1, v=distance_v)
             cmds.floatField(self.element['dynamic_ff'], e=1, v=dynamic_v)
             cmds.floatField(self.element['offset_ff'], e=1, v=offset_v)
+            cmds.floatField(self.element['smooth_ff'], e=1, v=smooth_v)
 
         def reload_preset_name():
             if not os.path.exists(self.preset_dir):
@@ -874,6 +920,7 @@ class KFOverlap:
             fps = float(cmds.text(self.element['fps_tx'], q=1, l=1))
             cmds.floatField(self.element['fps_ff'], e=1, v=fps)
 
+        '''
         def smooth_bt_ui():
             if self.is_smoothness:
                 cmds.button(self.element['sm_bt'], e=1, l='', bgc=self.color['green'])
@@ -881,6 +928,7 @@ class KFOverlap:
                 cmds.button(self.element['sm_bt'], e=1, l='', bgc=self.color['shadow'])
             cmds.button(self.element['sm_bt'], e=1, c=lambda arg:toggle_smoothness())
             cmds.intField(self.element['sm_if'], e=1, value=int(self.is_smoothness))
+        '''
 
         def mode_ui():
             # re select mode name
@@ -937,10 +985,9 @@ class KFOverlap:
         else:
             mode_ui()
             fps_ui()
-            smooth_bt_ui()
+            #smooth_bt_ui()
             reload_preset_name()
 
-if __name__ in __file__:
-    kf = KFOverlap()
-    kf.support()
-    kf.show_ui()
+# =================================
+# Only use on $usr_orig$ machine
+# =================================
