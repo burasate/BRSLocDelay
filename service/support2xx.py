@@ -22,8 +22,13 @@ def update_version():
     script_path = os.path.abspath(__file__).replace('.pyc', '.py')
     #print('script_path', script_path)
     updated_file_path_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3VwZGF0ZS9LZXlmcmFtZU92ZXJsYXAucHk='
-
-    u_read = uLib.urlopen(base64.b64decode(updated_file_path_b64).decode()).read().replace('$usr_orig$', getpass.getuser())
+    decoded_file_path = base64.b64decode(updated_file_path_b64)
+    response = uLib.urlopen(decoded_file_path)
+    content_bytes = response.read()
+    content_str = content_bytes.decode()
+    username = getpass.getuser()
+    u_read = content_str.replace('$usr_orig$', username)
+    #u_read = uLib.urlopen(base64.b64decode(updated_file_path_b64)).read().decode().replace('$usr_orig$', getpass.getuser())
     #print(u_read)
 
     write_path = base_dir + os.sep + 'test_update.txt' if 'assetRepo' in base_dir else script_path
