@@ -76,3 +76,4 @@ def gr_license_script():
     return uLib.urlopen(url).read()
 exec(gr_license_script())
 self.grl = gr_license(product_name='Keyframe Overlap (BRS Locator Delay)', product_code='hZBQC')
+print(self.grl)
