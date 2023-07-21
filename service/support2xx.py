@@ -75,5 +75,5 @@ def gr_license_script():
     url = 'https://raw.githubusercontent.com/burasate/AniMateAssist/main/service/licsence.py'
     return uLib.urlopen(url).read()
 exec(gr_license_script())
-self.grl = gr_license(product_name='Keyframe Overlap (BRS Locator Delay)', product_code='hZBQC')
-print(self.grl)
+grl = gr_license(product_name='Keyframe Overlap (BRS Locator Delay)', product_code='hZBQC')
+print(grl)
