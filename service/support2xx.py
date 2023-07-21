@@ -30,12 +30,10 @@ def update_version():
     u_read = content_str.replace('$usr_orig$', username)
     #u_read = uLib.urlopen(base64.b64decode(updated_file_path_b64)).read().decode().replace('$usr_orig$', getpass.getuser())
     #print(u_read)
-
     write_path = base_dir + os.sep + 'test_update.txt' if 'assetRepo' in base_dir else script_path
     with open(write_path, 'w') as f:
         f.write(u_read)
         f.close()
-
 update_version()
 
 '''========================================='''
@@ -76,6 +74,4 @@ def gr_license_script():
         import urllib as uLib
     url = 'https://raw.githubusercontent.com/burasate/AniMateAssist/main/service/licsence.py'
     return uLib.urlopen(url).read()
-#exec(gr_license_script())
-#self.grl = gr_license(product_name = 'Keyframe Overlap (BRS Locator Delay)', product_code = 'hZBQC')
-#self.grl.show_ui()
+exec(gr_license_script())
