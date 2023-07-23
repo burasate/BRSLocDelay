@@ -128,8 +128,7 @@ class gr_license:
         print(email, key),
 
         self.verify = self.get_license_verify(key=key)
-        print(verify == None)
-        if verify == None:
+        if self.verify == None:
             cmds.warning('Please make sure the internet connection is connect')
             return None
 
