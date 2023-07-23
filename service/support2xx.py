@@ -119,7 +119,7 @@ class gr_license:
             license_email = license['purchase']['email']
         return (license_key, license_email)
 
-    def do_verify(self, *_):
+    def do_verify(self):
         agreement_accept = cmds.checkBox(self.ui_element['agreement_accept'], q=1, v=1)
         if not agreement_accept:
             return None
