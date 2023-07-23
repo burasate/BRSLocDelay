@@ -163,7 +163,7 @@ https://app.gumroad.com/library
         if cmds.window(self.win_id, exists=True):
             cmds.deleteUI(self.win_id)
         cmds.window(self.win_id, t='DEX3D Gumroad License Argeement',
-            w=win_width, sizeable=1, h=10, tb=0,
+            w=win_width, sizeable=1, h=10, tb=1,
             retain=0, bgc=(.2, .2, .2))
 
         cmds.columnLayout(adj=0, w=win_width)

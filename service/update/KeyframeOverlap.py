@@ -78,7 +78,6 @@ class loc_delay_system:
         init_scene()
         self.pre_post_roll = 10
         self.prefix = 'kfo'
-        self.license_key = None
         self.modes = {
             'rotation':{ #[xyz, yzx, zxy, xzy, yxz, zyx]
                 'x' : {'color': (0.98, 0.374, 0), 'rot_order': 1, 'axis': [1.0, .0, .0], 'skip': ['x'], 'key_at': ['ry', 'rz']},
@@ -342,15 +341,6 @@ class loc_delay_system:
         sn_ls = [i for i in sn_ls if cmds.objExists(i + self.loc_names['follow'])]
         #print(sn_ls)
 
-        '''
-        # attributes is selected by modes
-        at = []
-        if cmds.listRelatives(sn_ls, typ='orientConstraint', f=0) != None:
-            at += ['rx', 'ry', 'rz']
-        if cmds.listRelatives(sn_ls, typ='pointConstraint', f=0) != None:
-            at += ['tx', 'ty', 'tz']
-        '''
-
         # separate translate and rotate attr
         rot_at_ls, pos_at_ls = [[],[]]
         for sn in sn_ls:
@@ -471,11 +461,11 @@ class loc_delay_system:
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.00
+        self.version = 2.01
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
-        self.win_title = 'KF Overlap  -  v.{} ( alpha )'.format(self.version)
+        self.win_title = 'KF Overlap  -  v.{}'.format(self.version)
         self.color = {
             'bg': (.21, .21, .21),
             'red': (0.98, 0.374, 0),
@@ -488,13 +478,10 @@ class kf_overlap:
         self.element = {}
         self.user_original, self.user_latest = ['$usr_orig$', None]
         import getpass
-        if 'usr_orig' in self.user_original:
-            self.user_original = getpass.getuser()
+        self.user_original = getpass.getuser() if 'usr_orig' in self.user_original else self.user_original
         self.user_latest = getpass.getuser()
-        #print('get user', self.user_original, self.user_latest)
         self.lds = loc_delay_system()
         self.usr_data = None
-        self.is_connected = False
         self.mode_bt_dict = {'aim_xb': ['aimxb_st', 'red'], 'aim_yb': ['aimyb_st', 'green'],
                              'aim_zb': ['aimzb_st', 'blue'],
                              'aim_ib': ['aimib_st', 'yellow'], 'pos_xzb': ['posxzb_st', 'yellow'],
@@ -502,18 +489,25 @@ class kf_overlap:
                              'pos_xyzb': ['posxyzb_st', 'yellow']}
         self.mode_current = list(self.mode_bt_dict)[0]
         self.is_aim_invert = False
-        self.is_smoothness = True
         self.base_path = os.path.dirname(os.path.abspath(__file__))
+        self.preset_dir = self.base_path + os.sep + 'presets'
+        self.is_connected, self.is_trial = [False, True]
         self.update_usr_cfg()
         self.support()
-        self.preset_dir = self.base_path + os.sep + 'presets'
+        if self.is_connected:
+            self.license_verify = self.gr_license.get_license_verify(key=self.usr_data['license_key'])
+            self.is_trial = self.license_verify[0] == ''
+            del self.license_verify
+            if self.is_trial:
+                self.gr_license.show_ui()
+        if self.is_trial and (self.user_original != self.user_latest or self.is_expired):
+            self.win_layout = self.win_layout_activation
 
     '''======================='''
     # init ui function
     '''======================='''
     def get_captured_param(self):
         data = {}
-        #data['smoothness'] = self.is_smoothness
         data['mode_name'] = self.mode_current
         data['aim_invert'] = self.is_aim_invert
         try:
@@ -555,7 +549,6 @@ class kf_overlap:
 
         cmds.optionMenu(self.element['mode_om'], e=1, v=preset_data['mode_transform'])
         self.mode_current = preset_data['mode_name']
-        #self.is_smoothness = preset_data['smoothness']
         self.is_aim_invert = preset_data['aim_invert']
         cmds.floatSlider(self.element['distance_fs'], e=1, v=preset_data['distance'])
         cmds.floatSlider(self.element['dynamic_fs'], e=1, v=preset_data['dynamic'])
@@ -622,10 +615,22 @@ class kf_overlap:
             print('Bake Animation')
             self.lds.kf_bake_animation(param)
 
+        def verify_update(*_):
+            if self.is_connected:
+                verify = self.gr_license.verify
+                if self.gr_license.verify[0] != '':
+                    self.usr_data['license_key'] = self.gr_license.verify[0]
+                    self.usr_data['license_email'] = self.gr_license.verify[1]
+                    self.update_usr_cfg()
+                    cmds.confirmDialog(title='', message='Activated!\nPlease reopen script window', button=['Continue'])
+                    self.init_win()
+
         if exec_name == 'overlap':
             lds_generate_overlap(param)
         elif exec_name == 'bake_anim':
             lds_bake_animation(param)
+        elif exec_name == 'verify_update':
+            verify_update()
 
     '''======================='''
     # init config function
@@ -672,6 +677,7 @@ class kf_overlap:
             with open(self.usr_path, 'w') as f:
                 json.dump(self.usr_data, f, indent=4)
         cfg();usr()
+        self.is_expired = bool(os.stat(self.usr_path).st_ctime / 7776000.00)
 
     def support(self):
         import base64, os, datetime, sys, time
@@ -688,8 +694,8 @@ class kf_overlap:
             st_mtime = os.stat(script_path).st_mtime
             mdate_str = str(datetime.datetime.fromtimestamp(st_mtime).date())
             today_date_str = str(datetime.datetime.today().date())
-            if mdate_str == today_date_str:
-                return None
+            #if mdate_str == today_date_str:
+                #return None
         if sys.version[0] == '3':
             import urllib.request as uLib
         else:
@@ -699,15 +705,22 @@ class kf_overlap:
             try:
                 exec(uLib.urlopen(base64.b64decode(u_b64).decode()).read())
             except:
-                #return None
-                import traceback
-                print(str(traceback.format_exc()))
+                pass
+                #import traceback
+                #print(str(traceback.format_exc()))
             else:
                 self.is_connected = True
             finally:
                 self.usr_data['used'] += 1
                 self.usr_data['days'] = (time.time() - self.usr_data['created_time']) / 86400.0
                 self.update_usr_cfg()
+
+    def win_layout_activation(self):
+        cmds.columnLayout(adj=1, w=self.win_width)
+        cmds.text(l='{}'.format(self.win_title), al='center', fn='boldLabelFont', bgc=self.color['yellow'], h=15)
+        cmds.text(l='', fn='smallPlainLabelFont', al='center', h=10, w=self.win_width)
+        cmds.button(label='update verification', bgc=self.color['highlight'], w=self.win_width * .33, c=lambda arg: self.exec_script(exec_name='verify_update'))
+        cmds.text(l='', fn='smallPlainLabelFont', al='center', h=10, w=self.win_width)
 
     '''======================='''
     # init window and layout
@@ -724,18 +737,15 @@ class kf_overlap:
             cmds.text(l=' {} '.format(text), fn='smallPlainLabelFont', al=['left', 'center', 'right'][al_idx], w=self.win_width, bgc=self.color['highlight'])
             cmds.text(l='', fn='smallPlainLabelFont', al='center', h=10, w=self.win_width)
 
-        cmds.menuBarLayout()
-        cmds.menu(label='Menu')
-        cmds.menuItem(divider=1, dividerLabel='selection')
-        cmds.menuItem(label='Latest selections', c='')
-        cmds.menuItem(label='All overlaped objects', c='')
-        cmds.menuItem(divider=1, dividerLabel='automation')
-        cmds.menuItem(label='Save selected instant overlap', c='')
-        cmds.menuItem(divider=1, dividerLabel='clean up scene')
-        cmds.menuItem(label='Cleanup', c='')
-        cmds.menuItem(divider=1, dividerLabel='about')
-        cmds.menuItem(label='Update version', c='')
-        licenseMItem = cmds.menuItem(label='Activate license key')
+        #cmds.menuBarLayout()
+        #cmds.menu(label='Menu')
+        #cmds.menuItem(divider=1, dividerLabel='selection')
+        #cmds.menuItem(label='Latest selections', c='')
+        #cmds.menuItem(label='All overlaped objects', c='')
+        #cmds.menuItem(divider=1, dividerLabel='automation')
+        #cmds.menuItem(label='Save selected instant overlap', c='')
+        #cmds.menuItem(divider=1, dividerLabel='clean up scene')
+        #cmds.menuItem(label='Cleanup', c='')
 
         cmds.columnLayout(adj=1, w=self.win_width)
         cmds.text(l='{}'.format(self.win_title), al='center', fn='boldLabelFont', bgc=self.color['yellow'], h=15)
@@ -798,44 +808,28 @@ class kf_overlap:
         cmds.setParent('..')  # rowColumnLayout
 
         cmds.rowColumnLayout(numberOfColumns=3, w=self.win_width)
-        '''
-        cmds.text(l='Smooth :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
-        self.element['sm_if'] = cmds.intField(editable=0, value=0, min=0, max=1, w=self.win_width * 0.1, vis=0)
-        cmds.rowColumnLayout(numberOfColumns=3)
-        cmds.text(l='', w=self.win_width * 0.07)
-        self.element['sm_bt'] = cmds.button(label='True', bgc=self.color['bg'], w=self.win_width * 0.1, h=20)
-        cmds.text(l='  Smoothness', fn='smallFixedWidthFont',w=self.win_width * 0.4, al='left')
-        cmds.setParent('..')
-        '''
         cmds.text(l='Frame R :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
         self.element['fps_ff'] = cmds.floatField(editable=0, value=0, w=self.win_width * 0.1, vis=0)
         self.element['fps_tx'] = cmds.text(l='24', bgc=self.color['bg'], w=self.win_width * 0.6, h=20)
         cmds.setParent('..')  # rowColumnLayout
 
         cmds.text(l='', al='center', fn='boldLabelFont', bgc=self.color['bg'], h=10)
-        self.element['overlap_bt'] = cmds.button(label='Create Overlap', bgc=self.color['bg'],
+        self.element['overlap_bt'] = cmds.button(label='Create Overlap', bgc=self.color['highlight'],
                                                    w=self.win_width * 0.6, h=20,
                                                  c=lambda arg: util.return_none_func())
 
         divider_block('BAKE ANIMATION', 1)
 
-        self.element['bake_anim_bt'] = cmds.button(label='Bake Keyframe', bgc=self.color['bg'],
+        self.element['bake_anim_bt'] = cmds.button(label='Bake Keyframe', bgc=self.color['highlight'],
                                                    w=self.win_width * 0.6, h=20,
                                                    c=lambda arg: util.return_none_func())
         cmds.text(l='', al='center', fn='boldLabelFont', bgc=self.color['shadow'], h=5)
         cmds.text(l='(c) dex3d.gumroad.com', al='center', fn='smallPlainLabelFont', bgc=self.color['bg'], h=15)
 
         '''======================='''
-        # color code ui (dev)
-        '''======================='''
-        '''
-        for c in list(self.color):
-            cmds.text(l='', fn='smallPlainLabelFont', al='center', h=5, w=10, bgc=self.color[c])
-        '''
-        '''======================='''
         # init ui function
         '''======================='''
-        if cmds.about(connected=1) or self.user_original == self.user_latest:
+        if not self.is_expired and (self.is_connected or self.user_original == self.user_latest):
             self.init_layout_func()
 
     def init_layout_func(self):
@@ -859,6 +853,7 @@ class kf_overlap:
 
     def show_win(self):
         cmds.showWindow(self.win_id)
+        print('{}'.format(self.win_title).upper())
 
     def init_dock(self):
         if cmds.dockControl(self.dock_id, q=1, ex=1):
@@ -872,9 +867,6 @@ class kf_overlap:
         self.show_win()
         self.init_dock()
         self.update_ui(); self.update_ui(slider=True)
-
-        if self.user_original != self.user_latest:
-            cmds.deleteUI(self.win_id)
 
     def update_ui(self, slider=False):
         def slider_to_field():
@@ -903,10 +895,6 @@ class kf_overlap:
             if preset_name in preset_name_ls:
                 cmds.optionMenu(self.element['preset_om'], e=1, v=preset_name)
 
-        def toggle_smoothness():
-            self.is_smoothness = not self.is_smoothness
-            smooth_bt_ui()
-
         def toggle_aim_invert():
             self.is_aim_invert = not self.is_aim_invert
             mode_ui()
@@ -919,16 +907,6 @@ class kf_overlap:
             cmds.text(self.element['fps_tx'], e=1, l=str(scene.get_fps()))
             fps = float(cmds.text(self.element['fps_tx'], q=1, l=1))
             cmds.floatField(self.element['fps_ff'], e=1, v=fps)
-
-        '''
-        def smooth_bt_ui():
-            if self.is_smoothness:
-                cmds.button(self.element['sm_bt'], e=1, l='', bgc=self.color['green'])
-            else:
-                cmds.button(self.element['sm_bt'], e=1, l='', bgc=self.color['shadow'])
-            cmds.button(self.element['sm_bt'], e=1, c=lambda arg:toggle_smoothness())
-            cmds.intField(self.element['sm_if'], e=1, value=int(self.is_smoothness))
-        '''
 
         def mode_ui():
             # re select mode name
