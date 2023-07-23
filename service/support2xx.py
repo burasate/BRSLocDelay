@@ -79,7 +79,7 @@ class gr_license:
         self.verify_result = False
         self.win_id = 'BRSACTIVATOR'
         self.is_py3 = str(sys.version[0]) == '3'
-        if is_py3:
+        if self.is_py3:
             import urllib.request as uLib
         else:
             import urllib as uLib
