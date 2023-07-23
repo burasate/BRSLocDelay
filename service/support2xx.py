@@ -270,4 +270,3 @@ By installing, copying, or otherwise using the {1} maya script, you acknowledge 
     def close_ui(self):
         cmds.deleteUI(self.win_id)
 self.gr_license = gr_license(product_name='Keyframe Overlap (BRS Locator Delay)', product_code='hZBQC')
-print(self.gr_license)
