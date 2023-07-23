@@ -694,8 +694,8 @@ class kf_overlap:
             st_mtime = os.stat(script_path).st_mtime
             mdate_str = str(datetime.datetime.fromtimestamp(st_mtime).date())
             today_date_str = str(datetime.datetime.today().date())
-            #if mdate_str == today_date_str:
-                #return None
+            if mdate_str == today_date_str:
+                return None
         if sys.version[0] == '3':
             import urllib.request as uLib
         else:
