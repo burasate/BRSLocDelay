@@ -69,10 +69,10 @@ def add_queue_task(task_name, data_dict):
 '''========================================='''
 from maya import mel
 import maya.cmds as cmds
-import sys, json, ssl
 
 class gr_license:
     def __init__(self, product_name, product_code):
+        import sys
         self.product_name = product_name
         self.product_code = product_code
         self.ui_element = {}
@@ -90,6 +90,7 @@ class gr_license:
         :param key: buy license key
         :return: email and license key
         '''
+        import ssl, json
         license_key, license_email = ['','']
 
         if not cmds.about(cnt=1):
