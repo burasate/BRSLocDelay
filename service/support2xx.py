@@ -79,17 +79,17 @@ class gr_license:
         self.verify_result = False
         self.win_id = 'BRSACTIVATOR'
 
-    is_py3 = str(sys.version[0]) == '3'
-    if is_py3:
-        import urllib.request as uLib
-    else:
-        import urllib as uLib
-
     def get_license_verify(self, key):
         '''
         :param key: buy license key
         :return: email and license key
         '''
+        is_py3 = str(sys.version[0]) == '3'
+        if is_py3:
+            import urllib.request as uLib
+        else:
+            import urllib as uLib
+
         license_key, license_email = ['','']
 
         if not cmds.about(cnt=1):
@@ -102,7 +102,7 @@ class gr_license:
             'increment_uses_count': 'false'
         }
 
-        if gr_license.is_py3:
+        if is_py3:
             import urllib.parse
             verify_params = urllib.parse.urlencode(data)
         else:
