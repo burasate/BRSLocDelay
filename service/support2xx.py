@@ -132,7 +132,7 @@ class gr_license:
             cmds.warning('Please make sure the internet connection is connect')
             return None
 
-        found_license_key = verify[0] != '' and verify[1] == email
+        found_license_key = self.verify[0] != '' and self.verify[1] == email
         #print(found_license_key)
         self.verify_result = found_license_key
 
