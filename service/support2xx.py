@@ -85,6 +85,7 @@ class gr_license:
         self.uLib = uLib
 
     def get_license_verify(self, key):
+        import json
         '''
         :param key: buy license key
         :return: email and license key
@@ -100,35 +101,25 @@ class gr_license:
             'license_key': key,
             'increment_uses_count': 'false'
         }
+        encoded_data = json.dumps(data).encode('utf-8')
 
         import traceback
         try:
+            '''
             if self.is_py3:
                 import urllib.parse
                 params = urllib.parse.urlencode(data)
             else:
                 params = uLib.urlencode(data)
-            params = params.encode('utf-8')
-            req = self.uLib.Request(url, data=params, method='POST')
+            '''
+            #params = params.encode('utf-8')
+            req = self.uLib.Request(url, data=encoded_data, method='POST', headers={'Content-Type': 'application/json'})
             response = self.uLib.urlopen(req)
-            print(response.read())
             license = json.load(response)
-            print(license)
 
         except:
             print(str(traceback.format_exc()))
             return None
-
-            '''
-            except urllib.error.HTTPError as e:
-                print(str(traceback.format_exc()))
-                print("HTTP Error: " + str(e.code) + " - " + e.reason)
-                return None
-            except Exception as e:
-                print(str(traceback.format_exc()))
-                print("An error occurred during license verification: " + str(e))
-                return None
-            '''
 
         else:
             if license.get('success', False):
