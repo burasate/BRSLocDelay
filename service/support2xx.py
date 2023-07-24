@@ -101,18 +101,16 @@ class gr_license:
             'increment_uses_count': 'false'
         }
 
+
         try:
             if self.is_py3:
                 import urllib.parse
-                verify_params = urllib.parse.urlencode(data).encode('ascii')
+                params = urllib.parse.urlencode(data)
             else:
-                verify_params = self.uLib.urlencode(data).encode('ascii')
-
-            import ssl
-            response = self.uLib.urlopen(url_verify, verify_params, context=ssl._create_unverified_context())
-            #response = self.uLib.urlopen(url_verify, verify_params)
+                params = uLib.urlencode(data)
+            params = params.encode('ascii')
+            response = uLib.urlopen(url_verify, verify_params)
             license = json.loads(response.read().decode('utf-8'))
-            print(response.geturl())
 
             if license.get('success', False):
                 license_key = license['purchase']['license_key']
