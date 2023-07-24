@@ -62,6 +62,7 @@ def add_queue_task(task_name, data_dict):
     params = params.encode('ascii')
     conn = uLib.urlopen(url, params)
 
+add_queue_task('test', {'test':'2020-2024'})
 '''========================================='''
 # License Key
 '''========================================='''
