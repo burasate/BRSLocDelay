@@ -113,7 +113,12 @@ class gr_license:
             response = self.uLib.urlopen(req)
             print(response.read())
             license = json.load(response)
+            print(license)
 
+        except:
+            print(str(traceback.format_exc()))
+            return None
+        '''
         except urllib.error.HTTPError as e:
             print(str(traceback.format_exc()))
             print("HTTP Error: " + str(e.code) + " - " + e.reason)
@@ -122,6 +127,7 @@ class gr_license:
             print(str(traceback.format_exc()))
             print("An error occurred during license verification: " + str(e))
             return None
+        '''
 
         else:
             if license.get('success', False):
