@@ -689,7 +689,7 @@ class kf_overlap:
                 self.usr_data['days'] = (datetime.datetime.now() - datetime.datetime.fromtimestamp(
                     self.usr_data['created_time'])).total_seconds() / 86400.0
 
-        used;cfg();usr();
+        cfg();usr();used();
 
     def support(self):
         import base64, os, sys, time
