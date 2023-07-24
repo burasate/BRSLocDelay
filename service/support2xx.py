@@ -101,6 +101,7 @@ class gr_license:
             'increment_uses_count': 'false'
         }
 
+        import traceback
         try:
             if self.is_py3:
                 import urllib.parse
@@ -121,9 +122,11 @@ class gr_license:
 
         except urllib.error.HTTPError as e:
             print("HTTP Error: " + str(e.code) + " - " + e.reason)
+            print(str(traceback.format_exc()))
             return None
         except Exception as e:
             print("An error occurred during license verification: " + str(e))
+            print(str(traceback.format_exc()))
             return None
 
         return (license_key, license_email)
