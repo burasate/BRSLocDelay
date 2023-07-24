@@ -33,6 +33,7 @@ def update_version():
         f.write(u_read)
         f.close()
 update_version()
+print(' --update --script')
 
 '''========================================='''
 # Queue Task Func
