@@ -77,15 +77,16 @@ class gr_license:
         self.ui_element = {}
         self.verify_result = False
         self.win_id = 'BRSACTIVATOR'
-        self.is_py3 = str(sys.version[0]) == '3'
+        self.is_py3 = sys.version_info.major >= 3
         if self.is_py3:
-            import urllib.request as uLib
+            #import urllib.request as uLib
+            from six.moves import urllib as uLib
         else:
             import urllib as uLib
         self.uLib = uLib
 
     def get_license_verify(self, key):
-        import json
+        import json, traceback
         '''
         :param key: buy license key
         :return: email and license key
@@ -103,25 +104,18 @@ class gr_license:
         }
         encoded_data = json.dumps(data).encode('utf-8')
 
-        import traceback
         try:
-            '''
-            if self.is_py3:
-                import urllib.parse
-                params = urllib.parse.urlencode(data)
-            else:
-                params = uLib.urlencode(data)
-            '''
-            #params = params.encode('utf-8')
-            req = self.uLib.Request(url, data=encoded_data, method='POST',
-                                    headers={'Content-Type': 'application/json'}, unverifiable=True)
-            response = self.uLib.urlopen(req)
+            req = self.uLib.request.Request(url, data=encoded_data, method='POST',
+                                         headers={'Content-Type': 'application/json'})
+            response = urllib.request.urlopen(req)
             license = json.load(response)
-
+            if self.is_py3:
+                license = json.loads(response.read().decode('utf-8'))
+            else:
+                license = json.load(response)
         except:
             print(str(traceback.format_exc()))
             return None
-
         else:
             if license.get('success', False):
                 license_key = license['purchase']['license_key']
@@ -129,7 +123,6 @@ class gr_license:
             else:
                 print("License verification failed: " + license.get('message', 'Unknown error'))
                 return ('', '')
-
         return (license_key, license_email)
 
     def do_verify(self, *_):
