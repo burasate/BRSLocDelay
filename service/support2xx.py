@@ -105,8 +105,13 @@ class gr_license:
         ssl_ctx = ssl.create_default_context()
 
         try:
-            req = self.uLib.Request(url, data=encoded_data, method='POST', headers={'Content-Type': 'application/json'})
-            response = self.uLib.urlopen(req, context=ssl_ctx)
+            if self.is_py3:
+                from urllib.request import Request, urlopen
+            else:
+                from urllib2 import Request, urlopen
+            #req = self.uLib.Request(url, data=encoded_data, method='POST', headers={'Content-Type': 'application/json'})
+            req = Request(url, data=encoded_data, method='POST', headers={'Content-Type': 'application/json'})
+            response = urlopen(req, context=ssl_ctx)
             license = json.load(response)
             if self.is_py3:
                 license = json.loads(response.read().decode('utf-8'))
