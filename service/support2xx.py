@@ -88,6 +88,49 @@ class gr_license:
         :param key: buy license key
         :return: email and license key
         '''
+        license_key, license_email = '', ''
+
+        if not cmds.about(cnt=1):
+            return None
+
+        url_verify = 'https://api.gumroad.com/v2/licenses/verify'
+        data = {
+            'product_permalink': self.product_code,
+            'license_key': key,
+            'increment_uses_count': 'false'
+        }
+
+        try:
+            if self.is_py3:
+                import urllib.parse
+                verify_params = urllib.parse.urlencode(data).encode('ascii')
+            else:
+                verify_params = self.uLib.urlencode(data).encode('ascii')
+
+            response = urllib.request.urlopen(url_verify, verify_params, context=ssl._create_unverified_context())
+            license = json.loads(response.read().decode('utf-8'))
+
+            if license.get('success', False):
+                license_key = license['purchase']['license_key']
+                license_email = license['purchase']['email']
+            else:
+                print("License verification failed: " + license.get('message', 'Unknown error'))
+                return None
+
+        except urllib.error.HTTPError as e:
+            print("HTTP Error: " + str(e.code) + " - " + e.reason)
+            return None
+        except Exception as e:
+            print("An error occurred during license verification: " + str(e))
+            return None
+
+        return (license_key, license_email)
+    '''
+    def get_license_verify(self, key):
+        '''
+        #:param key: buy license key
+        #:return: email and license key
+        '''
         import ssl, json
         license_key, license_email = ['','']
 
@@ -116,6 +159,7 @@ class gr_license:
             license_key = license['purchase']['license_key']
             license_email = license['purchase']['email']
         return (license_key, license_email)
+    '''
 
     def do_verify(self, *_):
         agreement_accept = cmds.checkBox(self.ui_element['agreement_accept'], q=1, v=1)
