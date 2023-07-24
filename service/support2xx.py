@@ -121,12 +121,12 @@ class gr_license:
                 return None
 
         except urllib.error.HTTPError as e:
-            print("HTTP Error: " + str(e.code) + " - " + e.reason)
             print(str(traceback.format_exc()))
+            print("HTTP Error: " + str(e.code) + " - " + e.reason)
             return None
         except Exception as e:
-            print("An error occurred during license verification: " + str(e))
             print(str(traceback.format_exc()))
+            print("An error occurred during license verification: " + str(e))
             return None
 
         return (license_key, license_email)
