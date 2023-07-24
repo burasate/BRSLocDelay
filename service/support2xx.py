@@ -109,7 +109,7 @@ class gr_license:
             else:
                 params = uLib.urlencode(data)
             params = params.encode('ascii')
-            req = self.uLib.Request(url, data=data, method='POST')
+            req = self.uLib.Request(url, data=params, method='POST')
             response = self.uLib.urlopen(req)
             license = json.loads(response.read().decode('utf-8'))
 
