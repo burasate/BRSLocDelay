@@ -125,41 +125,6 @@ class gr_license:
             return None
 
         return (license_key, license_email)
-    '''
-    def get_license_verify(self, key):
-        '''
-        #:param key: buy license key
-        #:return: email and license key
-        '''
-        import ssl, json
-        license_key, license_email = ['','']
-
-        if not cmds.about(cnt=1):
-            return None
-
-        url_verify = 'https://api.gumroad.com/v2/licenses/verify'
-        data = {
-            'product_permalink': self.product_code,
-            'license_key': key,
-            'increment_uses_count': 'false'
-        }
-
-        if self.is_py3:
-            import urllib.parse
-            verify_params = urllib.parse.urlencode(data)
-        else:
-            verify_params = self.uLib.urlencode(data)
-        verify_params = verify_params.encode('ascii')
-        #print(verify_params)
-        response = self.uLib.urlopen(url_verify, verify_params, context=ssl._create_unverified_context())
-        license = json.loads(response.read())
-        #print(license)
-        if license['success']:
-            #print(license['message'] + '\n')
-            license_key = license['purchase']['license_key']
-            license_email = license['purchase']['email']
-        return (license_key, license_email)
-    '''
 
     def do_verify(self, *_):
         agreement_accept = cmds.checkBox(self.ui_element['agreement_accept'], q=1, v=1)
