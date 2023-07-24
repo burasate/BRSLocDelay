@@ -111,14 +111,8 @@ class gr_license:
             params = params.encode('utf-8')
             req = self.uLib.Request(url, data=params, method='POST')
             response = self.uLib.urlopen(req)
+            print(response.read())
             license = json.load(response)
-
-            if license.get('success', False):
-                license_key = license['purchase']['license_key']
-                license_email = license['purchase']['email']
-            else:
-                print("License verification failed: " + license.get('message', 'Unknown error'))
-                return None
 
         except urllib.error.HTTPError as e:
             print(str(traceback.format_exc()))
@@ -128,6 +122,15 @@ class gr_license:
             print(str(traceback.format_exc()))
             print("An error occurred during license verification: " + str(e))
             return None
+
+        else:
+            if license.get('success', False):
+                license_key = license['purchase']['license_key']
+                license_email = license['purchase']['email']
+            else:
+                print("License verification failed: " + license.get('message', 'Unknown error'))
+                return None
+
         return (license_key, license_email)
 
     def do_verify(self, *_):
