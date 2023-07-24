@@ -118,16 +118,17 @@ class gr_license:
         except:
             print(str(traceback.format_exc()))
             return None
-        '''
-        except urllib.error.HTTPError as e:
-            print(str(traceback.format_exc()))
-            print("HTTP Error: " + str(e.code) + " - " + e.reason)
-            return None
-        except Exception as e:
-            print(str(traceback.format_exc()))
-            print("An error occurred during license verification: " + str(e))
-            return None
-        '''
+
+            '''
+            except urllib.error.HTTPError as e:
+                print(str(traceback.format_exc()))
+                print("HTTP Error: " + str(e.code) + " - " + e.reason)
+                return None
+            except Exception as e:
+                print(str(traceback.format_exc()))
+                print("An error occurred during license verification: " + str(e))
+                return None
+            '''
 
         else:
             if license.get('success', False):
