@@ -110,10 +110,9 @@ class gr_license:
                 params = uLib.urlencode(data)
             params = params.encode('ascii')
             req = self.uLib.Request(url, data=params, method='POST')
-            print(req.full_url)
+            print(req.get_full_url())
             response = self.uLib.urlopen(req)
-            print(response)
-            license = json.loads(response.read().decode('utf-8'))
+            license = json.load(response)
 
             if license.get('success', False):
                 license_key = license['purchase']['license_key']
