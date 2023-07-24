@@ -69,10 +69,10 @@ from maya import mel
 import maya.cmds as cmds
 
 class gr_license:
-    def __init__(self, product_name, product_code):
+    def __init__(self, product_name, product_id):
         import sys
         self.product_name = product_name
-        self.product_code = product_code
+        self.product_id = product_id
         self.ui_element = {}
         self.verify_result = False
         self.win_id = 'BRSACTIVATOR'
@@ -95,7 +95,7 @@ class gr_license:
 
         url_verify = 'https://api.gumroad.com/v2/licenses/verify'
         data = {
-            'product_permalink': self.product_code,
+            'product_id': self.product_id,
             'license_key': key,
             'increment_uses_count': 'false'
         }
@@ -108,8 +108,8 @@ class gr_license:
                 verify_params = self.uLib.urlencode(data).encode('ascii')
 
             import ssl
-            #response = urllib.request.urlopen(url_verify, verify_params, context=ssl._create_unverified_context())
-            response = urllib.request.urlopen(url_verify, verify_params)
+            response = urllib.request.urlopen(url_verify, verify_params, context=ssl._create_unverified_context())
+            #response = urllib.request.urlopen(url_verify, verify_params)
             license = json.loads(response.read().decode('utf-8'))
 
             if license.get('success', False):
@@ -249,7 +249,7 @@ By installing, copying, or otherwise using the {1} maya script, you acknowledge 
         cmds.rowLayout(numberOfColumns=2, columnWidth2=(ct_w_percentile*.2, ct_w_percentile*.8),
                        columnAlign2=['right', 'left'], adj=1, h=30)
         cmds.text(al='right', l='Product Code : ')
-        cmds.textField(tx=self.product_code, ed=0, w=ct_w_percentile * .7)
+        cmds.textField(tx=self.product_id, ed=0, w=ct_w_percentile * .7, vis=0)
         cmds.setParent('..')
         cmds.rowLayout(numberOfColumns=2, columnWidth2=(ct_w_percentile * .2, ct_w_percentile * .8),
                        columnAlign2=['right', 'left'], adj=1, h=30)
@@ -278,5 +278,5 @@ By installing, copying, or otherwise using the {1} maya script, you acknowledge 
 
     def close_ui(self):
         cmds.deleteUI(self.win_id)
-self.gr_license = gr_license(product_name='Keyframe Overlap (BRS Locator Delay)', product_code='hZBQC')
+self.gr_license = gr_license(product_name='Keyframe Overlap (BRS Locator Delay)', product_id='YGr34IvsrVqlvn6JghcRFg==')
 print('gr_license is loaded')
