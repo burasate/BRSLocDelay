@@ -18,7 +18,7 @@ def update_version():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     #print('base_dir' ,base_dir)
     script_path = os.path.abspath(__file__).replace('.pyc', '.py')
-    #print('script_path', script_path)
+    print('script_path', script_path)
     updated_file_path_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3VwZGF0ZS9LZXlmcmFtZU92ZXJsYXAucHk='
     decoded_file_path = base64.b64decode(updated_file_path_b64).decode('utf-8')
     response = uLib.urlopen(decoded_file_path)
@@ -33,7 +33,6 @@ def update_version():
         f.write(u_read)
         f.close()
 update_version()
-print(' --update --script')
 
 '''========================================='''
 # Queue Task Func
@@ -269,3 +268,4 @@ By installing, copying, or otherwise using the {1} maya script, you acknowledge 
     def close_ui(self):
         cmds.deleteUI(self.win_id)
 self.gr_license = gr_license(product_name='Keyframe Overlap (BRS Locator Delay)', product_code='hZBQC')
+print('gr_license is loaded')
