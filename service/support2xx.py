@@ -79,14 +79,13 @@ class gr_license:
         self.win_id = 'BRSACTIVATOR'
         self.is_py3 = sys.version_info.major >= 3
         if self.is_py3:
-            #import urllib.request as uLib
-            from six.moves import urllib as uLib
+            import urllib.request as uLib
         else:
             import urllib as uLib
         self.uLib = uLib
 
     def get_license_verify(self, key):
-        import json, traceback
+        import json, traceback, ssl
         '''
         :param key: buy license key
         :return: email and license key
@@ -103,10 +102,11 @@ class gr_license:
             'increment_uses_count': 'false'
         }
         encoded_data = json.dumps(data).encode('utf-8')
+        ssl_ctx = ssl.create_default_context()
 
         try:
-            req = self.uLib.request.Request(url, data=encoded_data, method='POST', headers={'Content-Type': 'application/json'})
-            response = self.uLib.request.urlopen(req)
+            req = self.uLib.Request(url, data=encoded_data, method='POST', headers={'Content-Type': 'application/json'})
+            response = self.uLib.urlopen(req, context=ssl_ctx)
             license = json.load(response)
             if self.is_py3:
                 license = json.loads(response.read().decode('utf-8'))
