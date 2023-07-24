@@ -107,7 +107,7 @@ class gr_license:
         try:
             req = self.uLib.request.Request(url, data=encoded_data, method='POST',
                                          headers={'Content-Type': 'application/json'})
-            response = urllib.request.urlopen(req)
+            response = self.uLib.request.urlopen(req)
             license = json.load(response)
             if self.is_py3:
                 license = json.loads(response.read().decode('utf-8'))
