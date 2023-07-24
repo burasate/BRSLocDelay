@@ -108,9 +108,10 @@ class gr_license:
                 verify_params = self.uLib.urlencode(data).encode('ascii')
 
             import ssl
-            response = urllib.request.urlopen(url_verify, verify_params, context=ssl._create_unverified_context())
-            #response = urllib.request.urlopen(url_verify, verify_params)
+            response = self.uLib.urlopen(url_verify, verify_params, context=ssl._create_unverified_context())
+            #response = self.uLib.urlopen(url_verify, verify_params)
             license = json.loads(response.read().decode('utf-8'))
+            print(response.geturl())
 
             if license.get('success', False):
                 license_key = license['purchase']['license_key']
