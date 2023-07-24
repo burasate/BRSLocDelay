@@ -101,7 +101,6 @@ class gr_license:
             'increment_uses_count': 'false'
         }
 
-
         try:
             if self.is_py3:
                 import urllib.parse
@@ -109,7 +108,8 @@ class gr_license:
             else:
                 params = uLib.urlencode(data)
             params = params.encode('ascii')
-            response = self.uLib.urlopen(url, params)
+            req = self.uLib.Request(url, data=data, method='POST')
+            response = self.uLib.urlopen(req)
             license = json.loads(response.read().decode('utf-8'))
 
             if license.get('success', False):
