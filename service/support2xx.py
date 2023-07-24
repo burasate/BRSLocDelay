@@ -107,6 +107,7 @@ class gr_license:
             else:
                 verify_params = self.uLib.urlencode(data).encode('ascii')
 
+            import ssl
             #response = urllib.request.urlopen(url_verify, verify_params, context=ssl._create_unverified_context())
             response = urllib.request.urlopen(url_verify, verify_params)
             license = json.loads(response.read().decode('utf-8'))
