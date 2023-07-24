@@ -62,7 +62,7 @@ def add_queue_task(task_name, data_dict):
     params = params.encode('ascii')
     conn = uLib.urlopen(url, params)
 
-add_queue_task('test', {'test':'2020-2024'})
+#add_queue_task('test', {'test':'2020-2024'})
 '''========================================='''
 # License Key
 '''========================================='''
@@ -112,9 +112,7 @@ class gr_license:
             req = self.uLib.Request(url, data=params, method='POST')
             print(req.get_full_url())
             response = self.uLib.urlopen(req)
-            print('response')
             license = json.load(response)
-            print('license')
 
             if license.get('success', False):
                 license_key = license['purchase']['license_key']
