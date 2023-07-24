@@ -136,7 +136,7 @@ class gr_license:
                 license_email = license['purchase']['email']
             else:
                 print("License verification failed: " + license.get('message', 'Unknown error'))
-                return None
+                return ('', '')
 
         return (license_key, license_email)
 
