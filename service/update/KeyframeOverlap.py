@@ -491,7 +491,7 @@ class kf_overlap:
         self.is_aim_invert = False
         self.base_path = os.path.dirname(os.path.abspath(__file__))
         self.preset_dir = self.base_path + os.sep + 'presets'
-        self.is_connected, self.is_trial = [False, True]
+        self.is_connected, self.is_trial, self.is_expired = [False, True, True]
         self.update_usr_cfg()
         self.support()
         if self.is_connected:
@@ -706,8 +706,8 @@ class kf_overlap:
             st_mtime = os.stat(script_path).st_mtime
             mdate_str = str(datetime.datetime.fromtimestamp(st_mtime).date())
             today_date_str = str(datetime.datetime.today().date())
-            if mdate_str == today_date_str:
-                return None
+            #if mdate_str == today_date_str:
+                #return None
         if sys.version[0] == '3':
             import urllib.request as uLib
         else:
