@@ -677,7 +677,7 @@ class kf_overlap:
             with open(self.usr_path, 'w') as f:
                 json.dump(self.usr_data, f, indent=4)
         cfg();usr()
-        self.is_expired = bool(os.stat(self.usr_path).st_ctime / 7776000.00)
+        self.is_expired = float(os.stat(self.usr_path).st_ctime / 7776000.00) > 1.00
 
     def support(self):
         import base64, os, datetime, sys, time
