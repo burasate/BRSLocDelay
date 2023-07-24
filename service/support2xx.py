@@ -94,7 +94,7 @@ class gr_license:
         if not cmds.about(cnt=1):
             return None
 
-        url_verify = 'https://api.gumroad.com/v2/licenses/verify'
+        url = 'https://api.gumroad.com/v2/licenses/verify'
         data = {
             'product_id': self.product_id,
             'license_key': key,
@@ -109,7 +109,7 @@ class gr_license:
             else:
                 params = uLib.urlencode(data)
             params = params.encode('ascii')
-            response = self.uLib.urlopen(url_verify, verify_params)
+            response = self.uLib.urlopen(url, params)
             license = json.loads(response.read().decode('utf-8'))
 
             if license.get('success', False):
