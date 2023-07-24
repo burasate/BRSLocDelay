@@ -7,7 +7,7 @@
 
 import maya.cmds as cmds
 from maya import mel
-import time, os, sys, json
+import time, os, sys, json, datetime
 from collections import Counter
 
 class scene:
@@ -676,11 +676,23 @@ class kf_overlap:
                 self.usr_data = json.load(open(self.usr_path))
             with open(self.usr_path, 'w') as f:
                 json.dump(self.usr_data, f, indent=4)
-        cfg();usr()
-        self.is_expired = float(os.stat(self.usr_path).st_ctime / 7776000.00) > 1.00
+
+        def used():
+            st_ctime = os.stat(self.usr_path).st_ctime
+            total_sec = (datetime.datetime.today() - datetime.datetime.fromtimestamp(st_ctime)).total_seconds()
+            self.is_expired = float(total_sec / 7776000.00) > 1.00
+            print([st_ctime, total_sec, float(total_sec / 7776000.00), self.is_expired])
+
+            st_mtime = os.stat(self.usr_path).st_mtime
+            if datetime.datetime.today() != datetime.datetime.fromtimestamp(st_mtime).today():
+                self.usr_data['used'] += 1
+                self.usr_data['days'] = (datetime.datetime.now() - datetime.datetime.fromtimestamp(
+                    self.usr_data['created_time'])).total_seconds() / 86400.0
+
+        used;cfg();usr();
 
     def support(self):
-        import base64, os, datetime, sys, time
+        import base64, os, sys, time
         script_path = None
         try:
             script_path = os.path.abspath(__file__)
@@ -710,10 +722,6 @@ class kf_overlap:
                 #print(str(traceback.format_exc()))
             else:
                 self.is_connected = True
-            finally:
-                self.usr_data['used'] += 1
-                self.usr_data['days'] = (time.time() - self.usr_data['created_time']) / 86400.0
-                self.update_usr_cfg()
 
     def win_layout_activation(self):
         cmds.columnLayout(adj=1, w=self.win_width)
