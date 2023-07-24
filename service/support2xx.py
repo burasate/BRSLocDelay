@@ -105,8 +105,12 @@ class gr_license:
         encoded_data = json.dumps(data).encode('utf-8')
 
         try:
-            req = self.uLib.request.Request(url, data=encoded_data, method='POST',
-                                         headers={'Content-Type': 'application/json'})
+            if self.is_py3:
+                req = self.uLib.request.Request(url, data=encoded_data, method='POST',
+                                             headers={'Content-Type': 'application/json'})
+            else:
+                req = self.uLib.Request(url, data=encoded_data, method='POST',
+                                             headers={'Content-Type': 'application/json'})
             response = self.uLib.request.urlopen(req)
             license = json.load(response)
             if self.is_py3:
