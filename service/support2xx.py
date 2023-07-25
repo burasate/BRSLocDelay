@@ -92,57 +92,30 @@ class gr_license:
         license_key, license_email = '', ''
 
         try:
-            if not cmds.about(cnt=1):
-                return None
+            # You will receive a 404 response code with an error message if verification fails.
+            url_verify = 'https://api.gumroad.com/v2/licenses/verify'
 
-            url = 'https://api.gumroad.com/v2/licenses/verify'
             data = {
                 'product_id': self.product_id,
                 'license_key': key,
                 'increment_uses_count': 'false'
             }
-
-            if isinstance(data, dict):
-                data = json.dumps(data).encode('utf-8')
-
-            req = Request(url, data=data, method='POST', headers={'Content-Type': 'application/json'})
-
-            # Create an SSL context
-            ssl_ctx = None
-            if self.is_py3:
-                import ssl
-                ssl_ctx = ssl.create_default_context()
-
-            # SSL context options to ignore certificate verification (use with caution)
-            # if ssl_ctx:
-            #     ssl_ctx.check_hostname = False
-            #     ssl_ctx.verify_mode = ssl.CERT_NONE
-
-            # Attach the SSL context to the request (Python 3 only)
-            if ssl_ctx:
-                response = urlopen(req, context=ssl_ctx)
-            else:
-                response = urlopen(req)
-
-            response_data = response.read().decode('utf-8')
-
-            if self.is_py3:
-                license = json.loads(response_data)
-            else:
-                license = json.load(response_data)
-
-            if license.get('success', False):
-                license_key = license['purchase']['license_key']
-                license_email = license['purchase']['email']
-            else:
-                print("License verification failed: " + license.get('message', 'Unknown error'))
-                return ('', '')
-        except:
-            print("Other error occurred:")
-            print(str(traceback.format_exc()))
-            return None
-
-        return (license_key, license_email)
+            if sys.version[0] == '3':  # python 3
+                import urllib.parse
+                verify_params = urllib.parse.urlencode(data)
+            else:  # python 2
+                verify_params = uLib.urlencode(data)
+            verify_params = verify_params.encode('utf-8')
+            print([verify, verify_params])
+            response = self.uLib.urlopen(url_verify, verify_params)
+            #print(response)
+            licenses = json.loads(response.read())
+            #print(licenses)
+        except Exception as e:
+            print(str(e))
+            return ('', '')
+        else:
+            return (license_key, license_email)
 
     def do_verify(self, *_):
         agreement_accept = cmds.checkBox(self.ui_element['agreement_accept'], q=1, v=1)
