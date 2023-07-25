@@ -105,7 +105,7 @@ class gr_license:
             else:  # python 2
                 verify_params = uLib.urlencode(data)
             verify_params = verify_params.encode('utf-8')
-            print(['/verify', verify_params])
+            #print(['/verify', verify_params])
             response = self.uLib.urlopen(url_verify, verify_params)
             #print(response)
             licenses = json.loads(response.read())
@@ -113,7 +113,7 @@ class gr_license:
             license_key = licenses['purchase']['license_key']
             license_email = licenses['purchase']['email']
         except Exception as e:
-            print(str(e))
+            #print(str(e))
             return ('', '')
         else:
             return (license_key, license_email)

