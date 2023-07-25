@@ -105,7 +105,7 @@ class gr_license:
             else:  # python 2
                 verify_params = uLib.urlencode(data)
             verify_params = verify_params.encode('utf-8')
-            print([verify, verify_params])
+            print(['/verify', verify_params])
             response = self.uLib.urlopen(url_verify, verify_params)
             #print(response)
             licenses = json.loads(response.read())
