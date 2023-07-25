@@ -461,7 +461,7 @@ class loc_delay_system:
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.01
+        self.version = 2.02
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
@@ -491,7 +491,7 @@ class kf_overlap:
         self.is_aim_invert = False
         self.base_path = os.path.dirname(os.path.abspath(__file__))
         self.preset_dir = self.base_path + os.sep + 'presets'
-        self.is_connected, self.is_trial, self.is_expired = [False, True, True]
+        self.is_connected, self.is_trial, self.is_lapsed = [False, True, True]
         self.update_usr_cfg()
         self.support()
         if self.is_connected:
@@ -500,9 +500,8 @@ class kf_overlap:
             del self.license_verify
             if self.is_trial:
                 self.gr_license.show_ui()
-        if self.is_trial and (self.user_original != self.user_latest or self.is_expired):
+        if self.is_trial and (self.user_original != self.user_latest or self.is_lapsed):
             self.win_layout = self.win_layout_activation
-
     '''======================='''
     # init ui function
     '''======================='''
@@ -610,10 +609,15 @@ class kf_overlap:
             finally:
                 cmds.evaluationManager(e=1, mode=evaluation)
 
-
         def lds_bake_animation(param):
             print('Bake Animation')
             self.lds.kf_bake_animation(param)
+
+        def license_activate_win(*_):
+            if not self.is_connected:
+                self.support()
+            if self.is_connected:
+                self.gr_license.show_ui()
 
         def verify_update(*_):
             if self.is_connected:
@@ -623,6 +627,7 @@ class kf_overlap:
                     self.update_usr_cfg()
                     cmds.confirmDialog(title='', message='Activated!\nPlease reopen script window', button=['Continue'])
                     self.init_win()
+                    self.init_dock()
 
         if exec_name == 'overlap':
             verify_update()
@@ -632,6 +637,8 @@ class kf_overlap:
             lds_bake_animation(param)
         elif exec_name == 'verify_update':
             verify_update()
+        elif exec_name == 'verify_window':
+            license_activate_win()
 
     '''======================='''
     # init config function
@@ -680,10 +687,12 @@ class kf_overlap:
 
         def used():
             st_ctime = os.stat(self.usr_path).st_ctime
-            total_sec = (datetime.datetime.today() - datetime.datetime.fromtimestamp(st_ctime)).total_seconds()
-            #self.is_expired = float(total_sec / 7776000.00) > 1.00
-            self.is_expired = float(total_sec / 259200.00) > 1.00
-            #print([st_ctime, total_sec, float(total_sec / 7776000.00), self.is_expired])
+            stand_sec = (datetime.datetime.today() - datetime.datetime.fromtimestamp(st_ctime)).total_seconds()
+            self.total_stand = 259200.00
+            #self.total_stand = 7776000.00
+            self.stand_ratio = float(stand_sec / self.total_stand)
+            self.is_lapsed = self.stand_ratio > 1.00
+            #print([st_ctime, total_sec, float(total_sec / 7776000.00), self.is_lapsed])
 
             st_mtime = os.stat(self.usr_path).st_mtime
             if datetime.datetime.today() != datetime.datetime.fromtimestamp(st_mtime).today():
@@ -742,6 +751,9 @@ class kf_overlap:
             cmds.deleteUI(self.win_id)
         cmds.window(self.win_id, t=self.win_title, menuBar=1, rtf=1, nde=1,
                     w=self.win_width, sizeable=1, h=10, retain=0, bgc=self.color['bg'])
+        if self.is_trial:
+            self.win_title = '{} {} {} {}'.format(
+                self.win_title, 'Trial', round((1-self.stand_ratio)*(self.total_stand/86400.0),0), 'days left')
 
     def win_layout(self):
         def divider_block(text, al_idx=1):
@@ -749,8 +761,10 @@ class kf_overlap:
             cmds.text(l=' {} '.format(text), fn='smallPlainLabelFont', al=['left', 'center', 'right'][al_idx], w=self.win_width, bgc=self.color['highlight'])
             cmds.text(l='', fn='smallPlainLabelFont', al='center', h=10, w=self.win_width)
 
-        #cmds.menuBarLayout()
-        #cmds.menu(label='Menu')
+        cmds.menuBarLayout()
+        cmds.menu(label='Menu')
+        cmds.menuItem(divider=1, dividerLabel='License')
+        cmds.menuItem(label='License key activator', c=lambda arg: self.exec_script(exec_name='verify_window'))
         #cmds.menuItem(divider=1, dividerLabel='selection')
         #cmds.menuItem(label='Latest selections', c='')
         #cmds.menuItem(label='All overlaped objects', c='')
@@ -841,7 +855,7 @@ class kf_overlap:
         '''======================='''
         # init ui function
         '''======================='''
-        if not self.is_expired and (self.is_connected or self.user_original == self.user_latest):
+        if not self.is_lapsed and (self.is_connected or self.user_original == self.user_latest):
             self.init_layout_func()
 
     def init_layout_func(self):
