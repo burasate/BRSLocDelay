@@ -752,8 +752,8 @@ class kf_overlap:
         cmds.window(self.win_id, t=self.win_title, menuBar=1, rtf=1, nde=1,
                     w=self.win_width, sizeable=1, h=10, retain=0, bgc=self.color['bg'])
         if self.is_trial:
-            self.win_title = '{} {} {} {}'.format(
-                self.win_title, 'Trial', round((1-self.stand_ratio)*(self.total_stand/86400.0),0), 'days left')
+            self.win_title = '{} | ({} {} {})'.format(
+                self.win_title, 'Trial', int(round((1-self.stand_ratio)*(self.total_stand/86400.0),0)), 'days left')
 
     def win_layout(self):
         def divider_block(text, al_idx=1):
