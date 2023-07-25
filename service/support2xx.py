@@ -85,16 +85,15 @@ class gr_license:
         self.uLib = uLib
 
     def get_license_verify(self, key):
+        # You will receive a 404 response code with an error message if verification fails.
         '''
         :param key: buy license key
         :return: email and license key
         '''
-        license_key, license_email = '', ''
+        license_key, license_email = ['', '']
 
         try:
-            # You will receive a 404 response code with an error message if verification fails.
             url_verify = 'https://api.gumroad.com/v2/licenses/verify'
-
             data = {
                 'product_id': self.product_id,
                 'license_key': key,
@@ -111,6 +110,8 @@ class gr_license:
             #print(response)
             licenses = json.loads(response.read())
             #print(licenses)
+            license_key = licenses['purchase']['license_key']
+            license_email = licenses['purchase']['email']
         except Exception as e:
             print(str(e))
             return ('', '')
