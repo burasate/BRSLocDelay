@@ -137,12 +137,7 @@ class gr_license:
             else:
                 print("License verification failed: " + license.get('message', 'Unknown error'))
                 return ('', '')
-
-        except URLError as e:
-            print("Error while making the POST request:")
-            print(str(e))
-            return None
-        except Exception as e:
+        except:
             print("Other error occurred:")
             print(str(traceback.format_exc()))
             return None
