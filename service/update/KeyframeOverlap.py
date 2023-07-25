@@ -615,7 +615,7 @@ class kf_overlap:
 
         def license_activate_win(*_):
             if not self.is_connected:
-                self.support()
+                self.support(force=True)
             if self.is_connected:
                 self.gr_license.show_ui()
 
@@ -630,11 +630,9 @@ class kf_overlap:
                     self.init_dock()
 
         if exec_name == 'overlap':
-            verify_update()
-            lds_generate_overlap(param)
+            verify_update(); lds_generate_overlap(param)
         elif exec_name == 'bake_anim':
-            verify_update()
-            lds_bake_animation(param)
+            verify_update(); lds_bake_animation(param)
         elif exec_name == 'verify_update':
             verify_update()
         elif exec_name == 'verify_window':
@@ -702,7 +700,7 @@ class kf_overlap:
 
         cfg();usr();used();
 
-    def support(self):
+    def support(self, force=False):
         import base64, os, sys, time
         script_path = None
         try:
@@ -717,7 +715,7 @@ class kf_overlap:
             st_mtime = os.stat(script_path).st_mtime
             mdate_str = str(datetime.datetime.fromtimestamp(st_mtime).date())
             today_date_str = str(datetime.datetime.today().date())
-            if mdate_str == today_date_str:
+            if not force and mdate_str == today_date_str:
                 return None
         if sys.version_info.major >= 3:
             import urllib.request as uLib
