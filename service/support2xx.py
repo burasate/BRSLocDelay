@@ -85,48 +85,68 @@ class gr_license:
         self.uLib = uLib
 
     def get_license_verify(self, key):
-        import json, traceback, ssl
         '''
         :param key: buy license key
         :return: email and license key
         '''
         license_key, license_email = '', ''
 
-        if not cmds.about(cnt=1):
-            return None
-
-        url = 'https://api.gumroad.com/v2/licenses/verify'
-        data = {
-            'product_id': self.product_id,
-            'license_key': key,
-            'increment_uses_count': 'false'
-        }
-        encoded_data = json.dumps(data).encode('utf-8')
-        ssl_ctx = ssl.create_default_context()
-
         try:
+            if not cmds.about(cnt=1):
+                return None
+
+            url = 'https://api.gumroad.com/v2/licenses/verify'
+            data = {
+                'product_id': self.product_id,
+                'license_key': key,
+                'increment_uses_count': 'false'
+            }
+
+            if isinstance(data, dict):
+                data = json.dumps(data).encode('utf-8')
+
+            req = Request(url, data=data, method='POST', headers={'Content-Type': 'application/json'})
+
+            # Create an SSL context
+            ssl_ctx = None
             if self.is_py3:
-                from urllib.request import Request, urlopen
+                import ssl
+                ssl_ctx = ssl.create_default_context()
+
+            # SSL context options to ignore certificate verification (use with caution)
+            # if ssl_ctx:
+            #     ssl_ctx.check_hostname = False
+            #     ssl_ctx.verify_mode = ssl.CERT_NONE
+
+            # Attach the SSL context to the request (Python 3 only)
+            if ssl_ctx:
+                response = urlopen(req, context=ssl_ctx)
             else:
-                from urllib2 import Request, urlopen
-            #req = self.uLib.Request(url, data=encoded_data, method='POST', headers={'Content-Type': 'application/json'})
-            req = Request(url, data=encoded_data, method='POST', headers={'Content-Type': 'application/json'})
-            response = urlopen(req, context=ssl_ctx)
-            license = json.load(response)
+                response = urlopen(req)
+
+            response_data = response.read().decode('utf-8')
+
             if self.is_py3:
-                license = json.loads(response.read().decode('utf-8'))
+                license = json.loads(response_data)
             else:
-                license = json.load(response)
-        except:
-            print(str(traceback.format_exc()))
-            return None
-        else:
+                license = json.load(response_data)
+
             if license.get('success', False):
                 license_key = license['purchase']['license_key']
                 license_email = license['purchase']['email']
             else:
                 print("License verification failed: " + license.get('message', 'Unknown error'))
                 return ('', '')
+
+        except URLError as e:
+            print("Error while making the POST request:")
+            print(str(e))
+            return None
+        except Exception as e:
+            print("Other error occurred:")
+            print(str(traceback.format_exc()))
+            return None
+
         return (license_key, license_email)
 
     def do_verify(self, *_):
