@@ -617,7 +617,6 @@ class kf_overlap:
 
         def verify_update(*_):
             if self.is_connected:
-                verify = self.gr_license.verify
                 if self.gr_license.verify[0] != '':
                     self.usr_data['license_key'] = self.gr_license.verify[0]
                     self.usr_data['license_email'] = self.gr_license.verify[1]
@@ -682,8 +681,9 @@ class kf_overlap:
         def used():
             st_ctime = os.stat(self.usr_path).st_ctime
             total_sec = (datetime.datetime.today() - datetime.datetime.fromtimestamp(st_ctime)).total_seconds()
-            self.is_expired = float(total_sec / 7776000.00) > 1.00
-            print([st_ctime, total_sec, float(total_sec / 7776000.00), self.is_expired])
+            #self.is_expired = float(total_sec / 7776000.00) > 1.00
+            self.is_expired = float(total_sec / 259200.00) > 1.00
+            #print([st_ctime, total_sec, float(total_sec / 7776000.00), self.is_expired])
 
             st_mtime = os.stat(self.usr_path).st_mtime
             if datetime.datetime.today() != datetime.datetime.fromtimestamp(st_mtime).today():
@@ -710,7 +710,7 @@ class kf_overlap:
             today_date_str = str(datetime.datetime.today().date())
             if mdate_str == today_date_str:
                 return None
-        if sys.version[0] == '3':
+        if sys.version_info.major >= 3:
             import urllib.request as uLib
         else:
             import urllib as uLib
