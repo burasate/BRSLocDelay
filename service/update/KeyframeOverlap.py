@@ -685,11 +685,10 @@ class kf_overlap:
         def used():
             st_ctime = os.stat(self.usr_path).st_ctime
             stand_sec = (datetime.datetime.today() - datetime.datetime.fromtimestamp(st_ctime)).total_seconds()
-            self.total_stand = 86400.00
-            #self.total_stand = 7776000.00
+            self.total_stand = 432000.0
             self.stand_ratio = float(stand_sec / self.total_stand)
             self.is_lapsed = self.stand_ratio > 1.00
-            #print([st_ctime, total_sec, float(total_sec / 7776000.00), self.is_lapsed])
+            #print([st_ctime, total_sec, float(total_sec / self.total_stand), self.is_lapsed])
 
             st_mtime = os.stat(self.usr_path).st_mtime
             if datetime.datetime.today() != datetime.datetime.fromtimestamp(st_mtime).today():

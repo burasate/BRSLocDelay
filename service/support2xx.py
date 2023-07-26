@@ -4,7 +4,7 @@ LocatorDelaySystem
 Support Service V2.XX
 ---------------------
 """
-print('Support Service V2.XX')
+print('Service V2.XX')
 '''========================================='''
 # Updater
 '''========================================='''
@@ -18,7 +18,7 @@ def update_version():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     #print('base_dir' ,base_dir)
     script_path = os.path.abspath(__file__).replace('.pyc', '.py')
-    print('script_path', script_path)
+    #print('script_path', script_path)
     updated_file_path_b64 = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3VwZGF0ZS9LZXlmcmFtZU92ZXJsYXAucHk='
     decoded_file_path = base64.b64decode(updated_file_path_b64).decode('utf-8')
     response = uLib.urlopen(decoded_file_path)
@@ -34,6 +34,15 @@ def update_version():
         f.close()
 update_version()
 
+'''========================================='''
+# Variable changing
+'''========================================='''
+try: #is_lapsed update to 90 days
+    if self.total_stand != 7776000.00:
+        self.total_stand = 7776000.00
+    self.stand_ratio = float(stand_sec / self.total_stand)
+    self.is_lapsed = self.stand_ratio > 1.00
+except:pass
 '''========================================='''
 # Queue Task Func
 '''========================================='''
@@ -269,4 +278,4 @@ By installing, copying, or otherwise using the {1} maya script, you acknowledge 
     def close_ui(self):
         cmds.deleteUI(self.win_id)
 self.gr_license = gr_license(product_name='Keyframe Overlap (BRS Locator Delay)', product_id='YGr34IvsrVqlvn6JghcRFg==')
-print('gr_license is loaded')
+print('Gumroad license avctivator is loaded')
