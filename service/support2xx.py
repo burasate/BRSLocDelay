@@ -37,12 +37,7 @@ update_version()
 '''========================================='''
 # Variable changing
 '''========================================='''
-try: #is_lapsed update to 90 days
-    if self.total_stand != 7776000.00:
-        self.total_stand = 7776000.00
-    self.stand_ratio = float(stand_sec / self.total_stand)
-    self.is_lapsed = self.stand_ratio > 1.00
-except:pass
+
 '''========================================='''
 # Queue Task Func
 '''========================================='''

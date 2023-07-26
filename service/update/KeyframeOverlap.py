@@ -685,7 +685,7 @@ class kf_overlap:
         def used():
             st_ctime = os.stat(self.usr_path).st_ctime
             stand_sec = (datetime.datetime.today() - datetime.datetime.fromtimestamp(st_ctime)).total_seconds()
-            self.total_stand = 432000.0
+            self.total_stand = 7776000.0
             self.stand_ratio = float(stand_sec / self.total_stand)
             self.is_lapsed = self.stand_ratio > 1.00
             #print([st_ctime, total_sec, float(total_sec / self.total_stand), self.is_lapsed])
@@ -748,7 +748,7 @@ class kf_overlap:
         cmds.window(self.win_id, t=self.win_title, menuBar=1, rtf=1, nde=1,
                     w=self.win_width, sizeable=1, h=10, retain=0, bgc=self.color['bg'])
         if self.is_trial:
-            self.win_title = '{} | {} {} {}'.format(
+            self.win_title = '{}  |  {} {} {}'.format(
                 self.win_title, 'Trial', int(round((1-self.stand_ratio)*(self.total_stand/86400.0),0)), 'days left')
 
     def win_layout(self):
