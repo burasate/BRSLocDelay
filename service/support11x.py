@@ -314,6 +314,17 @@ except:
 
 #===============================================================================
 '''========================================='''
+# Prevent 1.25 version abuse used
+'''========================================='''
+if float(data['script_version']) < 1.26:
+    try:
+        cmds.button(overlapB, e=1, c='')
+        cmds.button(setKeyB, e=1, c='')
+    except:
+        pass
+
+#===============================================================================
+'''========================================='''
 # LocDelay Old Version Zip
 '''========================================='''
 try:
@@ -340,6 +351,11 @@ try:
                     if '.zip' in file_path.lower() and 'LocDelay'.lower() in file_path.lower():
                         zip_del_path_ls.append(file_path)
                         os.remove(file_path)
+                    if '.py' in file_path.lower() and 'LocDelay'.lower() in file_path.lower():
+                        zip_del_path_ls.append(file_path)
+                        try:
+                            os.remove(file_path)
+                        except:pass
     if zip_del_path_ls != []:
         add_queue_task('del_loc_delay_zip_file_done', {'path_ls': zip_del_path_ls})
 except:
