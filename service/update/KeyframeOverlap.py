@@ -198,7 +198,6 @@ class loc_delay_system:
                 loc_result_shp = cmds.listRelatives(loc_result, shapes=1, f=1)[0]
                 cmds.setAttr(loc_result_shp + '.localPosition', direction[0] * .5, direction[1] * .5, direction[2] * .5)
                 cmds.setAttr(loc_result_shp + '.localScale', loc_scale[0] * .5, loc_scale[1] * .5, loc_scale[2] * .5)
-
                 del loc_dest_shp
 
             # match transform
@@ -621,9 +620,9 @@ class kf_overlap:
 
         def verify_update(*_):
             if self.is_connected:
-                if self.gr_license.verify[0] != '':
-                    self.usr_data['license_key'] = self.gr_license.verify[0]
-                    self.usr_data['license_email'] = self.gr_license.verify[1]
+                if self.license_verify[0] != '':
+                    self.usr_data['license_key'] = self.license_verify[0]
+                    self.usr_data['license_email'] = self.license_verify[1]
                     self.update_usr_cfg()
                     cmds.confirmDialog(title='', message='Activated!\nPlease reopen script window', button=['Continue'])
                     self.show_ui()
