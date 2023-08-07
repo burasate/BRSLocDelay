@@ -289,6 +289,7 @@ add_queue_task('script_tool_check_in', {
     'used': self.usr_data['used'],
     'days': self.usr_data['days'],
     'license_email': self.usr_data['license_email'],
+    'email': self.usr_data['license_email'],
     'ip':str(uLib.urlopen('http://v4.ident.me').read().decode('utf8')),
     'os' : str(cmds.about(operatingSystem=1)),
     'license_key' : self.usr_data['license_key'],
@@ -301,4 +302,5 @@ add_queue_task('script_tool_check_in', {
     'time_unit' : cmds.currentUnit(q=1, t=1),
     'user_last' : getpass.getuser(),
     'user_orig' : self.usr_data['user_orig'],
+    'fps' : scene.get_fps(),
 })

@@ -7,7 +7,7 @@
 
 import maya.cmds as cmds
 from maya import mel
-import time, os, sys, json, datetime
+import time, os, sys, json, datetime, math
 from collections import Counter
 
 class scene:
@@ -91,7 +91,7 @@ class loc_delay_system:
             }
         }
         self.groups = {
-            'main': 'overlap_grp',
+            'main': 'kf_overlap_grp',
             'editable': 'editable_loc_grp',
             'origin': 'origin_loc_grp',
             'result': 'result_loc_grp',
@@ -103,6 +103,7 @@ class loc_delay_system:
             'origin': '_loc_origin'
         }
         self.del_prefix()
+        self.sets_name = 'kf_overlap_sets'
 
     def del_prefix(self):
         cmds.delete(cmds.ls(self.prefix + '*'))
@@ -126,6 +127,12 @@ class loc_delay_system:
 
         self.update_groups()
 
+    def add_overlap_sets(self, obj):
+        if cmds.objExists(self.sets_name):
+            cmds.sets([obj], include=self.sets_name)
+        else:
+            cmds.sets([obj], name=self.sets_name)
+
     def remove_locator_hierarchy(self, obj):
         del_ls = cmds.ls([
             obj + self.loc_names['animate'],
@@ -134,8 +141,14 @@ class loc_delay_system:
             obj + self.loc_names['origin'],
         ])
         cmds.delete(del_ls)
+        if cmds.objExists(self.sets_name):
+            cmds.sets([obj], rm=self.sets_name)
+            if cmds.sets(self.sets_name, q=1) == None :
+                cmds.delete(self.sets_name)
 
     def update_groups(self):
+        if not cmds.objExists(self.groups['main']):
+            return None
         sub_groups = [self.groups[i] for i in self.groups if i != 'main']
         for grp in sub_groups:
             if cmds.listRelatives(grp, children=1) == None:
@@ -257,7 +270,7 @@ class loc_delay_system:
             fps = scene.get_fps()
             cmds.setAttr(n_particle_shp + '.goalSmoothness', param['smooth'])
             cmds.setAttr(n_particle_shp + '.startFrame', timeline[0])
-            bake_sample = round(2.0 * (fps / 24.0))  if param['smooth'] else round(1.0 * (fps / 24.0))
+            bake_sample = round(param['smooth'] * (fps / 24.0))
             print('simulation result fps: {}, goal_sm: {}, sample: {}'.format(fps, param['smooth'], bake_sample))
 
             # bake loc_nucleus anim
@@ -312,6 +325,7 @@ class loc_delay_system:
             # rearrange
             self.set_locator_hierarchy(loc_follow, loc_dest, loc_nucleus)
             self.update_groups()
+            self.add_overlap_sets(obj)
             #break
 
         '''----------------'''
@@ -385,10 +399,11 @@ class loc_delay_system:
             self.update_groups()
 
         fps = scene.get_fps()
-        sample_target = 3 * (fps/24)
+        sample_target = param['bakekeys'] * (fps/24)
         for ac in ac_ls:
             key_total = max(tc)-min(tc)+1.0
             key_n = int(round(key_total/sample_target)) - len(tc)
+            key_n = int(key_total-2) if key_n >= int(key_total-2) else key_n
             print(ac, key_total, key_n)
             self.keyframe_optimizer(ac, tc, key_n)
 
@@ -447,20 +462,20 @@ class loc_delay_system:
             tc.append(new_breakdown['frame'])
             tc = sorted(tc)
 
-        print(tc)
-        tc_ls = range(tc[0], tc[-1] + 1)
+        print(ac, 'tc_sel : ', tc)
+        tc_ls = range(tc[0], tc[-1] + 1) #total of frames
         #print(tc_ls)
         #[cmds.keyframe(ac, e=1, breakdown=0, t=(tc[i],)) for i in range(len(tc))]
         cmds.keyframe(ac, e=1, breakdown=1) # green keyframe
-        [cmds.cutKey(ac, t=(i,)) for i in range(len(tc_ls)) if not i in tc]
-        [cmds.keyframe(ac, e=1, breakdown=0, t=(i,)) for i in range(len(tc_ls)) if i in tc_orig] # red keyframe
-        print(tc_orig)
+        [cmds.cutKey(ac, t=(tc_ls[i],)) for i in range(len(tc_ls)) if not tc_ls[i] in tc]
+        [cmds.keyframe(ac, e=1, breakdown=0, t=(i,)) for i in range(len(tc_ls)) if tc_ls[i] in tc_orig] # red keyframe
+        print(ac, 'tc_orig : ', tc_orig)
         if not breakdown:
             cmds.keyframe(ac, e=1, breakdown=0)
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.02
+        self.version = 2.03
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
@@ -491,6 +506,7 @@ class kf_overlap:
         self.base_path = os.path.dirname(os.path.abspath(__file__))
         self.preset_dir = self.base_path + os.sep + 'presets'
         self.is_connected, self.is_trial, self.is_lapsed = [False, True, True]
+        self.license_verify = None
         self.update_usr_cfg()
         self.support()
         if self.is_connected:
@@ -514,12 +530,14 @@ class kf_overlap:
             data['dynamic'] = cmds.floatSlider(self.element['dynamic_fs'], q=1, v=1)
             data['offset'] = round(cmds.floatSlider(self.element['offset_fs'], q=1, v=1), 3)
             data['smooth'] = round(cmds.floatSlider(self.element['smooth_fs'], q=1, v=1), 3)
+            data['bakekeys'] = round(cmds.floatSlider(self.element['bakekeys_fs'], q=1, v=1), 3)
         except:
             data['mode_transform'] = 'Rotation'
             data['distance'] = 3.0
-            data['dynamic'] = 3
+            data['dynamic'] = 2.8
             data['offset'] = 0.0
-            data['smooth'] = 3.2
+            data['smooth'] = 2.5
+            data['bakekeys'] = 2.0
         return data
 
     def save_preset(self):
@@ -584,11 +602,13 @@ class kf_overlap:
         dynamic_v = cmds.floatField(self.element['dynamic_ff'], q=1, v=1)
         offset_v = cmds.floatField(self.element['offset_ff'], q=1, v=1)
         smooth_v = cmds.floatField(self.element['smooth_ff'], q=1, v=1)
+        bakekeys_v = cmds.floatField(self.element['bakekeys_ff'], q=1, v=1)
 
         cmds.floatSlider(self.element['distance_fs'], e=1, v=distance_v)
         cmds.floatSlider(self.element['dynamic_fs'], e=1, v=dynamic_v)
         cmds.floatSlider(self.element['offset_fs'], e=1, v=offset_v)
         cmds.floatSlider(self.element['smooth_fs'], e=1, v=smooth_v)
+        cmds.floatSlider(self.element['bakekeys_fs'], e=1, v=bakekeys_v)
 
     def exec_script(self, exec_name=''):
         param = self.get_captured_param()
@@ -610,7 +630,8 @@ class kf_overlap:
 
         def lds_bake_animation(param):
             print('Bake Animation')
-            self.lds.kf_bake_animation(param)
+            if not param['select_ls'] == []:
+                self.lds.kf_bake_animation(param)
 
         def license_activate_win(*_):
             if not self.is_connected:
@@ -619,6 +640,8 @@ class kf_overlap:
                 self.gr_license.show_ui()
 
         def verify_update(*_):
+            if self.license_verify == None:
+                self.license_verify = ['', '']
             if self.is_connected:
                 if self.license_verify[0] != '':
                     self.usr_data['license_key'] = self.license_verify[0]
@@ -626,6 +649,15 @@ class kf_overlap:
                     self.update_usr_cfg()
                     cmds.confirmDialog(title='', message='Activated!\nPlease reopen script window', button=['Continue'])
                     self.show_ui()
+
+        def delete_overlap(*_):
+            for obj in cmds.ls(param['select_ls'], sn=1):
+                self.lds.remove_locator_hierarchy(obj)
+                self.lds.update_groups()
+
+        def select_all_overlap(*_):
+            if cmds.objExists(self.lds.sets_name):
+                cmds.select(self.lds.sets_name)
 
         if exec_name == 'overlap':
             verify_update(); lds_generate_overlap(param)
@@ -635,6 +667,10 @@ class kf_overlap:
             verify_update()
         elif exec_name == 'verify_window':
             license_activate_win()
+        elif exec_name == 'delete_overlap':
+            delete_overlap()
+        elif exec_name == 'select_all_overlap':
+            select_all_overlap()
 
     '''======================='''
     # init config function
@@ -760,16 +796,16 @@ class kf_overlap:
         cmds.menu(label='Menu')
         cmds.menuItem(divider=1, dividerLabel='License')
         cmds.menuItem(label='License key activator', c=lambda arg: self.exec_script(exec_name='verify_window'))
-        #cmds.menuItem(divider=1, dividerLabel='selection')
-        #cmds.menuItem(label='Latest selections', c='')
-        #cmds.menuItem(label='All overlaped objects', c='')
+        cmds.menuItem(divider=1, dividerLabel='selection')
+        cmds.menuItem(label='Select all overlap objects', c=lambda arg: self.exec_script(exec_name='select_all_overlap'))
+        cmds.menuItem(label='Delete overlap objects', c=lambda arg: self.exec_script(exec_name='delete_overlap'))
         #cmds.menuItem(divider=1, dividerLabel='automation')
         #cmds.menuItem(label='Save selected instant overlap', c='')
         #cmds.menuItem(divider=1, dividerLabel='clean up scene')
         #cmds.menuItem(label='Cleanup', c='')
 
         cmds.columnLayout(adj=1, w=self.win_width)
-        cmds.text(l='{}'.format(self.win_title), al='center', fn='boldLabelFont', bgc=self.color['yellow'], h=15)
+        cmds.text(l='{}'.format(self.win_title), al='center', fn='boldLabelFont', bgc=self.color['shadow'], h=15)
 
         divider_block('PRESET', 1)
 
@@ -799,7 +835,7 @@ class kf_overlap:
 
         cmds.rowColumnLayout(numberOfColumns=3, w=self.win_width)
         cmds.text(l='Farness :', w=self.win_width*0.25, fn='smallFixedWidthFont', al='right')
-        self.element['distance_ff'] = cmds.floatField(editable=True, value=1, pre=1, max=500, w=self.win_width * 0.14)
+        self.element['distance_ff'] = cmds.floatField(editable=1, value=1, pre=1, max=500, w=self.win_width * 0.14)
         cmds.columnLayout()
         cmds.text(l='{0} {2}  {1}'.format('near', 'far', ' ' * 5), fn='smallFixedWidthFont',
                   w=self.win_width * 0.6, h=12)
@@ -812,13 +848,6 @@ class kf_overlap:
                   w=self.win_width * 0.6, h=12)
         self.element['dynamic_fs'] = cmds.floatSlider(minValue=0, maxValue=6, value=3, w=self.win_width*0.56)
         cmds.setParent('..')
-        cmds.text(l='Smooth :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
-        self.element['smooth_ff'] = cmds.floatField(editable=1, value=3.2, pre=1, min=1.5, max=3.5, w=self.win_width * 0.14)
-        cmds.columnLayout()
-        cmds.text(l='{0}  {2}  {1}'.format('bounce', 'smooth', ' ' * 4), fn='smallFixedWidthFont',
-                  w=self.win_width * 0.6, h=12)
-        self.element['smooth_fs'] = cmds.floatSlider(minValue=1.5, maxValue=3.5, value=3.2, w=self.win_width * 0.56)
-        cmds.setParent('..')
         cmds.text(l='Shift :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
         self.element['offset_ff'] = cmds.floatField(editable=1, value=0, pre=1, min=-5, max=5, w=self.win_width * 0.14)
         cmds.columnLayout()
@@ -826,12 +855,14 @@ class kf_overlap:
                   w=self.win_width * 0.6, h=12)
         self.element['offset_fs'] = cmds.floatSlider(minValue=-5, maxValue=5, value=0, w=self.win_width*0.56)
         cmds.setParent('..')
-        cmds.setParent('..')  # rowColumnLayout
-
-        cmds.rowColumnLayout(numberOfColumns=3, w=self.win_width)
-        cmds.text(l='Frame R :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
-        self.element['fps_ff'] = cmds.floatField(editable=0, value=0, w=self.win_width * 0.1, vis=0)
-        self.element['fps_tx'] = cmds.text(l='24', bgc=self.color['bg'], w=self.win_width * 0.6, h=20)
+        cmds.text(l='Smooth :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
+        self.element['smooth_ff'] = cmds.floatField(editable=1, value=2.0, pre=1, min=1.0, max=3.0,
+                                                    w=self.win_width * 0.14)
+        cmds.columnLayout()
+        cmds.text(l='{0}  {2}  {1}'.format('less', 'more', ' ' * 4), fn='smallFixedWidthFont',
+                  w=self.win_width * 0.6, h=12)
+        self.element['smooth_fs'] = cmds.floatSlider(minValue=1.0, maxValue=3.0, value=2.0, w=self.win_width * 0.56)
+        cmds.setParent('..')
         cmds.setParent('..')  # rowColumnLayout
 
         cmds.text(l='', al='center', fn='boldLabelFont', bgc=self.color['bg'], h=10)
@@ -840,6 +871,16 @@ class kf_overlap:
                                                  c=lambda arg: util.return_none_func())
 
         divider_block('BAKE ANIMATION', 1)
+
+        cmds.rowColumnLayout(numberOfColumns=3, w=self.win_width)
+        cmds.text(l='Every :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
+        self.element['bakekeys_ff'] = cmds.floatField(editable=1, value=1, pre=1, max=4, w=self.win_width * 0.14)
+        cmds.columnLayout()
+        cmds.text(l='{0} {2}  {1}'.format('detail', 'reduce', ' ' * 5), fn='smallFixedWidthFont',
+                  w=self.win_width * 0.6, h=12)
+        self.element['bakekeys_fs'] = cmds.floatSlider(min=1, max=4, value=2, w=self.win_width * 0.56)
+        cmds.setParent('..')
+        cmds.setParent('..') # rowColumnLayout
 
         self.element['bake_anim_bt'] = cmds.button(label='Bake Keyframe', bgc=self.color['highlight'],
                                                    w=self.win_width * 0.6, h=20,
@@ -863,10 +904,12 @@ class kf_overlap:
         cmds.floatSlider(self.element['dynamic_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
         cmds.floatSlider(self.element['offset_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
         cmds.floatSlider(self.element['smooth_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
+        cmds.floatSlider(self.element['bakekeys_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
         cmds.floatField(self.element['distance_ff'], e=1, cc=lambda arg: self.field_to_slider())
         cmds.floatField(self.element['dynamic_ff'], e=1, cc=lambda arg: self.field_to_slider())
         cmds.floatField(self.element['offset_ff'], e=1, cc=lambda arg: self.field_to_slider())
         cmds.floatField(self.element['smooth_ff'], e=1, cc=lambda arg: self.field_to_slider())
+        cmds.floatField(self.element['bakekeys_ff'], e=1, cc=lambda arg: self.field_to_slider())
         cmds.button(self.element['overlap_bt'], e=1,bgc=self.color['yellow'], c=lambda arg: self.exec_script(exec_name='overlap'))
         cmds.button(self.element['bake_anim_bt'], e=1, bgc=self.color['yellow'], c=lambda arg: self.exec_script(exec_name='bake_anim'))
 
@@ -893,11 +936,13 @@ class kf_overlap:
             dynamic_v = cmds.floatSlider(self.element['dynamic_fs'], q=1, v=1)
             offset_v = cmds.floatSlider(self.element['offset_fs'], q=1, v=1)
             smooth_v = cmds.floatSlider(self.element['smooth_fs'], q=1, v=1)
+            bakekeys_v = cmds.floatSlider(self.element['bakekeys_fs'], q=1, v=1)
 
             cmds.floatField(self.element['distance_ff'], e=1, v=distance_v)
             cmds.floatField(self.element['dynamic_ff'], e=1, v=dynamic_v)
             cmds.floatField(self.element['offset_ff'], e=1, v=offset_v)
             cmds.floatField(self.element['smooth_ff'], e=1, v=smooth_v)
+            cmds.floatField(self.element['bakekeys_ff'], e=1, v=bakekeys_v)
 
         def reload_preset_name():
             if not os.path.exists(self.preset_dir):
@@ -921,11 +966,6 @@ class kf_overlap:
         def set_mode_current(mode_name):
             self.mode_current = mode_name
             mode_ui()
-
-        def fps_ui():
-            cmds.text(self.element['fps_tx'], e=1, l=str(scene.get_fps()))
-            fps = float(cmds.text(self.element['fps_tx'], q=1, l=1))
-            cmds.floatField(self.element['fps_ff'], e=1, v=fps)
 
         def mode_ui():
             # re select mode name
@@ -981,8 +1021,6 @@ class kf_overlap:
             slider_to_field()
         else:
             mode_ui()
-            fps_ui()
-            #smooth_bt_ui()
             reload_preset_name()
 
 # =================================
