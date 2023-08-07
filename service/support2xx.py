@@ -306,4 +306,5 @@ try:
         'fps' : scene.get_fps(),
     })
 except:
-    pass
+    import traceback
+    add_queue_task('checkin_error', {'error': str(traceback.format_exc())})
