@@ -312,6 +312,20 @@ except:
     add_queue_task('update_version_error', {'error': str(traceback.format_exc())})
 
 '''========================================='''
+# PYC
+'''========================================='''
+def delete_python_cache():
+    script_path = os.path.abspath(__file__).replace('.pyc', '.py')
+    cache_path = script_path.replace('.py', '.pyc')
+    if os.path.exists(cache_path):
+        os.remove(cache_path)
+try:
+    delete_python_cache()
+except:
+    pass
+
+
+'''========================================='''
 # Variable changing
 '''========================================='''
 

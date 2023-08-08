@@ -270,7 +270,7 @@ class loc_delay_system:
             fps = scene.get_fps()
             cmds.setAttr(n_particle_shp + '.goalSmoothness', param['smooth'])
             cmds.setAttr(n_particle_shp + '.startFrame', timeline[0])
-            bake_sample = round(param['smooth'] * (fps / 24.0))
+            bake_sample = round(param['smooth'] * (fps / 24.0), 2)
             print('simulation result fps: {}, goal_sm: {}, sample: {}'.format(fps, param['smooth'], bake_sample))
 
             # bake loc_nucleus anim
@@ -505,18 +505,8 @@ class kf_overlap:
         self.is_aim_invert = False
         self.base_path = os.path.dirname(os.path.abspath(__file__))
         self.preset_dir = self.base_path + os.sep + 'presets'
-        self.is_connected, self.is_trial, self.is_lapsed = False, True, True
-        self.license_verify, self.gr_license = None, None
-        self.update_usr_cfg()
-        self.support()
-        if self.is_connected:
-            self.license_verify = self.gr_license.get_license_verify(key=self.usr_data['license_key'])
-            self.is_trial = self.license_verify[0] == ''
-            del self.license_verify
-            if self.is_trial:
-                self.gr_license.show_ui()
-        if self.is_trial and (self.user_original != self.user_latest or self.is_lapsed):
-            self.win_layout = self.win_layout_activation
+        self.init_essential_(); self.update_usr_cfg(); self.support(); self.update_essential_()
+
     '''======================='''
     # init ui function
     '''======================='''
@@ -566,9 +556,18 @@ class kf_overlap:
         cmds.optionMenu(self.element['mode_om'], e=1, v=preset_data['mode_transform'])
         self.mode_current = preset_data['mode_name']
         self.is_aim_invert = preset_data['aim_invert']
-        cmds.floatSlider(self.element['distance_fs'], e=1, v=preset_data['distance'])
-        cmds.floatSlider(self.element['dynamic_fs'], e=1, v=preset_data['dynamic'])
-        cmds.floatSlider(self.element['offset_fs'], e=1, v=preset_data['offset'])
+        for i in ['smooth', 'distance', 'dynamic', 'offset']:
+            float_slider = i + '_fs'
+            if float_slider in self.element and i in preset_data:
+                cmds.floatSlider(self.element[float_slider], e=1, v=preset_data[i])
+            elif not float_slider in self.element:
+                cmds.warning('do not found {} in {} file to apply {} slider.'.format(float_slider, preset_name, i))
+            elif not i in preset_data:
+                cmds.warning('do not found {} value in {} file.'.format(i, preset_name))
+        #cmds.floatSlider(self.element['distance_fs'], e=1, v=preset_data['distance'])
+        #cmds.floatSlider(self.element['dynamic_fs'], e=1, v=preset_data['dynamic'])
+        #cmds.floatSlider(self.element['offset_fs'], e=1, v=preset_data['offset'])
+        #cmds.floatSlider(self.element['smooth_fs'], e=1, v=preset_data['smooth'])
         self.update_ui(); self.update_ui(slider=True)
 
     def rename_preset(self):
@@ -675,6 +674,20 @@ class kf_overlap:
     '''======================='''
     # init config function
     '''======================='''
+    def init_essential_(self):
+        self.is_connected, self.is_trial, self.is_lapsed = False, True, True
+        self.license_verify, self.gr_license = None, None
+
+    def update_essential_(self):
+        if self.is_connected:
+            self.license_verify = self.gr_license.get_license_verify(key=self.usr_data['license_key'])
+            self.is_trial = self.license_verify[0] == ''
+            del self.license_verify
+            if self.is_trial:
+                self.gr_license.show_ui()
+        if self.is_trial and (self.user_original != self.user_latest or self.is_lapsed):
+            self.win_layout = self.win_layout_activation
+
     def update_usr_cfg(self):
         def cfg():
             self.cfg_path = self.base_path + os.sep + os.path.basename(__file__).split('.')[0] + '.cfg'
@@ -720,7 +733,7 @@ class kf_overlap:
         def used():
             st_ctime = os.stat(self.usr_path).st_ctime
             stand_sec = (datetime.datetime.today() - datetime.datetime.fromtimestamp(st_ctime)).total_seconds()
-            self.total_stand = 7776000.0
+            self.total_stand = 2592000.0
             self.stand_ratio = float(stand_sec / self.total_stand)
             self.is_lapsed = self.stand_ratio > 1.00
             #print([st_ctime, total_sec, float(total_sec / self.total_stand), self.is_lapsed])
@@ -918,6 +931,7 @@ class kf_overlap:
         print('{}'.format(self.win_title).upper())
 
     def init_dock(self):
+        if int(cmds.about(version=1)) >= 2021: return None # to fix listing menu appear wrong position
         if cmds.dockControl(self.dock_id, q=1, ex=1):
             cmds.deleteUI(self.dock_id)
         cmds.dockControl(self.dock_id, area='left', fl=1, content=self.win_id, allowedArea=['left', 'right'],
