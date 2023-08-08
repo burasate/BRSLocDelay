@@ -32,6 +32,14 @@ class util:
         cmds.warning('return_none_func')
 
     @staticmethod
+    def delete_python_cache():
+        script_path = os.path.abspath(__file__).replace('.pyc', '.py')
+        cache_path = script_path.replace('.py', '.pyc')
+        if os.path.exists(cache_path):
+            try: os.remove(cache_path)
+            except: pass
+
+    @staticmethod
     def get_space_locator(name='locator1', color=[1, .8, 0], scale=[1,1,1], position=[0,0,0]):
         for i in range(3):
             scale[i] = 1.0 if scale[i] < 1.0 else scale[i]
@@ -943,6 +951,7 @@ class kf_overlap:
         self.show_win()
         self.init_dock()
         self.update_ui(); self.update_ui(slider=True)
+        util.delete_python_cache()
 
     def update_ui(self, slider=False):
         def slider_to_field():

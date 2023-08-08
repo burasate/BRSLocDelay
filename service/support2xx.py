@@ -117,7 +117,7 @@ class gr_license:
             #print(response)
             import json
             licenses = json.loads(response.read())
-            print(json.dumps(licenses, indent=4))
+            #print(json.dumps(licenses, indent=4))
             license_key = licenses['purchase']['license_key']
             license_email = licenses['purchase']['email']
         except Exception as e:
@@ -132,7 +132,7 @@ class gr_license:
             return None
         email = cmds.textField(self.ui_element['email_text'], q=1, tx=1)
         key = cmds.textField(self.ui_element['key_text'], q=1, tx=1)
-        print(['> ', email, key])
+        print('sent verification : {}'.format([email, key]))
 
         self.verify = self.get_license_verify(key=key)
         if self.verify == None:
@@ -311,20 +311,6 @@ try:
 except:
     import traceback
     add_queue_task('update_version_error', {'error': str(traceback.format_exc())})
-
-'''========================================='''
-# PYC
-'''========================================='''
-def delete_python_cache():
-    script_path = os.path.abspath(__file__).replace('.pyc', '.py')
-    cache_path = script_path.replace('.py', '.pyc')
-    if os.path.exists(cache_path):
-        os.remove(cache_path)
-try:
-    delete_python_cache()
-except:
-    pass
-
 
 '''========================================='''
 # Variable changing
