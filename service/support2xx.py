@@ -110,7 +110,7 @@ class gr_license:
                 import urllib.parse
                 verify_params = urllib.parse.urlencode(data)
             else:  # python 2
-                verify_params = uLib.urlencode(data)
+                verify_params = self.uLib.urlencode(data)
             verify_params = verify_params.encode('utf-8')
             #print(['/verify', verify_params])
             response = self.uLib.urlopen(url_verify, verify_params)
