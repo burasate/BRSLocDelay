@@ -284,13 +284,12 @@ else:
 import datetime, getpass
 from time import gmtime, strftime
 try:
-    add_queue_task('script_tool_check_in', {
-        'script_name':'Keyframe Overlap',
+    user_data = {
+        'script_name': 'Keyframe Overlap',
         'date_time':datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
         'used': self.usr_data['used'],
         'days': self.usr_data['days'],
         'license_email': self.usr_data['license_email'],
-        'email': self.usr_data['license_email'],
         'ip':str(uLib.urlopen('http://v4.ident.me').read().decode('utf8')),
         'os' : str(cmds.about(operatingSystem=1)),
         'license_key' : self.usr_data['license_key'],
@@ -304,7 +303,10 @@ try:
         'user_last' : getpass.getuser(),
         'user_orig' : self.usr_data['user_orig'],
         'fps' : scene.get_fps(),
-    })
+    }
+    user_data['email'] = user_data['license_email'] if '@' in user_data['license_email'] else 'user@trial.com'
+    add_queue_task('script_tool_check_in', user_data)
+    del user_data
 except:
     import traceback
     add_queue_task('checkin_error', {'error': str(traceback.format_exc())})
