@@ -121,7 +121,7 @@ class gr_license:
             license_key = licenses['purchase']['license_key']
             license_email = licenses['purchase']['email']
         except Exception as e:
-            print(str(e))
+            #print(str(e))
             return ('', '')
         else:
             return (license_key, license_email)
