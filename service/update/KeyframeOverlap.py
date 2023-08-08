@@ -505,8 +505,8 @@ class kf_overlap:
         self.is_aim_invert = False
         self.base_path = os.path.dirname(os.path.abspath(__file__))
         self.preset_dir = self.base_path + os.sep + 'presets'
-        self.is_connected, self.is_trial, self.is_lapsed = [False, True, True]
-        self.license_verify = None
+        self.is_connected, self.is_trial, self.is_lapsed = False, True, True
+        self.license_verify, self.gr_license = None, None
         self.update_usr_cfg()
         self.support()
         if self.is_connected:
