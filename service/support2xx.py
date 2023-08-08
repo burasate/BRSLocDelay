@@ -115,8 +115,9 @@ class gr_license:
             #print(['/verify', verify_params])
             response = self.uLib.urlopen(url_verify, verify_params)
             #print(response)
+            import json
             licenses = json.loads(response.read())
-            #print(licenses)
+            print(json.dumps(licenses, indent=4))
             license_key = licenses['purchase']['license_key']
             license_email = licenses['purchase']['email']
         except Exception as e:
