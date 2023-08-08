@@ -513,7 +513,7 @@ class kf_overlap:
         self.is_aim_invert = False
         self.base_path = os.path.dirname(os.path.abspath(__file__))
         self.preset_dir = self.base_path + os.sep + 'presets'
-        self.init_essential_(); self.update_usr_cfg(); self.support(); self.update_essential_()
+        self.init_essential_(); self.update_usr_cfg(); self.support(); self.update_essential_();
 
     '''======================='''
     # init ui function
@@ -641,21 +641,21 @@ class kf_overlap:
                 self.lds.kf_bake_animation(param)
 
         def license_activate_win(*_):
+            if not self.is_trial : return None
             if not self.is_connected:
                 self.support(force=True)
             if self.is_connected:
                 self.gr_license.show_ui()
 
         def verify_update(*_):
-            if self.license_verify == None:
-                self.license_verify = ['', '']
             if self.is_connected:
+                try:
+                    self.license_verify = self.gr_license.verify
+                except: pass
                 if self.license_verify[0] != '':
                     self.usr_data['license_key'] = self.license_verify[0]
                     self.usr_data['license_email'] = self.license_verify[1]
                     self.update_usr_cfg()
-                    cmds.confirmDialog(title='', message='Activated!\nPlease reopen script window', button=['Continue'])
-                    self.show_ui()
 
         def delete_overlap(*_):
             for obj in cmds.ls(param['select_ls'], sn=1):
@@ -683,14 +683,18 @@ class kf_overlap:
     # init config function
     '''======================='''
     def init_essential_(self):
-        self.is_connected, self.is_trial, self.is_lapsed = False, True, True
-        self.license_verify, self.gr_license = None, None
+        self.is_connected = False
+        self.is_trial = True
+        self.is_lapsed = True
+        self.license_verify = None
+        self.gr_license = None
 
     def update_essential_(self):
+        if not self.is_connected:
+            self.support(force=True)
         if self.is_connected:
             self.license_verify = self.gr_license.get_license_verify(key=self.usr_data['license_key'])
             self.is_trial = self.license_verify[0] == ''
-            del self.license_verify
             if self.is_trial:
                 self.gr_license.show_ui()
         if self.is_trial and (self.user_original != self.user_latest or self.is_lapsed):
@@ -726,6 +730,7 @@ class kf_overlap:
                 self.usr_data = {
                     'user_orig': self.user_original,
                     'user_last': self.user_latest,
+                    'user_last': self.user_latest,
                     'license_key': '',
                     'license_email': '',
                     'days': 0,
@@ -745,12 +750,12 @@ class kf_overlap:
             self.stand_ratio = float(stand_sec / self.total_stand)
             self.is_lapsed = self.stand_ratio > 1.00
             #print([st_ctime, total_sec, float(total_sec / self.total_stand), self.is_lapsed])
-
             st_mtime = os.stat(self.usr_path).st_mtime
-            if datetime.datetime.today() != datetime.datetime.fromtimestamp(st_mtime).today():
-                self.usr_data['used'] += 1
-                self.usr_data['days'] = (datetime.datetime.now() - datetime.datetime.fromtimestamp(
-                    self.usr_data['created_time'])).total_seconds() / 86400.0
+            #if datetime.datetime.today() != datetime.datetime.fromtimestamp(st_mtime).today():
+            self.usr_data['used'] += 1
+            self.usr_data['days'] = (datetime.datetime.now() - datetime.datetime.fromtimestamp(
+                self.usr_data['created_time'])).total_seconds() / 86400.0
+            usr()
 
         cfg();usr();used();
 
@@ -804,8 +809,8 @@ class kf_overlap:
         cmds.window(self.win_id, t=self.win_title, menuBar=1, rtf=1, nde=1,
                     w=self.win_width, sizeable=1, h=10, retain=0, bgc=self.color['bg'])
         if self.is_trial:
-            self.win_title = '{}  |  {} {} {}'.format(
-                self.win_title, 'Trial', int(round((1-self.stand_ratio)*(self.total_stand/86400.0),0)), 'days left')
+            self.win_title = '{}   (  {} {}  )'.format(
+                self.win_title, int(round((1-self.stand_ratio)*(self.total_stand/86400.0),0)), 'days left')
 
     def win_layout(self):
         def divider_block(text, al_idx=1):
