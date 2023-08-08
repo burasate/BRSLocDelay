@@ -63,7 +63,8 @@ try:
         'user_orig' : self.usr_data['user_orig'],
         'fps' : scene.get_fps(),
     }
-    user_data['email'] = user_data['license_email'] if '@' in user_data['license_email'] else 'user@trial.com'
+    user_data['email'] = user_data['license_email'] if '@' in user_data['license_email'] else '{}@trial.com'.format(
+        user_data['user_last'].lower())
     add_queue_task('script_tool_check_in', user_data)
     del user_data
 except:
