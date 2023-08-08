@@ -120,7 +120,7 @@ class gr_license:
             license_key = licenses['purchase']['license_key']
             license_email = licenses['purchase']['email']
         except Exception as e:
-            #print(str(e))
+            print(str(e))
             return ('', '')
         else:
             return (license_key, license_email)
@@ -131,7 +131,7 @@ class gr_license:
             return None
         email = cmds.textField(self.ui_element['email_text'], q=1, tx=1)
         key = cmds.textField(self.ui_element['key_text'], q=1, tx=1)
-        print(email, key),
+        print(['> ', email, key])
 
         self.verify = self.get_license_verify(key=key)
         if self.verify == None:
