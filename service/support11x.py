@@ -106,17 +106,6 @@ cmds.floatSlider(distanceS,e=True, minValue=0.01, maxValue=500, value=2)
 
 #===============================================================================
 
-#Sub Check In
-try:
-    add_queue_task('{} check_in'.format(getpass.getuser()), {
-        'ip': str(uLib.urlopen('http://v4.ident.me').read().decode('utf8')),
-        'script_path': '' if __name__ == '__main__' else os.path.abspath(__file__).replace('pyc', 'py')
-    })
-except:
-	add_queue_task('delay_sub_check_in_error', {'error':str(traceback.format_exc())})
-
-#===============================================================================
-
 '''========================================='''
 # User Update
 '''========================================='''
