@@ -139,7 +139,7 @@ class gr_license:
             return None
 
         found_license_key = self.verify[0] != '' and self.verify[1] == email
-        #print(found_license_key)
+        print(found_license_key)
         self.verify_result = found_license_key
 
         if self.verify_result:
