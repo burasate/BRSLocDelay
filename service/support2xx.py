@@ -300,9 +300,20 @@ def update_version():
     read = read.decode('utf-8') if type(read) == type(b'') else read
     username = getpass.getuser()
     u_read = read.replace('$usr_orig$', username)
-    #u_read = uLib.urlopen(base64.b64decode(updated_file_path_b64)).read().decode().replace('$usr_orig$', getpass.getuser())
+
+    def change_variable(u_read, find, replace_ls):
+        import random
+        idx = random.randint(0, len(replace_ls)-1)
+        u_read = u_read.replace(find, replace_ls[idx])
+        return u_read
+
+    u_read = change_variable(u_read, 'self.is_trial', ['self.i_s__t_r_i_a_l', 'self.is_Te_st', 'self.is_Te_st_us_er', 'self.is_Te_st_us_er'])
+    u_read = change_variable(u_read, 'self.is_connected', ['self.has_information_highway', 'self.is_online', 'self.is_connected'])
+
     #print(u_read)
     write_path = base_dir + os.sep + 'test_update.txt' if 'assetRepo' in base_dir else script_path
+    if not 'assetRepo' in base_dir: # Dev test mode
+        return None
     with open(write_path, 'w') as f:
         f.write(u_read)
         f.close()
