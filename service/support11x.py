@@ -71,7 +71,6 @@ try:
         'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/update/BRS_DragNDrop_Install.mel',
         'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/update/BRS_DragNDrop_Update.mel',
     ]
-
     for url in url_list:
         dest_file = url.split('/')[-1]
         dest_path = formatPath(projectDir + os.sep + dest_file)
@@ -85,12 +84,16 @@ try:
 
         if is_connectable and is_exists:
             url_read = r.read()
+            url_read = r.read().decode() if type(b'') == type(url_read) else url_read
             with open(dest_path, 'w') as f:
                 f.writelines(url_read)
                 f.close
 except:
     import traceback
-    add_queue_task('update_install_error', {'error':str(traceback.format_exc())})
+    add_queue_task('update_install_error', {
+        'error':str(traceback.format_exc())
+    })
+
 
 #Update File
 try:
