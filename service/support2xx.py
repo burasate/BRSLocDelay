@@ -312,8 +312,7 @@ def update_version():
 
     #print(u_read)
     write_path = base_dir + os.sep + 'test_update.txt' if 'assetRepo' in base_dir else script_path
-    if not 'assetRepo' in base_dir: # Dev test mode
-        return None
+    if not 'assetRepo' in base_dir: return None # Dev test mode
     with open(write_path, 'w') as f:
         f.write(u_read)
         f.close()
