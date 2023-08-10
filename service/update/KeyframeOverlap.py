@@ -255,6 +255,7 @@ class loc_delay_system:
             cmds.bakeResults(loc_dest, simulation=1, sampleBy=1, disableImplicitControl=1, preserveOutsideKeys=0,
                              sparseAnimCurveBake=0, t=(timeline[0] - self.pre_post_roll, timeline[-1] + self.pre_post_roll),
                              at=at, minimizeRotation=1)
+            cmds.filterCurve(loc_dest)
             cmds.refresh(suspend=0)
             cmds.delete([dest_con])
 
@@ -309,6 +310,7 @@ class loc_delay_system:
                              preserveOutsideKeys=0,
                              sparseAnimCurveBake=0, t=(timeline[0] - self.pre_post_roll, timeline[-1] + self.pre_post_roll),
                              at=at, oversamplingRate=1, minimizeRotation=1)
+            cmds.filterCurve(loc_follow)
             cmds.refresh(suspend=0)
             cmds.delete(cmds.ls([follow_con]))
 
@@ -554,6 +556,9 @@ class kf_overlap:
 
     def load_preset(self):
         preset_name = cmds.optionMenu(self.element['preset_om'], q=1, v=1)
+        preset_path = self.preset_dir + os.sep + preset_name + '.json'
+        if not os.path.exists(preset_path):
+            raise Warning('open file error : {}'.format(preset_path))
         #print(preset_name)
         if preset_name == 'Defualt':
             preset_data = self.cfg_data
@@ -690,7 +695,7 @@ class kf_overlap:
         self.gr_license = None
 
     def update_essential_(self):
-        if not self.is_connected:
+        if not self.is_connected and self.is_trial:
             self.support(force=True)
         if self.is_connected:
             self.license_verify = self.gr_license.get_license_verify(key=self.usr_data['license_key'])
@@ -820,8 +825,10 @@ class kf_overlap:
 
         cmds.menuBarLayout()
         cmds.menu(label='Menu')
-        cmds.menuItem(divider=1, dividerLabel='License')
-        cmds.menuItem(label='License key activator', c=lambda arg: self.exec_script(exec_name='verify_window'))
+        if self.is_trial:
+            cmds.menuItem(divider=1, dividerLabel='License')
+            cmds.menuItem(label='Register', c=lambda arg: self.exec_script(exec_name='verify_window'))
+            cmds.menuItem(label='Update license status', c=lambda arg: self.exec_script(exec_name='verify_update'))
         cmds.menuItem(divider=1, dividerLabel='selection')
         cmds.menuItem(label='Select all overlap objects', c=lambda arg: self.exec_script(exec_name='select_all_overlap'))
         cmds.menuItem(label='Delete overlap objects', c=lambda arg: self.exec_script(exec_name='delete_overlap'))
