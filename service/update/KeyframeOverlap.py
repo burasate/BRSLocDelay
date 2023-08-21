@@ -77,6 +77,10 @@ class util:
         scale_z = depth *.5
         return [scale_x, scale_y, scale_z]
 
+    @staticmethod
+    def lerp(a, b, t):
+        return a + (b - a) * t
+
 class loc_delay_system:
     def __init__(self):
         print('Initialize Locator Delay Script')
@@ -84,7 +88,7 @@ class loc_delay_system:
             cmds.refresh(suspend=0)
             cmds.namespace(set=':')
         init_scene()
-        self.pre_post_roll = 10
+        self.pre_post_roll = int(round(scene.get_fps()))
         self.prefix = 'kfo'
         self.modes = {
             'rotation':{ #[xyz, yzx, zxy, xzy, yxz, zyx]
@@ -169,6 +173,50 @@ class loc_delay_system:
         :param param: ui parameter
         :return: overlap
         '''
+
+        def blend_first_frame(timeline, ac_ls):
+            #print('blend_first_frame')
+            del_ac_ls = []
+            for ac in ac_ls:
+                tc_ls = cmds.keyframe(ac, q=1, tc=1)
+                tc_ls = [round(i,0) for i in tc_ls if i > timeline[0] and i < timeline[1]]
+                tc_ls = sorted(list(set( [float(timeline[0])] + tc_ls + [float(timeline[1])] )))
+                vc_ls = [round(cmds.keyframe(ac, q=1, eval=1, t=(i,))[0], 4) for i in tc_ls]
+                if min(vc_ls) == max(vc_ls):
+                    del_ac_ls.append(ac)
+                #print(ac, tc_ls)
+                #print(vc_ls)
+
+                # extended value change
+                ext_tc_ls = range(timeline[1], timeline[1] + self.pre_post_roll+1)
+                ext_vc_ls = [round(cmds.keyframe(ac, q=1, eval=1, t=(i,))[0], 4) for i in ext_tc_ls]
+                #print('ext_tc_ls', ext_tc_ls)
+                #print('ext_vc_ls', ext_vc_ls)
+
+                # blend weight
+                blend_len = int(round(len(tc_ls) * .4))
+                blend_len = len(ext_tc_ls) if blend_len > len(ext_tc_ls) else blend_len
+                weight_ls = [round(util.lerp(1.0, 0.0, i/float(len(tc_ls[:blend_len]))),2) for i in range(len(tc_ls[:blend_len]))]
+                weight_ls = weight_ls + [0.0 for i in range(len(tc_ls[blend_len:]))]
+                #print('len', len(tc_ls[:blend_len]), tc_ls[:blend_len])
+                #print('weight_ls', len(weight_ls), weight_ls)
+                #print(len(weight_ls) == len(tc_ls))
+
+                # new vc
+                #print(vc_ls)
+                ext_vc_ls = ext_vc_ls + [ext_vc_ls[-1] for i in range(len(tc_ls[blend_len:]))]
+                #print(len(ext_vc_ls) == len(tc_ls))
+                new_vc_ls = [(ext_vc_ls[i]*weight_ls[i]) + (vc_ls[i]*(1.0-weight_ls[i])) for i in range(len(tc_ls))]
+                #print(new_vc_ls)
+
+                #set new keyframe
+                cmds.cutKey(ac, t=(tc_ls[0],tc_ls[-1]))
+                [cmds.setKeyframe(ac, t=(tc_ls[i],), v=new_vc_ls[i])for i in range(len(tc_ls))]
+            cmds.delete(del_ac_ls)
+            ac_ls = [i for i in ac_ls if not i in del_ac_ls]
+            cmds.filterCurve(ac_ls)
+            #print('\n')
+
         self.del_prefix()
         is_playing = cmds.play(q=1, st=1)
         if is_playing: cmds.play(st=0)
@@ -332,6 +380,10 @@ class loc_delay_system:
             elif mode_name == 'position': # pos
                 obj_con = cmds.pointConstraint(loc_result, obj, mo=0, skip=mode_param['skip'])[0]
 
+            # blend first keyframe
+            if param['blend_ovl_cb']:
+                blend_first_frame(timeline, cmds.keyframe(loc_nucleus, q=1, n=1))
+
             # rearrange
             self.set_locator_hierarchy(loc_follow, loc_dest, loc_nucleus)
             self.update_groups()
@@ -415,7 +467,7 @@ class loc_delay_system:
             key_n = int(round(key_total/sample_target)) - len(tc)
             key_n = int(key_total-2) if key_n >= int(key_total-2) else key_n
             print(ac, key_total, key_n)
-            self.keyframe_optimizer(ac, tc, key_n)
+            self.keyframe_optimizer(ac, tc, key_n, breakdown=param['breakdown_cb'])
 
     def keyframe_optimizer(self, ac, tc, n, breakdown=False):
         def linspace(start, stop, num):
@@ -478,14 +530,14 @@ class loc_delay_system:
         #[cmds.keyframe(ac, e=1, breakdown=0, t=(tc[i],)) for i in range(len(tc))]
         cmds.keyframe(ac, e=1, breakdown=1) # green keyframe
         [cmds.cutKey(ac, t=(tc_ls[i],)) for i in range(len(tc_ls)) if not tc_ls[i] in tc]
-        [cmds.keyframe(ac, e=1, breakdown=0, t=(i,)) for i in range(len(tc_ls)) if tc_ls[i] in tc_orig] # red keyframe
         print(ac, 'tc_orig : ', tc_orig)
         if not breakdown:
             cmds.keyframe(ac, e=1, breakdown=0)
+        [cmds.keyframe(ac, e=1, breakdown=0, t=(tc_ls[i],)) for i in range(len(tc_ls)) if tc_ls[i] in tc_orig]  # red keyframe
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.03
+        self.version = 2.04
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
@@ -524,6 +576,9 @@ class kf_overlap:
         data = {}
         data['mode_name'] = self.mode_current
         data['aim_invert'] = self.is_aim_invert
+        data['blend_ovl_cb'] = cmds.menuItem(self.element['blend_ovl_cb'], q=1, cb=1)
+        data['breakdown_cb'] = cmds.menuItem(self.element['breakdown_cb'], q=1, cb=1)
+        data['force_dg_cb'] = cmds.menuItem(self.element['force_dg_cb'], q=1, cb=1)
         try:
             data['mode_transform'] = cmds.optionMenu(self.element['mode_om'], q=1, v=1)
             data['distance'] = round(cmds.floatSlider(self.element['distance_fs'], q=1, v=1), 3)
@@ -557,11 +612,11 @@ class kf_overlap:
     def load_preset(self):
         preset_name = cmds.optionMenu(self.element['preset_om'], q=1, v=1)
         preset_path = self.preset_dir + os.sep + preset_name + '.json'
-        if not os.path.exists(preset_path):
-            raise Warning('open file error : {}'.format(preset_path))
         #print(preset_name)
         if preset_name == 'Defualt':
             preset_data = self.cfg_data
+        elif not os.path.exists(preset_path):
+            raise Warning('open file error : {}'.format(preset_path))
         else:
             preset_data = json.load(open(self.preset_dir + os.sep + preset_name + '.json'))
         #print(preset_data)
@@ -577,10 +632,6 @@ class kf_overlap:
                 cmds.warning('do not found {} in {} file to apply {} slider.'.format(float_slider, preset_name, i))
             elif not i in preset_data:
                 cmds.warning('do not found {} value in {} file.'.format(i, preset_name))
-        #cmds.floatSlider(self.element['distance_fs'], e=1, v=preset_data['distance'])
-        #cmds.floatSlider(self.element['dynamic_fs'], e=1, v=preset_data['dynamic'])
-        #cmds.floatSlider(self.element['offset_fs'], e=1, v=preset_data['offset'])
-        #cmds.floatSlider(self.element['smooth_fs'], e=1, v=preset_data['smooth'])
         self.update_ui(); self.update_ui(slider=True)
 
     def rename_preset(self):
@@ -631,14 +682,16 @@ class kf_overlap:
         def lds_generate_overlap(param):
             print('Generate Overlap')
             evaluation = cmds.evaluationManager(q=1, mode=1)[0]
-            cmds.evaluationManager(mode='off')
+            if param['force_dg_cb']:
+                cmds.evaluationManager(mode='off')
             try:
                 self.lds.kf_overlap(param)
             except:
                 import traceback
                 raise Warning(traceback.format_exc())
             finally:
-                cmds.evaluationManager(e=1, mode=evaluation)
+                if param['force_dg_cb']:
+                    cmds.evaluationManager(e=1, mode=evaluation)
 
         def lds_bake_animation(param):
             print('Bake Animation')
@@ -829,13 +882,15 @@ class kf_overlap:
             cmds.menuItem(divider=1, dividerLabel='License')
             cmds.menuItem(label='Register', c=lambda arg: self.exec_script(exec_name='verify_window'))
             cmds.menuItem(label='Update license status', c=lambda arg: self.exec_script(exec_name='verify_update'))
-        cmds.menuItem(divider=1, dividerLabel='selection')
+        cmds.menuItem(divider=1, dividerLabel='Select')
         cmds.menuItem(label='Select all overlap objects', c=lambda arg: self.exec_script(exec_name='select_all_overlap'))
+        cmds.menuItem(divider=1, dividerLabel='Delete')
         cmds.menuItem(label='Delete overlap objects', c=lambda arg: self.exec_script(exec_name='delete_overlap'))
-        #cmds.menuItem(divider=1, dividerLabel='automation')
-        #cmds.menuItem(label='Save selected instant overlap', c='')
-        #cmds.menuItem(divider=1, dividerLabel='clean up scene')
-        #cmds.menuItem(label='Cleanup', c='')
+        cmds.menuItem(divider=1, dividerLabel='Overlap options')
+        self.element['force_dg_cb'] = cmds.menuItem(cb=1, label='DG evaluation')
+        self.element['blend_ovl_cb'] = cmds.menuItem(cb=0, label='Loop overlap')
+        cmds.menuItem(divider=1, dividerLabel='Bake animation options')
+        self.element['breakdown_cb'] = cmds.menuItem(cb=0, label='Breakdown keys')
 
         cmds.columnLayout(adj=1, w=self.win_width)
         cmds.text(l='{}'.format(self.win_title), al='center', fn='boldLabelFont', bgc=self.color['shadow'], h=15)
@@ -915,9 +970,10 @@ class kf_overlap:
         cmds.setParent('..')
         cmds.setParent('..') # rowColumnLayout
 
-        self.element['bake_anim_bt'] = cmds.button(label='Bake Keyframe', bgc=self.color['highlight'],
+        self.element['bake_anim_bt'] = cmds.button(label='Bake Animation', bgc=self.color['highlight'],
                                                    w=self.win_width * 0.6, h=20,
                                                    c=lambda arg: util.return_none_func())
+
         cmds.text(l='', al='center', fn='boldLabelFont', bgc=self.color['shadow'], h=5)
         cmds.text(l='(c) dex3d.gumroad.com', al='center', fn='smallPlainLabelFont', bgc=self.color['bg'], h=15)
 
