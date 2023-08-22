@@ -936,13 +936,6 @@ class kf_overlap:
                   w=self.win_width * 0.6, h=12)
         self.element['dynamic_fs'] = cmds.floatSlider(minValue=0, maxValue=6, value=3, w=self.win_width*0.56)
         cmds.setParent('..')
-        cmds.text(l='Shift :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
-        self.element['offset_ff'] = cmds.floatField(editable=1, value=0, pre=1, min=-5, max=5, w=self.win_width * 0.14)
-        cmds.columnLayout()
-        cmds.text(l='{0}  {2}  {1}'.format('lead', 'follow', ' ' * 4), fn='smallFixedWidthFont',
-                  w=self.win_width * 0.6, h=12)
-        self.element['offset_fs'] = cmds.floatSlider(minValue=-5, maxValue=5, value=0, w=self.win_width*0.56)
-        cmds.setParent('..')
         cmds.text(l='Smooth :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
         self.element['smooth_ff'] = cmds.floatField(editable=1, value=2.0, pre=1, min=1.0, max=3.0,
                                                     w=self.win_width * 0.14)
@@ -951,6 +944,14 @@ class kf_overlap:
                   w=self.win_width * 0.6, h=12)
         self.element['smooth_fs'] = cmds.floatSlider(minValue=1.0, maxValue=3.0, value=2.0, w=self.win_width * 0.56)
         cmds.setParent('..')
+        cmds.text(l='Shift :', w=self.win_width * 0.25, fn='smallFixedWidthFont', al='right')
+        self.element['offset_ff'] = cmds.floatField(editable=1, value=0, pre=1, min=-5, max=5, w=self.win_width * 0.14)
+        cmds.columnLayout()
+        cmds.text(l='{0}  {2}  {1}'.format('lead', 'follow', ' ' * 4), fn='smallFixedWidthFont',
+                  w=self.win_width * 0.6, h=12)
+        self.element['offset_fs'] = cmds.floatSlider(minValue=-5, maxValue=5, value=0, w=self.win_width*0.56)
+        cmds.setParent('..')
+
         cmds.setParent('..')  # rowColumnLayout
 
         cmds.text(l='', al='center', fn='boldLabelFont', bgc=self.color['bg'], h=10)
