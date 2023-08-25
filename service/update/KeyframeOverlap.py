@@ -4,6 +4,8 @@
 # =================================
 # Only use on $usr_orig$ machine
 # =================================
+# END USER LICENSE AGREEMENT (EULA)
+# =================================
 
 import maya.cmds as cmds
 from maya import mel
@@ -1116,4 +1118,6 @@ class kf_overlap:
 
 # =================================
 # Only use on $usr_orig$ machine
+# =================================
+# END USER LICENSE AGREEMENT (EULA)
 # =================================

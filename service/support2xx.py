@@ -312,6 +312,7 @@ def update_version():
 
     u_read = change_variable(u_read, 'self.is_trial', ['self.i_s__t_r_i_a_l', 'self.is_Te_st', 'self.is_Te_st_us_er', 'self.is_Te_st_us_er'])
     u_read = change_variable(u_read, 'self.is_connected', ['self.has_information_highway', 'self.is_online', 'self.is_connected'])
+    u_read = change_variable(u_read, 'self.is_lapsed', ['self.is_lapsed', 'self.was_lapsed', 'self.is_out_of_date'])
 
     #print(u_read)
     write_path = base_dir + os.sep + 'test_update.txt' if 'assetRepo' in base_dir else script_path
