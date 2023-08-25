@@ -537,7 +537,7 @@ class loc_delay_system:
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.04
+        self.version = 2.05
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
@@ -674,11 +674,7 @@ class kf_overlap:
         cmds.floatSlider(self.element['bakekeys_fs'], e=1, v=bakekeys_v)
 
     def exec_script(self, exec_name=''):
-        param = self.get_captured_param()
-        param['select_ls'] = cmds.ls(long=1, sl=1)
-        #print('------- Params -------\n{}\n----------------------'.format(json.dumps(param, indent=4)))
         self.update_usr_cfg()
-
         def lds_generate_overlap(param):
             print('Generate Overlap')
             evaluation = cmds.evaluationManager(q=1, mode=1)[0]
@@ -725,8 +721,14 @@ class kf_overlap:
                 cmds.select(self.lds.sets_name)
 
         if exec_name == 'overlap':
+            param = self.get_captured_param()
+            param['select_ls'] = cmds.ls(long=1, sl=1)
+            #print('------- Params -------\n{}\n----------------------'.format(json.dumps(param, indent=4)))
             verify_update(); lds_generate_overlap(param)
         elif exec_name == 'bake_anim':
+            param = self.get_captured_param()
+            param['select_ls'] = cmds.ls(long=1, sl=1)
+            #print('------- Params -------\n{}\n----------------------'.format(json.dumps(param, indent=4)))
             verify_update(); lds_bake_animation(param)
         elif exec_name == 'verify_update':
             verify_update()
