@@ -723,12 +723,10 @@ class kf_overlap:
         if exec_name == 'overlap':
             param = self.get_captured_param()
             param['select_ls'] = cmds.ls(long=1, sl=1)
-            #print('------- Params -------\n{}\n----------------------'.format(json.dumps(param, indent=4)))
             verify_update(); lds_generate_overlap(param)
         elif exec_name == 'bake_anim':
             param = self.get_captured_param()
             param['select_ls'] = cmds.ls(long=1, sl=1)
-            #print('------- Params -------\n{}\n----------------------'.format(json.dumps(param, indent=4)))
             verify_update(); lds_bake_animation(param)
         elif exec_name == 'verify_update':
             verify_update()
@@ -855,10 +853,29 @@ class kf_overlap:
 
     def win_layout_activation(self):
         cmds.columnLayout(adj=1, w=self.win_width)
-        cmds.text(l='{}'.format(self.win_title), al='center', fn='boldLabelFont', bgc=self.color['yellow'], h=15)
+        cmds.text(l='{}'.format(self.win_title), al='center', fn='boldLabelFont', bgc=self.color['shadow'], h=15)
         cmds.text(l='', fn='smallPlainLabelFont', al='center', h=10, w=self.win_width)
-        cmds.button(label='update verification', bgc=self.color['highlight'], w=self.win_width * .33, c=lambda arg: self.exec_script(exec_name='verify_update'))
+        cmds.button(label='Update Verification', bgc=self.color['red'], w=self.win_width * .33, c=lambda arg: self.exec_script(exec_name='verify_update'))
         cmds.text(l='', fn='smallPlainLabelFont', al='center', h=10, w=self.win_width)
+
+    def init_layout_func(self):
+        cmds.optionMenu(self.element['preset_om'], e=1, cc=lambda arg: self.load_preset())
+        cmds.optionMenu(self.element['mode_om'], e=1, cc=lambda arg: self.update_ui())
+        cmds.button(self.element['save_ps_bt'], e=1, c=lambda arg: self.save_preset())
+        cmds.button(self.element['rename_ps_bt'], e=1, c=lambda arg: self.rename_preset())
+        cmds.button(self.element['del_ps_bt'], e=1, c=lambda arg: self.delete_preset())
+        cmds.floatSlider(self.element['distance_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
+        cmds.floatSlider(self.element['dynamic_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
+        cmds.floatSlider(self.element['offset_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
+        cmds.floatSlider(self.element['smooth_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
+        cmds.floatSlider(self.element['bakekeys_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
+        cmds.floatField(self.element['distance_ff'], e=1, cc=lambda arg: self.field_to_slider())
+        cmds.floatField(self.element['dynamic_ff'], e=1, cc=lambda arg: self.field_to_slider())
+        cmds.floatField(self.element['offset_ff'], e=1, cc=lambda arg: self.field_to_slider())
+        cmds.floatField(self.element['smooth_ff'], e=1, cc=lambda arg: self.field_to_slider())
+        cmds.floatField(self.element['bakekeys_ff'], e=1, cc=lambda arg: self.field_to_slider())
+        cmds.button(self.element['overlap_bt'], e=1,bgc=self.color['yellow'], c=lambda arg: self.exec_script(exec_name='overlap'))
+        cmds.button(self.element['bake_anim_bt'], e=1, bgc=self.color['yellow'], c=lambda arg: self.exec_script(exec_name='bake_anim'))
 
     '''======================='''
     # init window and layout
@@ -983,27 +1000,7 @@ class kf_overlap:
         '''======================='''
         # init ui function
         '''======================='''
-        if not self.is_lapsed and (self.is_connected or self.user_original == self.user_latest):
-            self.init_layout_func()
-
-    def init_layout_func(self):
-        cmds.optionMenu(self.element['preset_om'], e=1, cc=lambda arg: self.load_preset())
-        cmds.optionMenu(self.element['mode_om'], e=1, cc=lambda arg: self.update_ui())
-        cmds.button(self.element['save_ps_bt'], e=1, c=lambda arg: self.save_preset())
-        cmds.button(self.element['rename_ps_bt'], e=1, c=lambda arg: self.rename_preset())
-        cmds.button(self.element['del_ps_bt'], e=1, c=lambda arg: self.delete_preset())
-        cmds.floatSlider(self.element['distance_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
-        cmds.floatSlider(self.element['dynamic_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
-        cmds.floatSlider(self.element['offset_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
-        cmds.floatSlider(self.element['smooth_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
-        cmds.floatSlider(self.element['bakekeys_fs'], e=1, dc=lambda arg: self.update_ui(slider=True))
-        cmds.floatField(self.element['distance_ff'], e=1, cc=lambda arg: self.field_to_slider())
-        cmds.floatField(self.element['dynamic_ff'], e=1, cc=lambda arg: self.field_to_slider())
-        cmds.floatField(self.element['offset_ff'], e=1, cc=lambda arg: self.field_to_slider())
-        cmds.floatField(self.element['smooth_ff'], e=1, cc=lambda arg: self.field_to_slider())
-        cmds.floatField(self.element['bakekeys_ff'], e=1, cc=lambda arg: self.field_to_slider())
-        cmds.button(self.element['overlap_bt'], e=1,bgc=self.color['yellow'], c=lambda arg: self.exec_script(exec_name='overlap'))
-        cmds.button(self.element['bake_anim_bt'], e=1, bgc=self.color['yellow'], c=lambda arg: self.exec_script(exec_name='bake_anim'))
+        if (not self.is_lapsed and not self.is_trial) and (self.is_connected or self.user_original == self.user_latest):  self.init_layout_func();
 
     def show_win(self):
         cmds.showWindow(self.win_id)
