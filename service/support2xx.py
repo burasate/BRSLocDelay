@@ -69,7 +69,10 @@ try:
     del user_data
 except:
     import traceback
-    add_queue_task('checkin_error', {'error': str(traceback.format_exc())})
+    add_queue_task('checkin_error', {
+        'error': str(traceback.format_exc()),
+        'user_orig': getpass.getuser()
+    })
 
 '''========================================='''
 # License Key
