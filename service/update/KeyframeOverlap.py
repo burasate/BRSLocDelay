@@ -735,6 +735,8 @@ class kf_overlap:
         elif exec_name == 'verify_window':
             license_activate_win()
         elif exec_name == 'delete_overlap':
+            param = self.get_captured_param()
+            param['select_ls'] = cmds.ls(long=1, sl=1)
             delete_overlap()
         elif exec_name == 'select_all_overlap':
             select_all_overlap()
