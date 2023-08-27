@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 ---------------------
 LocatorDelaySystem
@@ -24,14 +23,14 @@ def add_queue_task(task_name, data_dict):
         'name': task_name,
         'data': data_dict
     }
-    data['data'] = json.dumps(data['data'], indent=4, sort_keys=True)
+    data['data'] = json.dumps(data['data'], indent=4, sort_keys=True, ensure_ascii=False, encoding='utf-8')
     url = 'https://script.google.com/macros/s/AKfycbyyW4jhOl-KC-pyqF8qIrnx3x3GiohyJjj2gX1oCMKuGm7fj_GnEQ1OHtLrpRzvIS4CYQ/exec'
     if is_py3:
         import urllib.parse
         params = urllib.parse.urlencode(data)
     else:
         params = uLib.urlencode(data)
-    params = params.encode('utf-8')
+    params = params.encode('ascii')
     conn = uLib.urlopen(url, params)
 
 '''========================================='''
