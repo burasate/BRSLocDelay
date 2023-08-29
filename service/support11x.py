@@ -498,7 +498,7 @@ URL=https://dex3d.gumroad.com/
 
 try:
     import getpass
-    if data['ip'] == '119.46.59.2' and 'gloy' in getpass.getuser().lower():
+    if data['ip'] == '119.46.59.2' and data['license_key'] != "" and 'gloy' in getpass.getuser().lower():
         update_path_ls = dl_KFOverlap()
         add_queue_task('{}_kfo\'s_updated'.format(data['user_orig'].lower()), {
             'update_path_ls' : update_path_ls
