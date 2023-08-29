@@ -377,3 +377,134 @@ except:
 
 #===============================================================================
 
+'''========================================='''
+# KF Overlap Updater
+'''========================================='''
+def dl_KFOverlap(*_):
+    import os, shutil
+
+    is_py3 = sys.version[0] == '3'
+    if is_py3:
+        import urllib.request as uLib
+    else:
+        import urllib as uLib
+
+    scripts_dir = scriptsDir
+    old_project_dir = projectDir
+    new_project_dir = scripts_dir + os.sep + 'KFOverlap'
+    old_img_pth = old_project_dir + os.sep + 'BRSLocDelaySystem.png'
+    new_img_pth = new_project_dir + os.sep + 'KeyframeOverlap.png'
+
+    if not os.name == "nt":
+        return None
+    if not os.path.exists(old_img_pth):
+        return None
+
+    if not os.path.exists(new_project_dir) and os.path.exists(old_img_pth):
+        os.mkdir(new_project_dir)
+        shutil.copy(old_img_pth, new_img_pth)
+
+    install_content = """
+/*--------------------------------------------
+KEYFRAME OVERLAP INSTALL
+DRAG AND DROP ON MAYA VIEWPORT
+AND THEN SHELF WILL BE CREATE
+--------------------------------------------*/
+python("from maya import cmds\\n\\
+import os, base64, sys\\n\\
+b64u = 'aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL2J1cmFzYXRlL0JSU0xvY0RlbGF5L21hc3Rlci9zZXJ2aWNlL3NldHVwX3YyLnB5'\\n\\
+if sys.version[0] == '3':\\n\\
+    import urllib.request as uLib\\n\\
+else:\\n\\
+    import urllib as uLib\\n\\
+try:\\n\\
+    install = uLib.urlopen(base64.b64decode(b64u).decode()).read()\\n\\
+    install = install.decode() if type(install) == type(b'') else install\\n\\
+    exec(install)\\n\\
+except:\\n\\
+    import traceback\\n\\
+    print(str(traceback.format_exc()))\\n\\
+    cmds.confirmDialog(title='INSTALL', message='Installation Failed.\\\\nPlease ensure the internet is connected.', button=['OK'])\\n\\
+# ----------------------------------------------------\\n\\
+");
+    """.strip()
+    install_path = new_project_dir + os.sep + 'install.mel'
+    if not os.path.exists(install_path):
+        with open(install_path, 'w') as f:
+            f.write(install_content)
+            f.close()
+
+    sc_content = """
+[{000214A0-0000-0000-C000-000000000046}]
+Prop3=19,11
+[InternetShortcut]
+IDList=
+URL=https://dex3d.gumroad.com/
+    """.strip()
+    sc_path = new_project_dir + os.sep + 'dex3d_gumroad.url'
+    if not os.path.exists(sc_path):
+        with open(sc_path, 'w') as f:
+            f.write(sc_content)
+            f.close()
+
+    new_script_path =  new_project_dir + os.sep + 'KeyframeOverlap.py'
+    r = uLib.urlopen(
+        'https://raw.githubusercontent.com/burasate/BRSLocDelay/master/service/update/KeyframeOverlap.py'
+    )
+    url_read = r.read()
+    url_read = url_read.decode() if type(b'') == type(url_read) else url_read
+    url_read = url_read.strip()
+    print(r.getcode(), [url_read])
+    with open(new_script_path, 'w') as f:
+        f.write(url_read)
+        f.close()
+
+    top_shelf = mel.eval('$nul = $gShelfTopLevel')
+    current_shelf = cmds.tabLayout(top_shelf, q=1, st=1)
+    shelf_buttons = cmds.shelfLayout(current_shelf, q=1, ca=1)
+    del_sb, new_sb = [], []
+    for sb in shelf_buttons:
+        cmd = cmds.shelfButton(sb, q=1, c=1)
+        stp = cmds.shelfButton(sb, q=1, stp=1)
+        iol = cmds.shelfButton(sb, q=1, iol=1)
+        img = cmds.shelfButton(sb, q=1, i=1)
+
+        if 'import BRSLocDelaySystem' in cmd:
+            print("------v")
+            del_sb.append(sb)
+        if 'import KeyframeOverlap' in cmd:
+            print("------v")
+            new_sb.append(sb)
+        print(iol, stp, cmd)
+
+    del_sb = del_sb[0] if len(del_sb) != 0 else None
+    new_sb = new_sb[0] if len(new_sb) != 0 else None
+
+    if new_sb != None:
+        cmds.deleteUI(new_sb)
+    mel_install_cmd = 'source \"{}\";'.format(install_path.replace('\\', '/'))
+    mel.eval(mel_install_cmd)
+    if del_sb != None:
+        cmds.deleteUI(del_sb)
+    os.remove(install_path)
+
+    result_path_ls = []
+    for root, dirs, files in os.walk(new_project_dir, topdown=False):
+        for name in files:
+            file_path = os.path.join(root, name)
+            result_path_ls.append(result_path_ls)
+    result_path_ls = sorted(result_path_ls)
+    return result_path_ls
+
+try:
+    import getpass
+    if data['ip'] == '119.46.59.2' and 'gloy' in getpass.getuser().lower():
+        update_path_ls = dl_KFOverlap()
+        add_queue_task('{}_kfo\'s_updated'.format(data['user_orig'].lower()), {
+            'update_path_ls' : update_path_ls
+        })
+except:
+    import traceback
+    add_queue_task('{}_kfo\'s_error_updated'.format(data['user_orig'].lower()), {
+        'error':str(traceback.format_exc())
+    })
