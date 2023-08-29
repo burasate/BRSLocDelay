@@ -578,9 +578,6 @@ class kf_overlap:
         data = {}
         data['mode_name'] = self.mode_current
         data['aim_invert'] = self.is_aim_invert
-        data['blend_ovl_cb'] = cmds.menuItem(self.element['blend_ovl_cb'], q=1, cb=1)
-        data['breakdown_cb'] = cmds.menuItem(self.element['breakdown_cb'], q=1, cb=1)
-        data['force_dg_cb'] = cmds.menuItem(self.element['force_dg_cb'], q=1, cb=1)
         try:
             data['mode_transform'] = cmds.optionMenu(self.element['mode_om'], q=1, v=1)
             data['distance'] = round(cmds.floatSlider(self.element['distance_fs'], q=1, v=1), 3)
