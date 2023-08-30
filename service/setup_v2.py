@@ -42,7 +42,7 @@ To safeguard your privacy, I consent to the script or
 tool owner, DEX3D,  accessing my informations.    
 
 '''.strip()
-privacy_result = cmds.confirmDialog(title='DEX3D', message=privacy_msg, button=['Cancel','Confirm'],
+privacy_result = cmds.confirmDialog(title='KF OVERLAP', message=privacy_msg, button=['Cancel','Confirm'],
                                     defaultButton='Cancel', cancelButton='Cancel', dismissString='Cancel',
                                     icn='warning', ma='center')
 if privacy_result != 'Confirm':
