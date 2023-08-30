@@ -18,7 +18,35 @@ print(install_path, os.path.exists(install_path))
 print(image_path)
 
 if not os.path.exists(tool_dir) or not os.path.exists(install_path):
+    error_msg = '''
+    -------------------------------------------------------------
+    Something went wrong about the installation.
+    -------------------------------------------------------------
+
+    please ensure the directory is placed correctly.
+    e.g. {0}
+
+    '''.format(tool_dir).strip()
+    cmds.confirmDialog(title='', message=error_msg, button=['OK'], icn='critical', ma='center')
     raise Warning('WARNING!!\ndo not found \"Install.mel\" in {}'.format(tool_dir))
+
+"""====================="""
+# Privacy Message
+"""====================="""
+privacy_msg = '''
+-------------------------------------------------------------
+Privacy Confirmation
+-------------------------------------------------------------
+
+To safeguard your privacy, I consent to the script or
+tool owner, DEX3D,  accessing my informations.    
+
+'''.strip()
+privacy_result = cmds.confirmDialog(title='DEX3D', message=privacy_msg, button=['Cancel','Confirm'],
+                                    defaultButton='Cancel', cancelButton='Cancel', dismissString='Cancel',
+                                    icn='warning', ma='center')
+if privacy_result != 'Confirm':
+    raise Warning('Installaition was canceled.')
 
 """====================="""
 # Orig User Register to Files
