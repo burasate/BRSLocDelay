@@ -539,7 +539,7 @@ class loc_delay_system:
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.05
+        self.version = 2.06
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
@@ -756,6 +756,8 @@ class kf_overlap:
             self.is_trial = self.license_verify[0] == ''
             if self.is_trial:
                 self.gr_license.show_ui()
+        elif bool(self.usr_data['license_key']):
+            self.is_trial = not bool(1)
         if self.is_trial and (self.user_original != self.user_latest or self.is_lapsed):
             self.win_layout = self.win_layout_activation
 
