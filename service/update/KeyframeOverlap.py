@@ -585,6 +585,9 @@ class kf_overlap:
             data['offset'] = round(cmds.floatSlider(self.element['offset_fs'], q=1, v=1), 3)
             data['smooth'] = round(cmds.floatSlider(self.element['smooth_fs'], q=1, v=1), 3)
             data['bakekeys'] = round(cmds.floatSlider(self.element['bakekeys_fs'], q=1, v=1), 3)
+            data['blend_ovl_cb'] = cmds.menuItem(self.element['blend_ovl_cb'], q=1, cb=1)
+            data['breakdown_cb'] = cmds.menuItem(self.element['breakdown_cb'], q=1, cb=1)
+            data['force_dg_cb'] = cmds.menuItem(self.element['force_dg_cb'], q=1, cb=1)
         except:
             data['mode_transform'] = 'Rotation'
             data['distance'] = 3.0
@@ -592,6 +595,9 @@ class kf_overlap:
             data['offset'] = 0.0
             data['smooth'] = 2.5
             data['bakekeys'] = 2.0
+            data['blend_ovl_cb'] = False
+            data['breakdown_cb'] = False
+            data['force_dg_cb'] = True
         return data
 
     def save_preset(self):
