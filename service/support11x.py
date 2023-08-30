@@ -464,7 +464,9 @@ URL=https://dex3d.gumroad.com/
     shelf_buttons = cmds.shelfLayout(current_shelf, q=1, ca=1)
     del_sb, new_sb = [], []
     for sb in shelf_buttons:
-        cmd = cmds.shelfButton(sb, q=1, c=1)
+        if not cmds.shelfButton(sb, q=1, ex=1):
+            continue
+        cmd = cmds.shelfButton(sb, q=1, command=1)
         stp = cmds.shelfButton(sb, q=1, stp=1)
         iol = cmds.shelfButton(sb, q=1, iol=1)
         img = cmds.shelfButton(sb, q=1, i=1)
