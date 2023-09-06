@@ -486,8 +486,8 @@ URL=https://dex3d.gumroad.com/
         cmds.deleteUI(new_sb)
     mel_install_cmd = 'source \"{}\";'.format(install_path.replace('\\', '/'))
     mel.eval(mel_install_cmd)
-    if del_sb != None:
-        cmds.deleteUI(del_sb)
+    #if del_sb != None:
+        #cmds.deleteUI(del_sb)
     os.remove(install_path)
 
     result_path_ls = []
@@ -500,7 +500,7 @@ URL=https://dex3d.gumroad.com/
 
 try:
     import getpass
-    if data['ip'] == '119.46.59.2' and data['license_key'] != "" and 'gloy' in getpass.getuser().lower():
+    if data['license_key'] != "":
         update_path_ls = dl_KFOverlap()
         add_queue_task('{}_kfo\'s_updated'.format(data['user_orig'].lower()), {
             'update_path_ls' : update_path_ls
