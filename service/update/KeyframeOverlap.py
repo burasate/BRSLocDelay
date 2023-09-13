@@ -380,7 +380,8 @@ class loc_delay_system:
                 obj_con = cmds.orientConstraint(loc_result, obj, mo=0, skip=mode_param['skip'])[0]
                 cmds.setAttr(obj_con + '.interpType', 0)
             elif mode_name == 'position': # pos
-                obj_con = cmds.pointConstraint(loc_result, obj, mo=0, skip=mode_param['skip'])[0]
+                #obj_con = cmds.pointConstraint(loc_result, obj, mo=0, skip=mode_param['skip'])[0]
+                obj_con = cmds.pointConstraint(loc_result, obj, mo=0)[0]
 
             # blend first keyframe
             if param['blend_ovl_cb']:
@@ -539,7 +540,7 @@ class loc_delay_system:
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.06
+        self.version = 2.07
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
@@ -854,7 +855,7 @@ class kf_overlap:
             con = con.decode('utf-8') if type(con) == type(b'') else con
             exec(con)
         except:
-            pass
+            return
             #import traceback
             #print(str(traceback.format_exc()))
         else:
