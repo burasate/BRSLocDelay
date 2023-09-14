@@ -442,7 +442,7 @@ class loc_delay_system:
         # bake object animation
         cmds.refresh(suspend=1)
         cmds.bakeResults(at_ls, simulation=1, sampleBy=1, disableImplicitControl=1,
-                         preserveOutsideKeys=0, sparseAnimCurveBake=0, t=(timeline[0], timeline[1]),
+                         preserveOutsideKeys=1, sparseAnimCurveBake=0, t=(timeline[0], timeline[1]),
                          oversamplingRate=1, minimizeRotation=1)
         cmds.refresh(suspend=0)
 
