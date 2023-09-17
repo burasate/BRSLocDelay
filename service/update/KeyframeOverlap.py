@@ -68,6 +68,8 @@ class util:
 
     @staticmethod
     def get_object_size(obj):
+        if cmds.listRelatives(obj, shapes=1, f=1) == None:
+            return [1, 1, 1]
         shp = cmds.listRelatives(obj, shapes=1, f=1)[0]
         bbox = cmds.exactWorldBoundingBox(shp)
         min_x, min_y, min_z, max_x, max_y, max_z = bbox
