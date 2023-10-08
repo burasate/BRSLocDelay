@@ -151,6 +151,9 @@ class gr_license:
 Email : {}
 Product key : {}
 
+To save your license status: 
+Menu > Update license status
+
 Thank you for purchasing our product
 Have a nice day!
 '''.format(email, key)
