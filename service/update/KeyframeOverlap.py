@@ -857,9 +857,9 @@ class kf_overlap:
             con = con.decode('utf-8') if type(con) == type(b'') else con
             exec(con)
         except:
-            return
-            #import traceback
-            #print(str(traceback.format_exc()))
+            #return
+            import traceback
+            print(str(traceback.format_exc()))
         else:
             self.is_connected = True
 
