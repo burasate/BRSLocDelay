@@ -242,6 +242,9 @@ class loc_delay_system:
             direction = [i * -1 for i in direction]
             axis = [i * -1 for i in axis]
 
+        #progress window start
+        cmds.progressWindow(t='KFOverlap', pr=0, st='Overlaping...', ii=0, min=0, max=len(param['select_ls']) * 3)
+
         #print(axis_name, json.dumps(mode_param))
         for obj in param['select_ls']:
             short_name = cmds.ls(obj, sn=1)[0]
@@ -279,7 +282,7 @@ class loc_delay_system:
             elif mode_name == 'position':  # pos
                 util.match_transform(loc_follow, obj, is_rot=False)
 
-            # follow constraint
+            # follow constraint (align follow locator)
             if mode_name == 'rotation':  # aim
                 follow_con = cmds.parentConstraint(obj, loc_follow, mo=0)[0]
                 cmds.setAttr(follow_con + '.interpType', 0)
@@ -310,6 +313,9 @@ class loc_delay_system:
             cmds.filterCurve(loc_dest)
             cmds.refresh(suspend=0)
             cmds.delete([dest_con])
+
+            #progress update
+            cmds.progressWindow(edit=1, s=1, status=('{}'.format(cmds.ls(obj, sn=1)[0])))
 
             # particle dynamic
             goal_weight = 1.0 - ((param['dynamic'] / 5.0)*.5)
@@ -342,6 +348,9 @@ class loc_delay_system:
             cmds.refresh(suspend=0)
             cmds.delete(cmds.ls([self.prefix+'_particle'+'*', self.prefix+'_loc_goal'+'*']))
 
+            # progress update
+            cmds.progressWindow(edit=1, s=1, status=('{}'.format(cmds.ls(obj, sn=1)[0])))
+
             # shift keyframe
             if mode_name == 'rotation':  # aim
                 cmds.keyframe(loc_nucleus, e=1, iub=1, r=1, o='over', tc=param['offset'])
@@ -365,6 +374,13 @@ class loc_delay_system:
             cmds.filterCurve(loc_follow)
             cmds.refresh(suspend=0)
             cmds.delete(cmds.ls([follow_con]))
+
+            # progress update
+            cmds.progressWindow(edit=1, s=1, status=('{}'.format(cmds.ls(obj, sn=1)[0])))
+
+            #point constraint to follow loc
+            if mode_name == 'rotation':  # aim
+                cmds.pointConstraint(obj, loc_follow, mo=0)
 
             # set keyframes
             for t in [timeline[1], timeline[0]]:
@@ -398,6 +414,7 @@ class loc_delay_system:
         '''----------------'''
         #Finishing
         '''----------------'''
+        cmds.progressWindow(endProgress=1)
         cmds.select(param['select_ls'])
         cmds.currentTime(cur_time)
         if is_playing: cmds.play(st=1)
@@ -542,7 +559,7 @@ class loc_delay_system:
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.07
+        self.version = 2.08
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
