@@ -9,7 +9,9 @@ import os, json, sys, getpass
 # Init
 """====================="""
 print(__file__)
-maya_app_dir = mel.eval('getenv MAYA_APP_DIR')
+print(os.path.dirname(os.path.abspath(__file__)))
+#maya_app_dir = mel.eval('getenv MAYA_APP_DIR')
+
 scripts_dir = os.path.abspath(maya_app_dir + os.sep + 'scripts')
 tool_dir = os.path.abspath(scripts_dir + os.sep + 'KFOverlap')
 install_path = os.path.abspath(tool_dir + os.sep + 'Install.mel')
