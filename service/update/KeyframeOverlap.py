@@ -55,7 +55,29 @@ class util:
         return loc
 
     @staticmethod
+    def parent_constraint(object, target, translate=True, rotate=True, maintain_offset=False):
+        translate_at = {'translateX': 'x', 'translateY': 'y', 'translateZ': 'z'}
+        rotate_at = {'rotateX': 'x', 'rotateY': 'y', 'rotateZ': 'z'}
+        t_at = [a for a in cmds.listAttr(object, k=True) if a in list(translate_at)]
+        r_at = [a for a in cmds.listAttr(object, k=True) if a in list(rotate_at)]
+        skip_t_at = [translate_at[a] for a in list(translate_at) if not a in t_at]
+        skip_r_at = [rotate_at[a] for a in list(rotate_at) if not a in r_at]
+        con_ls = []
+        if translate:
+            try:
+                point_con = cmds.pointConstraint(target, object, weight=1.0, mo=maintain_offset, skip=skip_t_at)
+            except:pass
+            else:con_ls.append(point_con[0]);
+        if rotate:
+            try:
+                orient_con = cmds.orientConstraint(target, object, weight=1.0, mo=maintain_offset, skip=skip_r_at)
+            except:pass
+            else:con_ls.append(orient_con[0]);
+        return con_ls
+
+    @staticmethod
     def match_transform(src, dst, is_rot=True, is_pos=True):
+        '''
         rotate_order_ls = ['xyz', 'yzx', 'zxy', 'xzy', 'yxz', 'zyx']
         roo_idx = int(cmds.getAttr(dst+'.rotateOrder'))
         pos = cmds.xform(dst, q=1, ws=1, t=1)
@@ -65,6 +87,16 @@ class util:
         if is_pos:
             cmds.xform(src, t=pos, ws=1)
         #print([rotate_order_ls[roo_idx], pos, rot])
+        '''
+        loc = cmds.spaceLocator()[0]
+        cmds.parent(loc, dst, relative=1)
+        cmds.parent(loc, world=1)
+        con_ls = []
+        if is_rot:
+            con_ls += util.parent_constraint(src, loc, translate=False, rotate=True)
+        if is_pos:
+            con_ls += util.parent_constraint(src, loc, translate=True, rotate=False)
+        cmds.delete(con_ls + [loc])
 
     @staticmethod
     def get_object_size(obj):
@@ -199,7 +231,8 @@ class loc_delay_system:
 
                 # blend weight
                 blend_len = int(round(len(tc_ls) * .4))
-                blend_len = len(ext_tc_ls) if blend_len > len(ext_tc_ls) else blend_len
+                #blend_len = len(ext_tc_ls) if blend_len > len(ext_tc_ls) else blend_len
+                blend_len = 7 if blend_len > 7 else blend_len
                 weight_ls = [round(util.lerp(1.0, 0.0, i/float(len(tc_ls[:blend_len]))),2) for i in range(len(tc_ls[:blend_len]))]
                 weight_ls = weight_ls + [0.0 for i in range(len(tc_ls[blend_len:]))]
                 #print('len', len(tc_ls[:blend_len]), tc_ls[:blend_len])
@@ -284,15 +317,15 @@ class loc_delay_system:
 
             # follow constraint (align follow locator)
             if mode_name == 'rotation':  # aim
-                follow_con = cmds.parentConstraint(obj, loc_follow, mo=0)[0]
+                follow_con = cmds.parentConstraint(obj, loc_follow, mo=1)[0]
                 cmds.setAttr(follow_con + '.interpType', 0)
             elif mode_name == 'position':  # pos
-                follow_con = cmds.pointConstraint(obj, loc_follow, mo=0)[0]
+                follow_con = cmds.pointConstraint(obj, loc_follow, mo=1)[0]
             #print(follow_con)
 
             # move to direction and unparent
             if mode_name == 'rotation':  # aim
-                cmds.xform(loc_dest, t=direction, r=1)
+                cmds.xform(loc_dest, t=direction, r=1, os=1)
                 cmds.parent(loc_dest, world=1)
             elif mode_name == 'position':  # pos
                 cmds.parent(loc_dest, world=1)
@@ -360,7 +393,7 @@ class loc_delay_system:
 
             # constraint mode
             if mode_name == 'rotation': # aim
-                result_con = cmds.aimConstraint(loc_nucleus, loc_result, mo=1, aimVector=axis, worldUpType='object')[0]
+                result_con = cmds.aimConstraint(loc_nucleus, loc_result, mo=1, aimVector=axis, worldUpType='none')[0]
             elif mode_name == 'position': # pos
                 result_con = cmds.pointConstraint(loc_nucleus, loc_result, mo=0, skip=mode_param['skip'])[0]
             #print(result_con)
@@ -395,11 +428,11 @@ class loc_delay_system:
             if exists_con != None:
                 cmds.delete(exists_con)
             if mode_name == 'rotation': # aim
-                obj_con = cmds.orientConstraint(loc_result, obj, mo=0, skip=mode_param['skip'])[0]
+                obj_con = cmds.orientConstraint(loc_result, obj, mo=1, skip=mode_param['skip'])[0]
                 cmds.setAttr(obj_con + '.interpType', 0)
             elif mode_name == 'position': # pos
                 #obj_con = cmds.pointConstraint(loc_result, obj, mo=0, skip=mode_param['skip'])[0]
-                obj_con = cmds.pointConstraint(loc_result, obj, mo=0)[0]
+                obj_con = cmds.pointConstraint(loc_result, obj, mo=1)[0]
 
             # blend first keyframe
             if param['blend_ovl_cb']:
@@ -460,9 +493,14 @@ class loc_delay_system:
 
         # bake object animation
         cmds.refresh(suspend=1)
-        cmds.bakeResults(at_ls, simulation=1, sampleBy=1, disableImplicitControl=1,
-                         preserveOutsideKeys=1, sparseAnimCurveBake=0, t=(timeline[0], timeline[1]),
-                         oversamplingRate=1, minimizeRotation=1)
+        if param['bake_adapt_cb']: # adaptive bake
+            cmds.bakeResults(at_ls, simulation=1, sampleBy=1, disableImplicitControl=1,
+                             preserveOutsideKeys=1, sparseAnimCurveBake=0, t=(timeline[0], timeline[1]),
+                             oversamplingRate=1, minimizeRotation=1)
+        else:
+            cmds.bakeResults(at_ls, simulation=1, sampleBy=round(param['bakekeys'],0), disableImplicitControl=1,
+                             preserveOutsideKeys=1, sparseAnimCurveBake=0, t=(timeline[0], timeline[1]),
+                             oversamplingRate=1, minimizeRotation=1)
         cmds.refresh(suspend=0)
 
         # get new animcurevs after bake
@@ -482,16 +520,17 @@ class loc_delay_system:
             self.remove_locator_hierarchy(obj)
             self.update_groups()
 
-        fps = scene.get_fps()
-        sample_target = param['bakekeys'] * (fps/24)
-        for ac in ac_ls:
-            key_total = max(tc)-min(tc)+1.0
-            key_n = int(round(key_total/sample_target)) - len(tc)
-            key_n = int(key_total-2) if key_n >= int(key_total-2) else key_n
-            print(ac, key_total, key_n)
-            self.keyframe_optimizer(ac, tc, key_n, breakdown=param['breakdown_cb'])
+        if param['bake_adapt_cb']: # adaptive bake
+            fps = scene.get_fps()
+            sample_target = param['bakekeys'] * (fps/24)
+            for ac in ac_ls:
+                key_total = max(tc)-min(tc)+1.0
+                key_n = int(round(key_total/sample_target)) - len(tc)
+                key_n = int(key_total-2) if key_n >= int(key_total-2) else key_n
+                print(ac, key_total, key_n)
+                self.keyframe_reducer(ac, tc, key_n, breakdown=param['breakdown_cb'])
 
-    def keyframe_optimizer(self, ac, tc, n, breakdown=False):
+    def keyframe_reducer(self, ac, tc, n, breakdown=False):
         def linspace(start, stop, num):
             if (num - 1) == 0.0:
                 step = 0.0
@@ -539,11 +578,18 @@ class loc_delay_system:
             #print(data)
             return data
 
+        err_max = None
         for i in range(n):
-            new_breakdown = get_imp_between(tc)
+            btwn = get_imp_between(tc)
+
+            err_max = btwn['error'] if err_max == None else err_max
+            if err_max == 0.0: continue
+            btwn['error_norm'] = round(btwn['error'] / err_max, 2)
+            # print(err_max, btwn['error'], btwn['error_norm'])
+
             if i == max(range(n)):
-                print(i ,new_breakdown)
-            tc.append(new_breakdown['frame'])
+                print(i, btwn)
+            tc.append(btwn['frame'])
             tc = sorted(tc)
 
         print(ac, 'tc_sel : ', tc)
@@ -559,7 +605,7 @@ class loc_delay_system:
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.08
+        self.version = 2.09
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
@@ -608,6 +654,7 @@ class kf_overlap:
             data['blend_ovl_cb'] = cmds.menuItem(self.element['blend_ovl_cb'], q=1, cb=1)
             data['breakdown_cb'] = cmds.menuItem(self.element['breakdown_cb'], q=1, cb=1)
             data['force_dg_cb'] = cmds.menuItem(self.element['force_dg_cb'], q=1, cb=1)
+            data['bake_adapt_cb'] = cmds.menuItem(self.element['bake_adapt_cb'], q=1, cb=1)
         except:
             data['mode_transform'] = 'Rotation'
             data['distance'] = 3.0
@@ -618,6 +665,7 @@ class kf_overlap:
             data['blend_ovl_cb'] = False
             data['breakdown_cb'] = False
             data['force_dg_cb'] = True
+            data['bake_adapt_cb'] = True
         return data
 
     def save_preset(self):
@@ -939,6 +987,7 @@ class kf_overlap:
         self.element['blend_ovl_cb'] = cmds.menuItem(cb=0, label='Loop overlap')
         cmds.menuItem(divider=1, dividerLabel='Bake animation options')
         self.element['breakdown_cb'] = cmds.menuItem(cb=0, label='Breakdown keys')
+        self.element['bake_adapt_cb'] = cmds.menuItem(cb=0, label='Adaptive bake')
 
         cmds.columnLayout(adj=1, w=self.win_width)
         cmds.text(l='{}'.format(self.win_title), al='center', fn='boldLabelFont', bgc=self.color['shadow'], h=15)
