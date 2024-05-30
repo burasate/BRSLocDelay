@@ -487,26 +487,32 @@ class loc_delay_system:
         min_time, max_time = [timeline[0] - self.pre_post_roll, timeline[1] + self.pre_post_roll]
 
         # orig tc before bake
-        ac_ls = cmds.keyframe(at_ls, q=1, n=1, at=at)
+        ac_ls = cmds.keyframe(at_ls, q=1, n=1, at=at_ls)
         orig_attr_tc = get_attr_tc(at_ls, timeline)
         #print(ac_ls)
 
+        # layer
+        if param['bake_layer_cb']:
+            anim_layer = cmds.animLayer('overlapLayer#', override=1)
+            cmds.setAttr(anim_layer + '.rotationAccumulationMode', 1)
+
         # bake object animation
         cmds.refresh(suspend=1)
-        if param['bake_adapt_cb']: # adaptive bake
+        if param['bake_layer_cb']: # layer
             cmds.bakeResults(at_ls, simulation=1, sampleBy=1, disableImplicitControl=1,
                              preserveOutsideKeys=1, sparseAnimCurveBake=0, t=(timeline[0], timeline[1]),
-                             oversamplingRate=1, minimizeRotation=1)
+                             oversamplingRate=1, minimizeRotation=1, bol=param['bake_layer_cb'], dl=anim_layer)
         else:
-            cmds.bakeResults(at_ls, simulation=1, sampleBy=round(param['bakekeys'],0), disableImplicitControl=1,
+            cmds.bakeResults(at_ls, simulation=1, sampleBy=1, disableImplicitControl=1,
                              preserveOutsideKeys=1, sparseAnimCurveBake=0, t=(timeline[0], timeline[1]),
                              oversamplingRate=1, minimizeRotation=1)
         cmds.refresh(suspend=0)
 
         # get new animcurevs after bake
-        ac_ls = cmds.keyframe(at_ls, q=1, n=1, at=at)
-        #print(ac_ls)
+        ac_ls = cmds.keyframe(at_ls, q=1, n=1, at=at_ls)
+        print(ac_ls)
 
+        '''
         # time change (tc all attribute)
         tc = []
         for i in orig_attr_tc:
@@ -514,6 +520,7 @@ class loc_delay_system:
         tc = sorted(list(set(tc)))
         #print(json.dumps(orig_attr_tc, indent=4))
         #print('tc', tc)
+        '''
 
         # remove locator
         for obj in sn_ls:
@@ -521,91 +528,13 @@ class loc_delay_system:
             self.update_groups()
 
         if param['bake_adapt_cb']: # adaptive bake
-            fps = scene.get_fps()
-            sample_target = param['bakekeys'] * (fps/24)
-            for ac in ac_ls:
-                key_total = max(tc)-min(tc)+1.0
-                key_n = int(round(key_total/sample_target)) - len(tc)
-                key_n = int(key_total-2) if key_n >= int(key_total-2) else key_n
-                print(ac, key_total, key_n)
-                self.keyframe_reducer(ac, tc, key_n, breakdown=param['breakdown_cb'])
-
-    def keyframe_reducer(self, ac, tc, n, breakdown=False):
-        def linspace(start, stop, num):
-            if (num - 1) == 0.0:
-                step = 0.0
-            else:
-                step = (stop - start) / (num - 1)
-            return [start + step * i for i in range(num)]
-
-        tc_orig = tc
-        tc = sorted([int(round(i)) for i in tc])  # kept keyframe list
-        def get_imp_between(tc):
-            tc_window_ls = [tc[i:i + 2] for i in range(len(tc)) if len(tc[i:i + 2]) == 2]
-            diff_win_ls = []
-            len_win_ls = []
-            tc_win_pass_ls = []
-            for tc_win in list(tc_window_ls):
-                if len(tc_window_ls) == len(tc_win_pass_ls):
-                    tc_win_pass_ls = []
-                if not tc_win in tc_win_pass_ls:
-                    tc_win_pass_ls += [tc_win]
-                else: continue
-                #print(tc_win_pass_ls)
-
-                tc_ls = range(tc_win[0], tc_win[1] + 1)
-                #print(ac, cmds.objExists(ac), tc_win)
-                vc_ls = [round(cmds.keyframe(ac, q=1, eval=1, t=(i,))[0], 4) for i in tc_ls]
-                # print(tc_ls)
-                # print('frame length', len(tc_ls))
-                len_win_ls.append(len(tc_ls))
-                # print(vc_ls)
-                lin_vc_ls = linspace(vc_ls[0], vc_ls[-1], len(vc_ls))
-                # print(lin_vc_ls)
-
-                diff_vc_ls = [abs(vc_ls[i] - lin_vc_ls[i]) for i in range(len(tc_ls))]
-                max_idx = diff_vc_ls.index(max(diff_vc_ls))
-                # print(diff_vc_ls)
-                # print(tc_win, tc_ls[max_idx])
-                diff_win_ls.append([diff_vc_ls[max_idx], tc_ls[max_idx]])
-            diff_win_ls = sorted(diff_win_ls)
-            data = {
-                'error': round(diff_win_ls[-1][0], 3),
-                'frame': diff_win_ls[-1][1],
-                'win_avg': round(sum(len_win_ls) / float(len(len_win_ls)), 2),
-                'tc_length': len(tc),
-            }
-            #print(data)
-            return data
-
-        err_max = None
-        for i in range(n):
-            btwn = get_imp_between(tc)
-
-            err_max = btwn['error'] if err_max == None else err_max
-            if err_max == 0.0: continue
-            btwn['error_norm'] = round(btwn['error'] / err_max, 2)
-            # print(err_max, btwn['error'], btwn['error_norm'])
-
-            if i == max(range(n)):
-                print(i, btwn)
-            tc.append(btwn['frame'])
-            tc = sorted(tc)
-
-        print(ac, 'tc_sel : ', tc)
-        tc_ls = range(tc[0], tc[-1] + 1) #total of frames
-        #print(tc_ls)
-        #[cmds.keyframe(ac, e=1, breakdown=0, t=(tc[i],)) for i in range(len(tc))]
-        cmds.keyframe(ac, e=1, breakdown=1) # green keyframe
-        [cmds.cutKey(ac, t=(tc_ls[i],)) for i in range(len(tc_ls)) if not tc_ls[i] in tc]
-        print(ac, 'tc_orig : ', tc_orig)
-        if not breakdown:
-            cmds.keyframe(ac, e=1, breakdown=0)
-        [cmds.keyframe(ac, e=1, breakdown=0, t=(tc_ls[i],)) for i in range(len(tc_ls)) if tc_ls[i] in tc_orig]  # red keyframe
+            precision = (param['bakekeys'] / 4.0) * 10.0
+            cmds.filterCurve(ac_ls, f='keyReducer', selectedKeys=0, precisionMode=1, precision=precision)
+            cmds.selectKey(clear=1)
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.09
+        self.version = 2.10
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
@@ -655,6 +584,7 @@ class kf_overlap:
             data['breakdown_cb'] = cmds.menuItem(self.element['breakdown_cb'], q=1, cb=1)
             data['force_dg_cb'] = cmds.menuItem(self.element['force_dg_cb'], q=1, cb=1)
             data['bake_adapt_cb'] = cmds.menuItem(self.element['bake_adapt_cb'], q=1, cb=1)
+            data['bake_layer_cb'] = cmds.menuItem(self.element['bake_layer_cb'], q=1, cb=1)
         except:
             data['mode_transform'] = 'Rotation'
             data['distance'] = 3.0
@@ -666,6 +596,7 @@ class kf_overlap:
             data['breakdown_cb'] = False
             data['force_dg_cb'] = True
             data['bake_adapt_cb'] = True
+            data['bake_layer_cb'] = False
         return data
 
     def save_preset(self):
@@ -824,7 +755,7 @@ class kf_overlap:
 
     def update_essential_(self):
         if not self.is_connected and self.is_trial:
-            self.support(force=True)
+            self.support(force=False)
         if self.is_connected:
             self.license_verify = self.gr_license.get_license_verify(key=self.usr_data['license_key'])
             self.is_trial = self.license_verify[0] == ''
@@ -987,7 +918,8 @@ class kf_overlap:
         self.element['blend_ovl_cb'] = cmds.menuItem(cb=0, label='Loop overlap')
         cmds.menuItem(divider=1, dividerLabel='Bake animation options')
         self.element['breakdown_cb'] = cmds.menuItem(cb=0, label='Breakdown keys')
-        self.element['bake_adapt_cb'] = cmds.menuItem(cb=0, label='Adaptive bake')
+        self.element['bake_adapt_cb'] = cmds.menuItem(cb=0, label='Reduced keys')
+        self.element['bake_layer_cb'] = cmds.menuItem(cb=0, label='Animation layer')
 
         cmds.columnLayout(adj=1, w=self.win_width)
         cmds.text(l='{}'.format(self.win_title), al='center', fn='boldLabelFont', bgc=self.color['shadow'], h=15)
