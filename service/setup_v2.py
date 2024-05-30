@@ -76,20 +76,22 @@ for pt_path in pt_file_path_ls:
 # Create Shelf
 top_shelf = mel.eval('$nul = $gShelfTopLevel')
 cur_shelf = cmds.tabLayout(top_shelf, q=1, st=1)
+is_py3 = sys.version[0] == '3'
 
-command = '''
+command_py2 = '''
 # -----------------------------------
 # KEYFRAME OVERLAP
 # dex3d.gumroad.com
 # -----------------------------------
-import imp, os, sys
+import os, sys
 # -----------------------------------
 if not r'{0}' in sys.path:
     sys.path.insert(0, r'{0}')
 # -----------------------------------
 try: 
+    import imp
     imp.reload(KeyframeOverlap)
-except:
+except ImportError:
     import KeyframeOverlap
 finally:
     kfo = KeyframeOverlap.kf_overlap()
@@ -97,5 +99,29 @@ finally:
 # -----------------------------------
 '''.format(tool_dir).strip()
 
-cmds.shelfButton(stp='python', iol='Overlap', parent=cur_shelf, ann='KF Overlap', i=image_path, c=command)
+command_py3 = '''
+# -----------------------------------
+# KEYFRAME OVERLAP
+# dex3d.gumroad.com
+# -----------------------------------
+import os, sys
+# -----------------------------------
+if not r'{0}' in sys.path:
+    sys.path.insert(0, r'{0}')
+# -----------------------------------
+try:
+    import importlib
+    KeyframeOverlap = importlib.import_module('KeyframeOverlap')
+except ModuleNotFoundError:
+    import KeyframeOverlap
+finally:
+    kfo = KeyframeOverlap.kf_overlap()
+    kfo.show_ui()
+# -----------------------------------
+'''.format(tool_dir).strip()
+
+if is_py3:
+    cmds.shelfButton(stp='python', iol='Overlap', parent=cur_shelf, ann='KF Overlap', i=image_path, c=command_py3)
+else:
+    cmds.shelfButton(stp='python', iol='Overlap', parent=cur_shelf, ann='KF Overlap', i=image_path, c=command_py2)
 cmds.confirmDialog(title='Keyframe Overlap', message='Installation Successful.', button=['OK'])
