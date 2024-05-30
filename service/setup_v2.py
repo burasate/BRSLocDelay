@@ -109,11 +109,12 @@ import os, sys
 if not r'{0}' in sys.path:
     sys.path.insert(0, r'{0}')
 # -----------------------------------
+import KeyframeOverlap 
 try:
     import importlib
     KeyframeOverlap = importlib.import_module('KeyframeOverlap')
-except ModuleNotFoundError:
-    import KeyframeOverlap
+except:
+    pass
 finally:
     kfo = KeyframeOverlap.kf_overlap()
     kfo.show_ui()
