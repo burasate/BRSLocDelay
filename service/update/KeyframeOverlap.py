@@ -918,7 +918,7 @@ class kf_overlap:
         self.element['blend_ovl_cb'] = cmds.menuItem(cb=0, label='Loop overlap')
         cmds.menuItem(divider=1, dividerLabel='Bake animation options')
         self.element['breakdown_cb'] = cmds.menuItem(cb=0, label='Breakdown keys')
-        self.element['bake_adapt_cb'] = cmds.menuItem(cb=0, label='Reduced keys')
+        self.element['bake_adapt_cb'] = cmds.menuItem(cb=1, label='Reduced keys')
         self.element['bake_layer_cb'] = cmds.menuItem(cb=0, label='Animation layer')
 
         cmds.columnLayout(adj=1, w=self.win_width)
