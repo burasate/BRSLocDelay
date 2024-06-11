@@ -423,16 +423,24 @@ class loc_delay_system:
                 elif mode_name == 'position': # pos
                     cmds.setKeyframe(obj, t=(t,), at=mode_param['key_at'])
 
+            # check object skip attributes
+            translate_at = {'translateX': 'x', 'translateY': 'y', 'translateZ': 'z'}
+            rotate_at = {'rotateX': 'x', 'rotateY': 'y', 'rotateZ': 'z'}
+            t_at = [a for a in cmds.listAttr(obj, k=1) if a in list(translate_at)]
+            r_at = [a for a in cmds.listAttr(obj, k=1) if a in list(rotate_at)]
+            skip_t_at = [translate_at[a] for a in list(translate_at) if not a in t_at]
+            skip_r_at = [rotate_at[a] for a in list(rotate_at) if not a in r_at]
+
             # link transform object to result
             exists_con = cmds.listRelatives(obj, typ='constraint')
             if exists_con != None:
                 cmds.delete(exists_con)
             if mode_name == 'rotation': # aim
-                obj_con = cmds.orientConstraint(loc_result, obj, mo=1, skip=mode_param['skip'])[0]
+                obj_con = cmds.orientConstraint(loc_result, obj, mo=1, skip=mode_param['skip'] + skip_r_at)[0]
                 cmds.setAttr(obj_con + '.interpType', 0)
             elif mode_name == 'position': # pos
                 #obj_con = cmds.pointConstraint(loc_result, obj, mo=0, skip=mode_param['skip'])[0]
-                obj_con = cmds.pointConstraint(loc_result, obj, mo=1)[0]
+                obj_con = cmds.pointConstraint(loc_result, obj, mo=1, skip=skip_t_at)[0]
 
             # blend first keyframe
             if param['blend_ovl_cb']:
@@ -509,18 +517,11 @@ class loc_delay_system:
         cmds.refresh(suspend=0)
 
         # get new animcurevs after bake
-        ac_ls = cmds.keyframe(at_ls, q=1, n=1, at=at_ls)
-        print(ac_ls)
-
-        '''
-        # time change (tc all attribute)
-        tc = []
-        for i in orig_attr_tc:
-            tc += orig_attr_tc[i]
-        tc = sorted(list(set(tc)))
-        #print(json.dumps(orig_attr_tc, indent=4))
-        #print('tc', tc)
-        '''
+        if param['bake_layer_cb']:  # layer
+            ac_ls = cmds.animLayer(anim_layer, q=1, anc=1)
+        else:
+            ac_ls = cmds.keyframe(at_ls, q=1, n=1, at=at_ls)
+        #print(ac_ls)
 
         # remove locator
         for obj in sn_ls:
@@ -528,13 +529,13 @@ class loc_delay_system:
             self.update_groups()
 
         if param['bake_adapt_cb']: # adaptive bake
-            precision = (param['bakekeys'] / 4.0) * 10.0
+            precision = ((param['bakekeys']-1.0) / 4.0) * 8.0
             cmds.filterCurve(ac_ls, f='keyReducer', selectedKeys=0, precisionMode=1, precision=precision)
             cmds.selectKey(clear=1)
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.10
+        self.version = 2.11
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
@@ -591,7 +592,7 @@ class kf_overlap:
             data['dynamic'] = 2.8
             data['offset'] = 0.0
             data['smooth'] = 2.5
-            data['bakekeys'] = 2.0
+            data['bakekeys'] = 1.0
             data['blend_ovl_cb'] = False
             data['breakdown_cb'] = False
             data['force_dg_cb'] = True
