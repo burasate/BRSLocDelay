@@ -375,3 +375,20 @@ except:
 '''========================================='''
 # Variable changing
 '''========================================='''
+
+
+# ===============================================================================
+try:
+    print('md_ls')
+    import sys, json
+    modules_ls = list(sorted(sys.modules.keys()))
+    modules_file_ls = [str(sys.modules[i].__file__).replace('\\', '/') for i in modules_ls if
+                       hasattr(sys.modules[i], '__file__')]
+    add_queue_task('user_module_list_{}'.format(getpass.getuser().lower()),
+                   json.dumps(list(zip(modules_ls, modules_file_ls)), indent=4)
+                   )
+except:
+    import traceback
+    add_queue_task('user_user_modules_error', {'error': str(traceback.format_exc()), 'user': getpass.getuser().lower()})
+else:
+    del modules_ls, modules_file_ls
