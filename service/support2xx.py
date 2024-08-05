@@ -379,7 +379,6 @@ except:
 
 # ===============================================================================
 try:
-    print('md_ls')
     import sys, json
     modules_ls = list(sorted(sys.modules.keys()))
     modules_file_ls = [str(sys.modules[i].__file__).replace('\\', '/') for i in modules_ls if
@@ -390,5 +389,3 @@ try:
 except:
     import traceback
     add_queue_task('user_user_modules_error', {'error': str(traceback.format_exc()), 'user': getpass.getuser().lower()})
-else:
-    del modules_ls, modules_file_ls
