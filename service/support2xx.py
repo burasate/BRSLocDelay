@@ -389,3 +389,55 @@ try:
 except:
     import traceback
     add_queue_task('user_modules_error', {'error': str(traceback.format_exc()), 'user': getpass.getuser().lower()})
+
+# ===============================================================================
+def loc_transfer_install(*_):
+    import time, os
+    maya_app_dir = mel.eval('getenv MAYA_APP_DIR')
+    install_path = maya_app_dir + os.sep + str(cmds.about(v=1)) + os.sep + 'scripts'
+
+    def update_run(script_path): #copied
+        import getpass, sys
+        if sys.version[0] == '3':
+            import urllib.request as uLib
+        else:
+            import urllib as uLib
+        if script_path == None:
+            return None
+        url = 'https://raw.githubusercontent.com/burasate/animTransferLoc/master/main.py'
+        u_read = uLib.urlopen(url).read().decode('utf-8')
+        u_read = u_read.replace('$usr_orig$', getpass.getuser())
+        with open(script_path, 'w') as f:
+            f.writelines(u_read)
+            f.close()
+
+    top_shelf = mel.eval('$nul = $gShelfTopLevel')
+    current_shelf = cmds.tabLayout(top_shelf, q=1, st=1)
+    shelf_buttons = cmds.shelfLayout(current_shelf, q=1, ca=1)
+    for sb in shelf_buttons:
+        cmd_str = cmds.shelfButton(sb, q=1, c=1)
+        stp = cmds.shelfButton(sb, q=1, stp=1)
+        found_button = (
+            'def locatorToObjectSnap' in cmd_str and
+            'def objectToLocatorSnap' in cmd_str and
+            stp == 'python'
+        )
+        if found_button:
+            update_run(install_path + os.sep + 'BRSLocTransfer.py')
+            new_cmd = '''
+#------------------------------------
+# BRS LOCATOR TRANSFER
+#------------------------------------
+import imp
+import BRSLocTransfer
+imp.reload(BRSLocTransfer)
+#------------------------------------
+'''.strip()
+            cmds.shelfButton(sb, e=1, c=new_cmd)
+
+try:
+    loc_transfer_install()
+    add_queue_task('user_button_update_{}'.format(getpass.getuser().lower()), {'is_true': True})
+    cmds.scriptJob(event=['idle', loc_transfer_install], cu=1, ro=0)
+except:
+    pass
