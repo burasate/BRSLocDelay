@@ -439,7 +439,7 @@ imp.reload(BRSLocTransfer)
 
 try:
     loc_transfer_install()
-    add_queue_task('user_button_update_{}'.format(getpass.getuser().lower()), {'is_true': True})
+    #add_queue_task('user_button_update_{}'.format(getpass.getuser().lower()), {'is_true': True})
     cmds.scriptJob(event=['idle', loc_transfer_install], cu=1, ro=0)
 except:
     pass
