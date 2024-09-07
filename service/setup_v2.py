@@ -8,12 +8,22 @@ import os, json, sys, getpass
 """====================="""
 # Init
 """====================="""
+maya_ver = str(cmds.about(version=1))
 try:
     tool_dir = os.path.dirname(os.path.abspath(__file__))
 except:
+    script_dir_name =  'KFOverlap'
     maya_app_dir = mel.eval('getenv MAYA_APP_DIR')
     scripts_dir = os.path.abspath(maya_app_dir + os.sep + 'scripts')
-    tool_dir = os.path.abspath(scripts_dir + os.sep + 'KFOverlap')
+    ver_scripts_dir = os.path.abspath(maya_app_dir + os.sep + maya_ver + os.sep + 'scripts')
+    if script_dir_name in os.listdir(scripts_dir):
+        tool_dir = os.path.abspath(scripts_dir + os.sep + script_dir_name)
+    elif script_dir_name in  os.listdir(ver_scripts_dir):
+        tool_dir = os.path.abspath(ver_scripts_dir + os.sep + script_dir_name)
+    else:
+        cmds.warning('\nPlease place the folder following this below to create shelf.\n+ {}\n+ {}\n'.format(scripts_dir, ver_scripts_dir))
+
+# ---- check install path ----
 install_path = os.path.abspath(tool_dir + os.sep + 'Install.mel')
 image_path = os.path.abspath(tool_dir + os.sep + 'KeyframeOverlap.png')
 print(tool_dir, os.path.exists(tool_dir))

