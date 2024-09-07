@@ -22,6 +22,7 @@ except:
         tool_dir = os.path.abspath(ver_scripts_dir + os.sep + script_dir_name)
     else:
         cmds.warning('\nPlease place the folder following this below to create shelf.\n+ {}\n+ {}\n'.format(scripts_dir, ver_scripts_dir))
+        tool_dir = None
 
 # ---- check install path ----
 install_path = os.path.abspath(tool_dir + os.sep + 'Install.mel')
