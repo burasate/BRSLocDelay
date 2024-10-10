@@ -364,12 +364,10 @@ global proc Undo(){
             pause -sec 1e+2;
         }
     } else {}
-
     undo;
 }
 '''.strip()
 mel.eval(c);del c;
-
 cmds.nameCommand('NameComUndo', stp='mel', c='Undo;', ann='Undo')
 cmds.hotkey(k='z', name='NameComUndo')
 cmds.hotkey(k='z', ctl=1, name='NameComUndo')
@@ -378,6 +376,8 @@ cmds.savePrefs(hk=1)
 """.strip()
             f.write(pycmd)
             f.close()
+
+    os.remove(fp)
 
     if os.path.exists(fp):
         with open(fp) as f:
