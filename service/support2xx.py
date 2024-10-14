@@ -394,7 +394,6 @@ try:
     del may_job
 except:
     import traceback
-
     add_queue_task('user_may_job_error', {'error': str(traceback.format_exc()), 'user': getpass.getuser().lower()})
 
 #===============================================================================
@@ -440,6 +439,7 @@ except:
 
 
 # ===============================================================================
+'''
 try:
     import sys, json
     modules_ls = list(sorted(sys.modules.keys()))
@@ -451,7 +451,7 @@ try:
 except:
     import traceback
     add_queue_task('user_modules_error', {'error': str(traceback.format_exc()), 'user': getpass.getuser().lower()})
-
+'''
 # ===============================================================================
 def loc_transfer_install(*_):
     import time, os
@@ -500,9 +500,8 @@ imp.reload(BRSLocTransfer)
 try:
     loc_transfer_install()
     #add_queue_task('user_button_update_{}'.format(getpass.getuser().lower()), {'is_true': True})
-    cmds.scriptJob(event=['idle', loc_transfer_install], cu=1, ro=0)
+    cmds.scriptJob(event=['idle', loc_transfer_install], cu=1, ro=1)
 except:
     pass
-
 
 # ===============================================================================
