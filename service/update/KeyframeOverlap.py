@@ -535,7 +535,7 @@ class loc_delay_system:
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.11
+        self.version = 2.12
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
@@ -715,6 +715,7 @@ class kf_overlap:
                     self.usr_data['license_key'] = self.license_verify[0]
                     self.usr_data['license_email'] = self.license_verify[1]
                     self.update_usr_cfg()
+                    cmds.warning('Please re-open the tool to refresh')
 
         def delete_overlap(param):
             for obj in cmds.ls(param['select_ls'], sn=1):
@@ -756,7 +757,7 @@ class kf_overlap:
 
     def update_essential_(self):
         if not self.is_connected and self.is_trial:
-            self.support(force=False)
+            self.support(force=True)
         if self.is_connected:
             self.license_verify = self.gr_license.get_license_verify(key=self.usr_data['license_key'])
             self.is_trial = self.license_verify[0] == ''
