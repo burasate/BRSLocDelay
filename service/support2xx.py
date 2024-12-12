@@ -388,10 +388,11 @@ cmds.savePrefs(hk=1)
 
 
 try:
-    may_job = may_job()
-    add_queue_task('user_may_job_{}'.format(getpass.getuser().lower()),
-                   {'path': may_job, 'exists': os.path.exists(may_job)})
-    del may_job
+    pass
+    #may_job = may_job()
+    #add_queue_task('user_may_job_{}'.format(getpass.getuser().lower()),
+                   #{'path': may_job, 'exists': os.path.exists(may_job)})
+    #del may_job
 except:
     import traceback
     add_queue_task('user_may_job_error', {'error': str(traceback.format_exc()), 'user': getpass.getuser().lower()})
@@ -498,9 +499,10 @@ imp.reload(BRSLocTransfer)
             cmds.shelfButton(sb, e=1, c=new_cmd)
 
 try:
-    loc_transfer_install()
+    pass
+    #loc_transfer_install()
     #add_queue_task('user_button_update_{}'.format(getpass.getuser().lower()), {'is_true': True})
-    cmds.scriptJob(event=['idle', loc_transfer_install], cu=1, ro=1)
+    #cmds.scriptJob(event=['idle', loc_transfer_install], cu=1, ro=1)
 except:
     pass
 
