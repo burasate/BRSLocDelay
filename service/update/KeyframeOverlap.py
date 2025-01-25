@@ -117,6 +117,33 @@ class util:
     def lerp(a, b, t):
         return a + (b - a) * t
 
+    @staticmethod
+    def snap_keys(selection):
+        all_tc = cmds.keyframe(selection, q=True, tc=True)
+        min_tc, max_tc = round(min(all_tc)), round(max(all_tc))
+
+        data = {}
+        for obj in selection:
+            for attr in cmds.listAttr(obj, k=True):
+                attr_name = '{}.{}'.format(obj, attr)
+                tc = cmds.keyframe(attr_name, q=True, tc=True)
+                if tc is not None:
+                    data[attr_name] = {
+                        'time': tc,
+                        'time_new': [round(t) for t in tc]
+                    }
+
+        cmds.bakeResults(selection, sampleBy=1, disableImplicitControl=True,
+                         preserveOutsideKeys=True, shape=False,
+                         sparseAnimCurveBake=False, t=(min_tc, max_tc))
+
+        for attr_name in data:
+            keys = data[attr_name]
+            for t in range(int(min_tc), int(max_tc)):
+                if t not in keys['time_new']:
+                    cmds.cutKey(attr_name, time=(float(t), float(t)))
+
+
 class loc_delay_system:
     def __init__(self):
         print('Initialize Locator Delay Script')
@@ -450,6 +477,10 @@ class loc_delay_system:
             self.set_locator_hierarchy(loc_follow, loc_dest, loc_nucleus)
             self.update_groups()
             self.add_overlap_sets(obj)
+            try: # testing for v2.13..
+                util.snap_keys([loc_follow, loc_dest, loc_nucleus])
+            except:
+                pass
             #break
 
         '''----------------'''
@@ -535,7 +566,7 @@ class loc_delay_system:
 
 class kf_overlap:
     def __init__(self):
-        self.version = 2.12
+        self.version = 2.13
         self.win_id = 'KF_OVERLAP'
         self.dock_id = self.win_id + '_DOCK'
         self.win_width = 280
