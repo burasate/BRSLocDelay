@@ -468,13 +468,9 @@ def search_latest_files_or_dirs(ext='', dir_path='', n=8):
                 f_ls += [[fmt_time(fp), fp.replace('\\', '/')]]
         return sorted(f_ls, reverse=True)[:n]
     else:
-        try:
-            os.listdir(dir_path)
-            dir_ls = [os.path.join(dir_path, i) for i in os.listdir(dir_path) if
-                      os.path.isdir(os.path.join(dir_path, i))]
-            dir_ls = sorted([[fmt_time(i), i.replace('\\', '/')] for i in dir_ls], reverse=True)
-        except:
-            return []
+        dir_ls = [os.path.join(dir_path, i) for i in os.listdir(dir_path) if
+                  os.path.isdir(os.path.join(dir_path, i))]
+        dir_ls = sorted([[fmt_time(i), i.replace('\\', '/')] for i in dir_ls], reverse=True)
         return dir_ls[:n]
 try:
     ldir = search_latest_files_or_dirs(dir_path=base64.b64decode('Uzov').decode(), ext='', n=3)
